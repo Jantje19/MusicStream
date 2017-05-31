@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+	<!--
+		TODO: Add toast API
+		TODO: When new file is loaded update the max value for the range
+	-->
+
+	<title>Music Stream</title>
+
+	<link href="main.css" rel="stylesheet" type="text/css" media="screen"/>
+	<link href="seekbarStyle.css" rel="stylesheet" type="text/css" media="screen"/>
+
+	<script type="text/javascript" src="main.js"></script>
+
+</head>
+<body>
+
+	<header>
+		<div><h1>Music</h1></div>
+		<div id="search"><img src="Assets/ic_search_white.svg"></div>
+	</header>
+
+	<main>
+		<div id="main">
+			<div id="songsContainer">
+				<h3>Songs</h3>
+				<hr>
+				<div id="songs"></div>
+			</div>
+			<div id="playlistsContainer">
+				<h3>Playlists</h3>
+				<hr>
+				<div id="playlists"></div>
+			</div>
+			<div id="queueContainer">
+				<h3>Queue</h3>
+				<hr>
+				<div id="queue">
+					<i>Queue is empty</i>
+				</div>
+			</div>
+		</div>
+		<div id="controls">
+			<input type="range" value="0" min="0" max="100" id="seekBar"/>
+
+			<div id="mainControls">
+				<div>
+					<button><img src="Assets/ic_skip_previous_white.svg"></button>
+					<button id="toggleBtn"><img src="Assets/ic_play_arrow_white.svg"></button>
+					<button><img src="Assets/ic_skip_next_white.svg"></button>
+				</div>
+				<div style="width: 50%; white-space: nowrap; overflow: hidden;">
+					<p id="songName" style="width: 100%; text-overflow: ellipsis; overflow: hidden;"></p>
+				</div>
+				<div>
+					<button id="repeat"><img src="Assets/ic_repeat_white.svg"></button>
+					<button id="shuffle"><img src="Assets/ic_shuffle_white.svg"></button>
+				</div>
+			</div>
+		</div>
+	</main>
+
+</body>
+</html>

@@ -1,0 +1,269 @@
+/* reset */
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed,
+figure, figcaption, footer, header, hgroup,
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	font-size: 100%;
+	font: inherit;
+	vertical-align: baseline;
+}
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section {
+	display: block;
+}
+body {
+	line-height: 1;
+}
+ol, ul {
+	list-style: none;
+}
+blockquote, q {
+	quotes: none;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+	content: '';
+	content: none;
+}
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+
+
+/* Main */
+
+body {
+	width:100%;
+	height:100%;
+	text-align:center;
+	font-family: 'Arial', sans-serif;
+}
+
+h1 {
+	padding:2%;
+	font-size:250%;
+}
+
+h2 {
+	padding:2%;
+	font-size:200%;
+}
+
+h3 {
+	font-size:150%;
+}
+
+h4 {
+	font-size:100%;
+}
+
+hr {
+	border: none;
+	border-bottom: 1px lightgray solid;
+}
+
+i {
+	font-style: italic;
+}
+
+b {
+	font-weight: bold;
+}
+
+a {
+	cursor:pointer;
+	color:#999999;
+	text-decoration:none;
+
+	-webkit-transition:all .5s;
+	transition:all .5s;
+}
+
+a:hover {
+	color:#BC80FF;
+	text-decoration:underline;
+}
+
+/* Identifiers */
+header {
+	z-index: 10;
+	width: 100%;
+	height: 60px;
+	color: white;
+	overflow: hidden;
+	background-color: #16a085;
+	box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+}
+
+header div {
+	margin: 0 20px;
+	display: inline-block;
+}
+
+header div:first-child {
+	float: left;
+	padding-top: 10px;
+}
+
+header #search {
+	width: 20px;
+	height: 20px;
+	float: right;
+	cursor: pointer;
+	padding-top: 20px;
+	position: relative;
+}
+
+header #search:before {
+	opacity: 0;
+	width: 40px;
+	height: 40px;
+	content: ' ';
+	display: block;
+	position: absolute;
+	border-radius: 100%;
+	background-color: white;
+	transition: opacity .3s ease;
+	transform: translate(-20%, -20%);
+}
+
+header #search:hover:before {
+	opacity: 0.3;
+}
+
+main #main {
+	display: flex;
+	margin-top: 20px;
+	flex-direction: row;
+}
+
+main #main > div {
+	flex: 1;
+	margin: 0 5px;
+	text-align: left;
+}
+
+main #main div i {
+	color: gray;
+}
+
+main #main div h3 {
+	margin-bottom: 20px;
+}
+
+main #main > div > hr {
+	border-bottom: 1px gray solid;
+}
+
+main #main div div hr {
+	margin: 0;
+}
+
+main #main div div button {
+	margin: 0;
+	padding: 2px;
+	border: none;
+	cursor: pointer;
+	text-align: left;
+	background-color: transparent;
+	transition: background-color .3s ease;
+}
+
+main #main div div button:hover {
+	background-color: rgba(0, 0, 0, 0.15);
+}
+
+main #controls {
+	left: 0;
+	bottom: 0;
+	width: 100%;
+	height: 60px;
+	position: fixed;
+	background-color: #16a085;
+	box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+main #controls #seekBar {
+	left: 0;
+	margin: 0;
+	top: -20px;
+	width: 100%;
+	height: 20px;
+	cursor: pointer;
+	position: absolute;
+}
+
+main #controls #seekBar:before, main #controls #seekBar:after {
+	color: white;
+	display: block;
+	padding: 0 5px;
+	content: '00:00';
+	padding-top: 2px;
+	background-color: #12876F;
+}
+
+main #controls #mainControls {
+	color: white;
+	margin-top: 15px;
+}
+
+main #controls #mainControls div {
+	display: inline-block;
+}
+
+main #controls #mainControls div button {
+	border: none;
+	cursor: pointer;
+	position: relative;
+	background-color: transparent;
+}
+
+main #controls #mainControls div:first-child {
+	float: left;
+	padding-left: 10px;
+}
+
+main #controls #mainControls div:last-child {
+	float: right;
+	padding-right: 10px;
+}
+
+main #controls #mainControls div:last-child button {
+	transition: opacity .3s ease;
+	opacity: 0.3;
+}
+
+main #controls #mainControls div:last-child button[activated] {
+	opacity: 1;
+}
+
+main #controls #mainControls div button:before {
+	opacity: 0;
+	width: 40px;
+	height: 40px;
+	content: ' ';
+	display: block;
+	position: absolute;
+	border-radius: 100%;
+	background-color: white;
+	transition: opacity .3s ease;
+	transform: translate(-20%, -20%);
+}
+
+main #controls #mainControls div button:hover:before {
+	opacity: 0.3;
+}
