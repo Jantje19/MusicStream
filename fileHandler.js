@@ -5,17 +5,16 @@ module.exports = {
 		const folderPath = os.homedir() + '/Music/';
 
 		return new Promise((resolve, reject) => {
+			console.log('Starting checking files');
 			return handleFolders(folderPath, utils).then(() => {
-				setTimeout(() => {
-					jsonFileArr = {songs: songsArr, playlists: playlistsArr};
+				jsonFileArr = {songs: songsArr, playlists: playlistsArr};
 
-					fs.writeFile(__dirname + '/JSON.json', JSON.stringify(jsonFileArr), (err) => {
-						if (err) throw err;
-						else console.log('Updated the Json file');
-					});
+				fs.writeFile(__dirname + '/JSON.json', JSON.stringify(jsonFileArr), (err) => {
+					if (err) throw err;
+					else console.log('Updated the Json file');
+				});
 
-					resolve(jsonFileArr);
-				}, 500);
+				resolve(jsonFileArr);
 			}).catch(err => {
 				reject(err);
 			});
@@ -37,7 +36,9 @@ module.exports = {
 
 									if (fileExtentions.contains(fileExtention)) songsArr.push({path: path, fileName: object});
 									else if (fileExtention == '.m3u') playlistsArr.push({path: path, fileName: object});
-									else handleFolders(path + object + '/');
+									else if (fileExtention) console.log('File extention not supported', object);
+									else if (!fileExtention) handleFolders(path + object + '/', utils);
+									else console.warn('Something is weird...', object, fileExtention);
 								}
 							});
 

@@ -16,7 +16,6 @@ module.exports = {
 				const playlists = [];
 
 				json.songs.forEach((object, key) => {
-					console.log(object);
 					songs.push(object.fileName);
 				});
 
