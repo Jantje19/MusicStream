@@ -26,7 +26,17 @@ function next() {
 }
 
 function previus() {
+	const newIndex = queueIndex - 1;
 
+	if (queueIndex > 0) {
+		queueIndex = newIndex;
+	} else {
+		if (document.getElementById('repeat').getAttribute('activated') != null) queueIndex = queue.length - 1;
+		else return;
+	}
+
+	updateInterface();
+	playSong(queue[queueIndex], true);
 }
 
 function deleteQueue() {
