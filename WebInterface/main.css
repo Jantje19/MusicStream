@@ -122,7 +122,20 @@ header div:first-child {
 	padding-top: 10px;
 }
 
-header #search {
+header #searchBar {
+	height: 20px;
+	display: none;
+	padding-top: 15px;
+}
+
+header #searchBar input {
+	padding: 5px;
+	border: none;
+	color: #16a085;
+	text-align: center;
+}
+
+header #searchBtn {
 	width: 20px;
 	height: 20px;
 	float: right;
@@ -131,7 +144,7 @@ header #search {
 	position: relative;
 }
 
-header #search:before {
+header #searchBtn:before {
 	opacity: 0;
 	width: 40px;
 	height: 40px;
@@ -144,7 +157,7 @@ header #search:before {
 	transform: translate(-20%, -20%);
 }
 
-header #search:hover:before {
+header #searchBtn:hover:before {
 	opacity: 0.3;
 }
 

@@ -1,3 +1,4 @@
+let data;
 let clickTimer;
 
 const cssRules = [];
@@ -133,7 +134,52 @@ function load() {
 		}
 	});
 
+	document.getElementById('searchBtn').addEventListener('click', evt => {
+		const searchBar = document.getElementById('searchBar');
+		const searchInp = document.getElementById('searchInp');
+
+		if (searchBar.style.display == 'inline-block') {
+			searchInp.blur();
+			searchInp.value = '';
+			searchBar.style.display = 'none';
+		} else {
+			searchBar.style.display = 'inline-block';
+			searchInp.focus();
+		}
+	});
+
+	document.getElementById('searchInp').addEventListener('keyup', evt => {
+		const string = evt.target.value;
+
+		const songArr = searchArr(string, data.songs);
+		const playlistArr = searchArr(string, data.playlists);
+
+		songsElem.innerHTML = '';
+		playlistsElem.innerHTML = '';
+
+		songArr.forEach((object, key) => {
+			songsElem.innerHTML += `<button class="song ${key}" onclick="songClick(this)">${object}</button><hr>`;
+		});
+
+		playlistArr.forEach((object, key) => {
+			playlistsElem.innerHTML += `<button class="listElem ${key}" onclick="handlePlaylist('${object}')">${object}</button><hr>`;
+		});
+
+		function searchArr(query, array) {
+			const outp = [];
+
+			for (let i = 0; i < array.length; i++) {
+				const item = array[i];
+				if (item.toString().toLowerCase().indexOf(query.toString().toLowerCase()) > -1) outp.push(item);
+			}
+
+			return outp;
+		}
+	});
+
 	getData().then(json => {
+		data = json;
+
 		if (json.songs.length > 0) {
 			json.songs.forEach((object, key) => {
 				songsElem.innerHTML += `<button class="song ${key}" onclick="songClick(this)">${object}</button><hr>`;
