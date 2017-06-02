@@ -154,8 +154,8 @@ function load() {
 		const songArr = searchArr(string, data.songs);
 		const playlistArr = searchArr(string, data.playlists);
 
-		songsElem.innerHTML = '';
-		playlistsElem.innerHTML = '';
+		if (songArr.length > 0) songsElem.innerHTML = '';
+		if (playlistArr.length > 0) playlistsElem.innerHTML = '';
 
 		songArr.forEach((object, key) => {
 			songsElem.innerHTML += `<button class="song ${key}" onclick="songClick(this)">${object}</button><hr>`;
