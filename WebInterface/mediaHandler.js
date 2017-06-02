@@ -97,8 +97,8 @@ function updateInterface() {
 		elem.innerHTML = '';
 
 		queue.forEach((object, key) => {
-			if (key == queueIndex) elem.innerHTML += `<button onclick="queueClick('${key}')" style="background-color: lightblue;"><span>${key + 1}</span><span>${object}</button></div><hr>`;
-			else elem.innerHTML += `<button onclick="queueClick('${key}')"><span>${key + 1}</span><span>${object}</button></div><hr>`;
+			if (key == queueIndex) elem.innerHTML += `<button title="${object}" onclick="queueClick('${key}')" style="background-color: lightblue;"><span>${key + 1}</span><span>${object}</button></div><hr>`;
+			else elem.innerHTML += `<button title="${object}" onclick="queueClick('${key}')"><span>${key + 1}</span><span>${object}</button></div><hr>`;
 
 			elem.innerHTML += '<br>';
 		});

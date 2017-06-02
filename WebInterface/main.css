@@ -157,6 +157,7 @@ main #main {
 
 main #main > div {
 	flex: 1;
+	width: 30%;
 	margin: 0 5px;
 	text-align: left;
 }
@@ -209,6 +210,8 @@ main #main div div button {
 	border: none;
 	cursor: pointer;
 	text-align: left;
+	overflow: hidden;
+	text-overflow: ellipsis;
 	background-color: transparent;
 	transition: background-color .3s ease;
 }
@@ -219,6 +222,22 @@ main #main div div button:before {
 
 main #main div div button:hover {
 	background-color: rgba(0, 0, 0, 0.15);
+}
+
+main #main #queueContainer #queue button {
+	display: flex;
+	overflow: hidden;
+}
+
+main #main #queueContainer #queue button span {
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+main #main #queueContainer #queue button span:first-child {
+	overflow: visible;
+	margin-right: 10%;
 }
 
 main #controls {

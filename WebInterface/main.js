@@ -14,6 +14,7 @@ function getData() {
 
 function handlePlaylist(name) {
 	get('/playlist/' + name).then(json => {
+		if (document.getElementById('shuffle')) json.songs.shuffle();
 		deleteQueue();
 		enqueue(...json.songs);
 		playSong(queue[queueIndex], true);
@@ -123,9 +124,11 @@ function load() {
 	document.getElementById('shuffle').addEventListener('click', evt => {
 		const val = evt.target.getAttribute('activated');
 
-		if (val) {
+		if (val != null) {
 			evt.target.removeAttribute('activated');
 		} else {
+			queue.shuffle();
+			updateInterface();
 			evt.target.setAttribute('activated', '');
 		}
 	});
@@ -145,6 +148,22 @@ function load() {
 	}).catch(err => {
 		console.error('Something went wrong', err);
 	});
+}
+
+Array.prototype.shuffle = function() {
+	let randomIndex;
+	let currentIndex = this.length;
+
+	while (0 !== currentIndex) {
+		randomIndex = Math.floor(Math.random() * currentIndex);
+		currentIndex--;
+
+		const temporaryValue = this[currentIndex];
+		this[currentIndex] = this[randomIndex];
+		this[randomIndex] = temporaryValue;
+	}
+
+	return this;
 }
 
 window.onload = load;
