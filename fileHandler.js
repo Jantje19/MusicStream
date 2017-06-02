@@ -7,14 +7,18 @@ module.exports = {
 		return new Promise((resolve, reject) => {
 			console.log('Starting checking files');
 			return handleFolders(folderPath, utils).then(() => {
-				jsonFileArr = {songs: songsArr, playlists: playlistsArr};
+				setTimeout(() => {
+					jsonFileArr = {songs: songsArr, playlists: playlistsArr};
 
-				fs.writeFile(__dirname + '/JSON.json', JSON.stringify(jsonFileArr), (err) => {
-					if (err) throw err;
-					else console.log('Updated the Json file');
-				});
+					console.log(jsonFileArr);
 
-				resolve(jsonFileArr);
+					fs.writeFile(__dirname + '/JSON.json', JSON.stringify(jsonFileArr), (err) => {
+						if (err) throw err;
+						else console.log('Updated the Json file');
+					});
+
+					resolve(jsonFileArr);
+				}, 500);
 			}).catch(err => {
 				reject(err);
 			});
@@ -52,15 +56,50 @@ module.exports = {
 		}
 	},
 
-	// getPlaylistArr: function(fs) {
-	// 	readPlayList: function(fs, dir) {
-	// 		fs.readFile(dir).then(content => {
-	// 			console.log(content);
-	// 		}).catch(err => {
-	// 			console.log(err);
-	// 		})
-	// 	}
-	// },
+	readPlayList: function(fs, path, songsArr) {
+		// Check if file exists
+		// Load the file from disk
+		// Check if all the songs are in the json
+
+		return new Promise((resolve, reject) => {
+			fs.exists(path, exists => {
+				if (exists) {
+					fs.readFile(path, 'utf-8', (err, data) => {
+						if (err) reject(err);
+						else {
+							const songs = [];
+							data = data.replace('#EXTM3U', '');
+
+							data.split(/#EXTINF:[0-9]+,.+/).forEach((object, key) => {
+								object = object.trim();
+
+								if (object != '') {
+									const match = object.match(/(.+)\/(.+)$/);
+									if (match) {
+										const songName = match[2].trim();
+
+										console.log(songName, findSong(songsArr, songName));
+
+										if (findSong(songsArr, songName) == true) songs.push(songName);
+									}
+								}
+							});
+
+							resolve(songs);
+						}
+					});
+				} else reject('File doesn\'t exist');
+			});
+		});
+
+		function findSong(songs, songName) {
+			for (let i = 0; i < songs.length; i++) {
+				if (songs[i].fileName == songName) return true;
+			}
+
+			return false;
+		}
+	},
 
 	getJSON: function(fs, os, fileExtentions, utils) {
 		return new Promise((resolve, reject) => {

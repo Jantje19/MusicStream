@@ -4,7 +4,7 @@ const server = require('./server.js');
 const querystring = require('querystring');
 const fileHandler = require('./fileHandler.js');
 
-const fileExtentions = ['.mp3'];
+const fileExtentions = ['.mp3', '.m3a', '.wav'];
 
 const utils = {
 	getFileExtention: function(fileName) {
