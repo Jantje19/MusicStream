@@ -12,8 +12,9 @@ function getData() {
 
 function handlePlaylist(name) {
 	get('/playlist/' + name).then(json => {
-		queue.push(...json.songs);
-		updateQueue();
+		deleteQueue();
+		enqueue(...json.songs);
+		playSong(queue[queueIndex], true);
 	}).catch( err => {
 		console.error('An error occurred', err);
 	});
@@ -32,6 +33,11 @@ function get(url) {
 			}
 		}).catch(err => reject(err));
 	});
+}
+
+function queueClick(index) {
+	queueIndex = index;
+	playSong(null, true);
 }
 
 function updateCSS(newValBefore, newValAfter) {
@@ -62,9 +68,9 @@ function load() {
 	const playlistsElem = document.getElementById('playlists');
 
 	document.getElementById('toggleBtn').addEventListener('click', evt => {
-		if (audio.src != '' && audio.src != undefined) {
+		if (queue.length > 0) {
 			if (audio.paused == true) {
-				playSong();
+				playSong(null, true);
 			} else if (audio.paused == false) {
 				pauseSong();
 			} else {
@@ -90,7 +96,7 @@ function load() {
 	document.getElementById('repeat').addEventListener('click', evt => {
 		const val = evt.target.getAttribute('activated');
 
-		if (val) {
+		if (val != null) {
 			evt.target.removeAttribute('activated');
 		} else {
 			evt.target.setAttribute('activated', '');
@@ -103,14 +109,14 @@ function load() {
 		if (val) {
 			evt.target.removeAttribute('activated');
 		} else {
-			evt.target.setAttribute('activated', ' ');
+			evt.target.setAttribute('activated', '');
 		}
 	});
 
 	getData().then(json => {
 		if (json.songs.length > 0) {
 			json.songs.forEach((object, key) => {
-				songsElem.innerHTML += `<button class="song ${key}" onclick="playSong('${object}')">${object}</button><hr>`;
+				songsElem.innerHTML += `<button class="song ${key}" ondblclick="playSong('${object}')" onclick="enqueue('${object}')">${object}</button><hr>`;
 			});
 		} else songsElem.innerHTML = '<i>No songs</i>';
 

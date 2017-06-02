@@ -1,8 +1,13 @@
 const queue = [];
 let queueIndex = 0;
 
-function enqueue(val) {
-	queue[queue.length] = val;
+function enqueue(...vals) {
+	if (vals.length > 1) {
+		vals.forEach((object, key) => {
+			queue[queue.length] = object;
+		});
+	} else queue[queue.length] = vals[0];
+
 	updateInterface();
 }
 
@@ -31,6 +36,7 @@ function deleteQueue() {
 }
 
 function playSong(songName, notAddToQueue) {
+	if (!songName) songName = queue[queueIndex];
 	audio.src = '/song/' + songName;
 	if (!notAddToQueue) enqueue(songName);
 	startSong();
@@ -62,8 +68,8 @@ function updateInterface() {
 		elem.innerHTML = '';
 
 		queue.forEach((object, key) => {
-			if (key == queueIndex) elem.innerHTML += `<span style="background-color: green;">${key} - ${object}</span><hr>`;
-			else elem.innerHTML += key + ' - ' + object + '<hr>';
+			if (key == queueIndex) elem.innerHTML += `<button onclick="queueClick('${key}')" style="background-color: lightblue;"><span>${key}</span><span>${object}</button></div><hr>`;
+			else elem.innerHTML += `<button onclick="queueClick('${key}')"><span>${key}</span><span>${object}</button></div><hr>`;
 
 			elem.innerHTML += '<br>';
 		});
