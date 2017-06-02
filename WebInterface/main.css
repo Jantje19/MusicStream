@@ -47,9 +47,12 @@ table {
 /* Main */
 
 body {
+	top: 0;
+	left: 0;
 	width:100%;
 	height:100%;
 	text-align:center;
+	position: absolute;
 	font-family: 'Arial', sans-serif;
 }
 
@@ -148,6 +151,7 @@ header #search:hover:before {
 main #main {
 	display: flex;
 	margin-top: 20px;
+	margin-bottom: 80px;
 	flex-direction: row;
 }
 
@@ -162,7 +166,32 @@ main #main div i {
 }
 
 main #main div h3 {
+	display: inline;
 	margin-bottom: 20px;
+}
+
+main #main button {
+	border: none;
+	cursor: pointer;
+	position: relative;
+	background-color: transparent;
+}
+
+main #main button:before {
+	opacity: 0;
+	width: 40px;
+	height: 40px;
+	content: ' ';
+	display: block;
+	position: absolute;
+	border-radius: 100%;
+	background-color: black;
+	transition: opacity .3s ease;
+	transform: translate(-20%, -20%);
+}
+
+main #main button:hover:before {
+	opacity: 0.15;
 }
 
 main #main > div > hr {
@@ -175,12 +204,17 @@ main #main div div hr {
 
 main #main div div button {
 	margin: 0;
+	width: 100%;
 	padding: 2px;
 	border: none;
 	cursor: pointer;
 	text-align: left;
 	background-color: transparent;
 	transition: background-color .3s ease;
+}
+
+main #main div div button:before {
+	display: none;
 }
 
 main #main div div button:hover {
