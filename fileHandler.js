@@ -10,8 +10,6 @@ module.exports = {
 				setTimeout(() => {
 					jsonFileArr = {songs: songsArr, playlists: playlistsArr};
 
-					console.log(jsonFileArr);
-
 					fs.writeFile(__dirname + '/JSON.json', JSON.stringify(jsonFileArr), (err) => {
 						if (err) throw err;
 						else console.log('Updated the Json file');
@@ -60,6 +58,7 @@ module.exports = {
 		// Check if file exists
 		// Load the file from disk
 		// Check if all the songs are in the json
+		const songs = [];
 
 		return new Promise((resolve, reject) => {
 			fs.exists(path, exists => {
@@ -67,7 +66,6 @@ module.exports = {
 					fs.readFile(path, 'utf-8', (err, data) => {
 						if (err) reject(err);
 						else {
-							const songs = [];
 							data = data.replace('#EXTM3U', '');
 
 							data.split(/#EXTINF:[0-9]+,.+/).forEach((object, key) => {
@@ -78,9 +76,7 @@ module.exports = {
 									if (match) {
 										const songName = match[2].trim();
 
-										console.log(songName, findSong(songsArr, songName));
-
-										if (findSong(songsArr, songName) == true) songs.push(songName);
+										if (findSong(songsArr, songName)) songs.push(songName);
 									}
 								}
 							});

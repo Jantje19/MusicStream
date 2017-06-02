@@ -25,14 +25,14 @@ module.exports = {
 						json.playlists.forEach((object, key) => {
 							fileHandler.readPlayList(fs, object.path + object.fileName, json.songs).then(songsArr => {
 								if (songsArr.length > 0) playlists.push(object.fileName);
+								if (key == json.playlists.length - 1) resolve(playlists);
 							}).catch(err => reject(err));
 						});
-
-						resolve(playlists);
 					});
 				}
 
 				getPlaylists(json, fs).then(playlists => {
+					console.log('KAA', playlists);
 					if (playlists.length > 0) response.send({songs: songs, playlists: playlists});
 					else response.send({songs: songs, playlists: []});
 				}).catch(err => {
