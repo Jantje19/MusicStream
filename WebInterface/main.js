@@ -1,3 +1,5 @@
+let clickTimer;
+
 const cssRules = [];
 const audio = new Audio();
 
@@ -38,6 +40,21 @@ function get(url) {
 function queueClick(index) {
 	queueIndex = index;
 	playSong(null, true);
+}
+
+function songClick(elem) {
+	const object = elem.innerText;
+
+	if (clickTimer) {
+		clearTimeout(clickTimer);
+		clickTimer = null;
+		playSong(object);
+	} else {
+		clickTimer = setTimeout(() => {
+			clickTimer = null;
+			enqueue(object);
+		}, 200);
+	}
 }
 
 function updateCSS(newValBefore, newValAfter) {
@@ -116,7 +133,7 @@ function load() {
 	getData().then(json => {
 		if (json.songs.length > 0) {
 			json.songs.forEach((object, key) => {
-				songsElem.innerHTML += `<button class="song ${key}" ondblclick="playSong('${object}')" onclick="enqueue('${object}')">${object}</button><hr>`;
+				songsElem.innerHTML += `<button class="song ${key}" onclick="songClick(this)">${object}</button><hr>`;
 			});
 		} else songsElem.innerHTML = '<i>No songs</i>';
 

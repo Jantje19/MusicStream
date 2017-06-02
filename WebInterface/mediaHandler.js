@@ -46,10 +46,29 @@ function deleteQueue() {
 }
 
 function playSong(songName, notAddToQueue) {
-	if (!songName) songName = queue[queueIndex];
-	audio.src = '/song/' + songName;
-	if (!notAddToQueue) enqueue(songName);
-	startSong();
+	if (audio.currentTime > 0) {
+		if (audio.src != '' && audio.src != undefined) {
+			if (audio.paused == true) {
+				audio.play();
+				document.getElementById('toggleBtn').querySelector('img').src = 'Assets/ic_play_arrow_white.svg';
+			} else if (audio.paused == false) {
+				audio.pause();
+				document.getElementById('toggleBtn').querySelector('img').src = 'Assets/ic_pause_white.svg';
+			} else {
+				console.error('WUT?');
+			}
+		}
+	} else {
+		if (!songName) songName = queue[queueIndex];
+		audio.src = '/song/' + songName;
+		if (!notAddToQueue) {
+			enqueue(songName);
+			queueIndex++;
+			updateInterface();
+		}
+
+		startSong();
+	}
 }
 
 function startSong() {
@@ -78,8 +97,8 @@ function updateInterface() {
 		elem.innerHTML = '';
 
 		queue.forEach((object, key) => {
-			if (key == queueIndex) elem.innerHTML += `<button onclick="queueClick('${key}')" style="background-color: lightblue;"><span>${key}</span><span>${object}</button></div><hr>`;
-			else elem.innerHTML += `<button onclick="queueClick('${key}')"><span>${key}</span><span>${object}</button></div><hr>`;
+			if (key == queueIndex) elem.innerHTML += `<button onclick="queueClick('${key}')" style="background-color: lightblue;"><span>${key + 1}</span><span>${object}</button></div><hr>`;
+			else elem.innerHTML += `<button onclick="queueClick('${key}')"><span>${key + 1}</span><span>${object}</button></div><hr>`;
 
 			elem.innerHTML += '<br>';
 		});
