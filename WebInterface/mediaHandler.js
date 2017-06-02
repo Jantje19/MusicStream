@@ -20,6 +20,10 @@ function next() {
 	playSong(queue[queueIndex], true);
 }
 
+function previus() {
+
+}
+
 function deleteQueue() {
 	stopSong();
 	queue.length = 0;
