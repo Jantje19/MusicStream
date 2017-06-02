@@ -32,7 +32,6 @@ module.exports = {
 				}
 
 				getPlaylists(json, fs).then(playlists => {
-					console.log('KAA', playlists);
 					if (playlists.length > 0) response.send({songs: songs, playlists: playlists});
 					else response.send({songs: songs, playlists: []});
 				}).catch(err => {
