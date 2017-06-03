@@ -4,7 +4,6 @@
 
 	<!--
 		TODO: Add toast API
-		TODO: Delete option per item for queue
 		TODO: Sort by artist
 		TODO: When accessing the LastFM data make it so the player can pop up and display the data
 	-->
@@ -65,7 +64,7 @@
 			</div>
 			<div id="queueContainer">
 				<h3>Queue</h3>
-				<button title="Empty queue" style="float: right;" onclick="deleteQueue()"><img src="Assets/ic_delete_black.svg"/></button>
+				<button title="Empty queue" style="float: right;" onclick="deleteQueue()"><img src="Assets/ic_clear_all_black.svg"/></button>
 				<hr>
 				<div id="queue">
 					<i>Queue is empty</i>
@@ -85,6 +84,7 @@
 					<p id="songName" style="width: 100%; text-overflow: ellipsis; overflow: hidden;"></p>
 				</div>
 				<div>
+					<button id="showData"><img src="Assets/ic_repeat_white.svg"></button>
 					<button id="repeat"><img src="Assets/ic_repeat_white.svg"></button>
 					<button id="shuffle"><img src="Assets/ic_shuffle_white.svg"></button>
 				</div>
