@@ -126,6 +126,42 @@ module.exports = {
 			});
 		});
 
+		app.get('/getSettings', (request, response) => {
+			const url = querystring.unescape(request.url);
+
+			console.log('Got a request for ' + url);
+
+			fileHandler.getSettings(fs).then(json => {
+				response.send(json);
+			}).catch(err => {
+				console.log('There was an error with getting the JSON file', err);
+				response.send({error: 'There was an error with getting the JSON file', info: err});
+			});
+		});
+
+		app.post('/updateSettings', (request, response) => {
+			let body = '';
+
+			request.on('data', function (data) {
+				body += data;
+
+				if (body.length > 1e6)
+					request.connection.destroy();
+			});
+
+			request.on('end', function () {
+				const jsonPath = 'settings.json';
+				const url = querystring.unescape(request.url);
+
+				console.log('Got a request for ' + url);
+
+				fs.writeFile(__dirname + '/' + jsonPath, body, (err) => {
+					if (err) response.send({success: false, error: 'There was an error with creating the settings file', info: err});
+					else response.send({success: true});
+				});
+			});
+		});
+
 		app.get('/', (request, response) => {
 			const url = request.url;
 

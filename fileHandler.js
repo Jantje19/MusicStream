@@ -113,5 +113,20 @@ module.exports = {
 				}
 			});
 		});
+	},
+
+	getSettings: function(fs) {
+		return new Promise((response, reject) => {
+			const path = './settings.json';
+
+			fs.exists(path, exists => {
+				if (exists) {
+					fs.readFile(path, 'utf-8', (err, data) => {
+						if (err) reject(err);
+						else resolve(data);
+					});
+				} else reject('File doesn\'t exist');
+			});
+		});
 	}
 };
