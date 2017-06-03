@@ -79,7 +79,9 @@ function playSong(songName, notAddToQueue) {
 function startSong() {
 	document.getElementById('toggleBtn').querySelector('img').src = 'Assets/ic_play_arrow_white.svg';
 	document.getElementById('songName').innerText = queue[queueIndex];
-	audio.play();
+	audio.play().then(mediaSession).catch(err => {
+		console.log(err);
+	});
 }
 
 function pauseSong() {
@@ -117,5 +119,37 @@ function updateInterface() {
 		} else {
 			console.error('WUT?');
 		}
+	}
+}
+
+
+
+// Media Sessions
+function mediaSession() {
+	const songName = queue[queueIndex];
+	const arr = songName.split(/\s+-\s+/);
+	const title = arr[0].trim();
+	const artist = arr[1].trim();
+
+	if ('mediaSession' in navigator) {
+		navigator.mediaSession.metadata = new MediaMetadata({
+			title: title,
+			artist: artist,
+			artwork: [
+			{ src: 'https://dummyimage.com/96x96',   sizes: '96x96',   type: 'image/png' },
+			{ src: 'https://dummyimage.com/128x128', sizes: '128x128', type: 'image/png' },
+			{ src: 'https://dummyimage.com/192x192', sizes: '192x192', type: 'image/png' },
+			{ src: 'https://dummyimage.com/256x256', sizes: '256x256', type: 'image/png' },
+			{ src: 'https://dummyimage.com/384x384', sizes: '384x384', type: 'image/png' },
+			{ src: 'https://dummyimage.com/512x512', sizes: '512x512', type: 'image/png' }
+			]
+		});
+
+		navigator.mediaSession.setActionHandler('nexttrack', next);
+		navigator.mediaSession.setActionHandler('previoustrack', previus);
+		navigator.mediaSession.setActionHandler('play', evt => {playSong(null, true)});
+		navigator.mediaSession.setActionHandler('pause', evt => {pauseSong(null, true)});
+		// navigator.mediaSession.setActionHandler('seekforward', function() {  Code excerpted.  });
+		// navigator.mediaSession.setActionHandler('seekbackward', evt => {playSong(null, true)});
 	}
 }
