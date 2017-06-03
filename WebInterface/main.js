@@ -42,7 +42,7 @@ function get(url) {
 function queueClick(evt, index) {
 	if (evt.ctrlKey) {
 		queue.splice(index, 1);
-		if (audio.paused) updateInterface();
+		if (audio.paused || (!audio.paused && index != queueIndex)) updateInterface();
 		else playSong(null, true);
 	} else {
 		queueIndex = index;
@@ -63,6 +63,10 @@ function songClick(elem) {
 			enqueue(object);
 		}, 200);
 	}
+}
+
+function addWholeListToQueue() {
+	document.getElementById('songs').querySelectorAll();
 }
 
 function updateCSS(newValBefore, newValAfter) {
@@ -135,7 +139,7 @@ function load() {
 			evt.target.removeAttribute('activated');
 		} else {
 			queue.shuffle();
-			updateInterface();
+			playSong(null, true);
 			evt.target.setAttribute('activated', '');
 		}
 	});

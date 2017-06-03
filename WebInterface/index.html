@@ -29,6 +29,7 @@
 		<div id="main">
 			<div id="songsContainer">
 				<h3>Songs</h3>
+				<button title="Add whole list to queue" style="float: right;" onclick="addWholeListToQueue()"><img src="Assets/ic_playlist_add_black.svg"></button>
 				<hr>
 				<div id="songs"></div>
 			</div>
@@ -39,7 +40,7 @@
 			</div>
 			<div id="queueContainer">
 				<h3>Queue</h3>
-				<button style="float: right;" onclick="deleteQueue()"><img src="Assets/ic_delete_black.svg"/></button>
+				<button title="Empty queue" style="float: right;" onclick="deleteQueue()"><img src="Assets/ic_delete_black.svg"/></button>
 				<hr>
 				<div id="queue">
 					<i>Queue is empty</i>
