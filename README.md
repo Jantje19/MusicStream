@@ -20,4 +20,5 @@ Supported browsers with build numbers:
 - Android browser (WebView): 56
 
 **Internet Explorer won't work.** *but why would you use it anyway.*
+
 **Only tested (and used) on Chrome Canary 60 and Android Chrome 58**
