@@ -65,8 +65,14 @@ function songClick(elem) {
 	}
 }
 
-function addWholeListToQueue() {
-	document.getElementById('songs').querySelectorAll();
+function addWholeSongsToQueue() {
+	const buttons = document.getElementById('songs').querySelectorAll('button');
+
+	if (document.getElementById('shuffle').getAttribute('activated') != null) buttons.shuffle();
+
+	buttons.forEach((object, key) => {
+		enqueue(object.innerText);
+	});
 }
 
 function updateCSS(newValBefore, newValAfter) {

@@ -3,6 +3,7 @@ let queueIndex = 0;
 
 function enqueue(...vals) {
 	if (vals.length > 1) {
+		if (document.getElementById('shuffle').getAttribute('activated') != null) vals.shuffle();
 		vals.forEach((object, key) => {
 			queue[queue.length] = object;
 		});
