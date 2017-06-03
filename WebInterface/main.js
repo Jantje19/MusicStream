@@ -77,14 +77,20 @@ function addWholeSongsToQueue() {
 }
 
 function convertToReadableTime(int) {
-	const hours   = Math.floor(int / 3600);
-	const minutes = Math.floor((int - (hours * 3600)) / 60);
-	const seconds = int - (hours * 3600) - (minutes * 60);
+	let outp = '';
+	let hours   = Math.floor(int / 3600);
+	let minutes = Math.floor((int - (hours * 3600)) / 60);
+	let seconds = int - (hours * 3600) - (minutes * 60);
 
-	if (hours   < 10) {hours   = "0"+hours;}
-	if (minutes < 10) {minutes = "0"+minutes;}
-	if (seconds < 10) {seconds = "0"+seconds;}
-	return hours+':'+minutes+':'+seconds;
+	if (hours < 10) hours = "0"+hours;
+	if (minutes < 10) minutes = "0"+minutes;
+	if (seconds < 10) seconds = "0"+seconds;
+	if (hours > 0) outp += hours + ':';
+
+	outp += minutes + ':';
+	outp += seconds;
+
+	return outp;
 }
 
 function updateCSS(newValBefore, newValAfter) {
@@ -215,7 +221,7 @@ function load() {
 				controlsElem.style.height = '';
 			} else {
 				elem.className += 'active';
-				controlsElem.style.height = '200px';
+				controlsElem.style.height = '230px';
 			}
 		}
 	});
