@@ -219,14 +219,18 @@ main #main div div hr {
 main #main div div button {
 	margin: 0;
 	width: 100%;
-	padding: 2px;
 	border: none;
 	cursor: pointer;
 	text-align: left;
 	overflow: hidden;
+	padding: 10px 5px;
 	text-overflow: ellipsis;
 	background-color: transparent;
 	transition: background-color .3s ease;
+
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
 }
 
 main #main div div button:before {

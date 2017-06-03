@@ -104,7 +104,7 @@ function updateInterface() {
 			if (key == queueIndex) elem.innerHTML += `<button title="${object}" onclick="queueClick(event, '${key}')" style="background-color: lightblue;"><span>${key + 1}</span><span>${object}</button></div><hr>`;
 			else elem.innerHTML += `<button title="${object}" onclick="queueClick(event, '${key}')"><span>${key + 1}</span><span>${object}</button></div><hr>`;
 
-			elem.innerHTML += '<br>';
+			// elem.innerHTML += '<br>';
 		});
 	} else elem.innerHTML = '<i>Queue is empty</i>';
 

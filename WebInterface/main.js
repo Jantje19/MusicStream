@@ -160,8 +160,8 @@ function load() {
 		const songArr = searchArr(string, data.songs);
 		const playlistArr = searchArr(string, data.playlists);
 
-		if (songArr.length > 0) songsElem.innerHTML = '';
-		if (playlistArr.length > 0) playlistsElem.innerHTML = '';
+		songsElem.innerHTML = '';
+		playlistsElem.innerHTML = '';
 
 		songArr.forEach((object, key) => {
 			songsElem.innerHTML += `<button class="song ${key}" onclick="songClick(this)">${object}</button><hr>`;
@@ -188,13 +188,13 @@ function load() {
 
 		if (json.songs.length > 0) {
 			json.songs.forEach((object, key) => {
-				songsElem.innerHTML += `<button class="song ${key}" onclick="songClick(this)">${object}</button><hr>`;
+				songsElem.innerHTML += `<button title="${object}" class="song ${key}" onclick="songClick(this)">${object}</button><hr>`;
 			});
 		} else songsElem.innerHTML = '<i>No songs</i>';
 
 		if (json.playlists.length > 0) {
 			json.playlists.forEach((object, key) => {
-				playlistsElem.innerHTML += `<button class="listElem ${key}" onclick="handlePlaylist('${object}')">${object}</button><hr>`;
+				playlistsElem.innerHTML += `<button title="${object}" class="listElem ${key}" onclick="handlePlaylist('${object}')">${object}</button><hr>`;
 			});
 		} else playlistsElem.innerHTML = '<i>No playlists found</i>';
 	}).catch(err => {
