@@ -46,7 +46,11 @@ function deleteQueue() {
 }
 
 function playSong(songName, notAddToQueue) {
-	if (audio.currentTime > 0) {
+	if (notAddToQueue) {
+		if (!songName) songName = queue[queueIndex];
+		audio.src = '/song/' + songName;
+		startSong();
+	} else if (audio.currentTime > 0) {
 		if (audio.src != '' && audio.src != undefined) {
 			if (audio.paused == true) {
 				audio.play();
@@ -97,8 +101,8 @@ function updateInterface() {
 		elem.innerHTML = '';
 
 		queue.forEach((object, key) => {
-			if (key == queueIndex) elem.innerHTML += `<button title="${object}" onclick="queueClick('${key}')" style="background-color: lightblue;"><span>${key + 1}</span><span>${object}</button></div><hr>`;
-			else elem.innerHTML += `<button title="${object}" onclick="queueClick('${key}')"><span>${key + 1}</span><span>${object}</button></div><hr>`;
+			if (key == queueIndex) elem.innerHTML += `<button title="${object}" onclick="queueClick(event, '${key}')" style="background-color: lightblue;"><span>${key + 1}</span><span>${object}</button></div><hr>`;
+			else elem.innerHTML += `<button title="${object}" onclick="queueClick(event, '${key}')"><span>${key + 1}</span><span>${object}</button></div><hr>`;
 
 			elem.innerHTML += '<br>';
 		});
@@ -114,73 +118,3 @@ function updateInterface() {
 		}
 	}
 }
-
-
-// let queueIndex = 0;
-
-// function songEnd(evt) {
-// 	if (queueIndex == queue.length - 1) {
-// 		if (document.getElementById('repeat').getAttribute('activated')) {
-// 			queueIndex = 0;
-// 			updateQueue();
-// 			playSong(queue[0], true);
-// 		}
-// 	} else playNextSong();
-// }
-
-// function playNextSong() {
-// 	if (queue[queueIndex + 1]) playSong(queue[queueIndex + 1]);
-// }
-
-// function playSong(songName, notAddToQueue) {
-// 	document.getElementById('songName').innerText = songName;
-// 	audio.src = '/song/' + songName;
-// 	audio.play();
-
-// 	if (!notAddToQueue) {
-// 		queue.push(songName);
-// 		queueIndex++;
-// 		updateQueue();
-// 	}
-// }
-
-// function updatePlayState(evt) {
-// 	if (audio.src != '' && audio.src != undefined) {
-// 		if (audio.paused == true) {
-// 			document.getElementById('toggleBtn').querySelector('img').src = 'Assets/ic_play_arrow_white.svg';
-// 		} else if (audio.paused == false) {
-// 			document.getElementById('toggleBtn').querySelector('img').src = 'Assets/ic_pause_white.svg';
-// 		} else {
-// 			console.error('WUT?');
-// 		}
-// 	}
-// }
-
-// function stopSong() {
-// 	document.getElementById('toggleBtn').querySelector('img').src = 'Assets/ic_play_arrow_white.svg';
-// 	document.getElementById('songName').innerText = '';
-// 	audio.pause();
-// }
-
-// function deleteQueue() {
-// 	queue.length = 0;
-// 	updateQueue();
-// 	stopSong();
-// }
-
-// function updateQueue() {
-// 	const queueElem = document.getElementById('queue');
-
-// 	queueElem.innerHTML = '';
-// 	queue.forEach((object, key) => {
-// 		queueElem.innerHTML += `<button class="song ${key}" onclick="playSong('${object}', true)">${object}</button><hr>`;
-// 	});
-
-// 	queueElem.querySelectorAll('button').forEach((object, key) => {
-// 		let newIndex = queueIndex - 1;
-// 		if (newIndex < 0) newIndex = 0;
-
-// 		if (key == newIndex) object.style.backgroundColor = 'green';
-// 		else object.style.backgroundColor = 'transparent';
-// 	});
-// }

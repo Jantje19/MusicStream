@@ -39,9 +39,15 @@ function get(url) {
 	});
 }
 
-function queueClick(index) {
-	queueIndex = index;
-	playSong(null, true);
+function queueClick(evt, index) {
+	if (evt.ctrlKey) {
+		queue.splice(index, 1);
+		if (audio.paused) updateInterface();
+		else playSong(null, true);
+	} else {
+		queueIndex = index;
+		playSong(null, true);
+	}
 }
 
 function songClick(elem) {
