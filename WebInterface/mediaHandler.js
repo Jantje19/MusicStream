@@ -79,9 +79,12 @@ function playSong(songName, notAddToQueue) {
 function startSong() {
 	document.getElementById('toggleBtn').querySelector('img').src = 'Assets/ic_play_arrow_white.svg';
 	document.getElementById('songName').innerText = queue[queueIndex];
+	document.getElementById('showData').removeAttribute('activated');
 	audio.play().then(mediaSession).catch(err => {
 		console.log(err);
 	});
+
+	try {document.getElementById('artistInfo').remove()} catch(err) {}
 }
 
 function pauseSong() {
@@ -134,10 +137,22 @@ function mediaSession() {
 	fetchArtistData(artist).then(json => {
 		console.log(json);
 
-		console.log(json.image, 'mediaSession' in navigator, json.image && 'mediaSession' in navigator);
+		// Display info
+		const dataDiv = document.createElement('div');
 
+		dataDiv.id = 'artistInfo';
+		dataDiv.innerHTML += `<p style="font-size: 120%;"><i>Artist info:</i></p><hr>`;
+		dataDiv.innerHTML += `<p><b>Name:</b> <a href="${json.url}">${json.name}</a></p>`;
+		dataDiv.innerHTML += `<p><b>On tour:</b> ${(json.ontour == 1) ? true : false}</p>`;
+		dataDiv.innerHTML += `<p><b>Playcount:</b> ${json.stats.playcount}</p>`;
+		dataDiv.innerHTML += `<p><b>Listeners:</b> ${json.stats.listeners}</p>`;
+		dataDiv.innerHTML += `<p><b>Tags:</b> ${json.tags.tag.map(obj => {return obj.name})}</p>`;
+
+		document.getElementById('mainControls').appendChild(dataDiv);
+		document.getElementById('showData').setAttribute('activated', '');
+
+		// Edit thumbnail
 		if (json.image && 'mediaSession' in navigator) {
-			console.log('Setting');
 			navigator.mediaSession.metadata = new MediaMetadata({
 				title: title,
 				artist: artist,

@@ -264,6 +264,7 @@ main #controls {
 	height: 60px;
 	position: fixed;
 	background-color: #16a085;
+	transition: height .5s ease;
 	box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
 }
 
@@ -302,6 +303,14 @@ main #controls #mainControls div button {
 	background-color: transparent;
 }
 
+main #controls #mainControls div button img {
+	transition: transform .3s ease;
+}
+
+main #controls #mainControls div button.active img {
+	transform: rotate(180deg);
+}
+
 main #controls #mainControls div:first-child {
 	float: left;
 	padding-left: 10px;
@@ -336,4 +345,20 @@ main #controls #mainControls div button:before {
 
 main #controls #mainControls div button:hover:before {
 	opacity: 0.3;
+}
+
+main #controls #mainControls #artistInfo {
+	width: 90%;
+	float: unset;
+	margin: auto;
+	overflow: hidden;
+	padding-bottom: 100px;
+	transform: translateY(30px);
+}
+
+main #controls #mainControls #artistInfo p {
+	margin: 5px 0;
+	text-align: left;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }

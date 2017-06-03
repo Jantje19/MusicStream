@@ -76,6 +76,17 @@ function addWholeSongsToQueue() {
 	});
 }
 
+function convertToReadableTime(int) {
+	const hours   = Math.floor(int / 3600);
+	const minutes = Math.floor((int - (hours * 3600)) / 60);
+	const seconds = int - (hours * 3600) - (minutes * 60);
+
+	if (hours   < 10) {hours   = "0"+hours;}
+	if (minutes < 10) {minutes = "0"+minutes;}
+	if (seconds < 10) {seconds = "0"+seconds;}
+	return hours+':'+minutes+':'+seconds;
+}
+
 function updateCSS(newValBefore, newValAfter) {
 	const addRule = function(sheet, selector, styles) {
 		if (sheet.insertRule) return sheet.insertRule(selector + " {" + styles + "}", sheet.cssRules.length);
@@ -124,9 +135,9 @@ function load() {
 		seekBarElem.value = (audio.currentTime / audio.duration) * 100;
 
 		if (audio.duration)
-			updateCSS(Math.floor(audio.currentTime) + 's', Math.floor(audio.duration - audio.currentTime) + 's');
+			updateCSS(convertToReadableTime(Math.floor(audio.currentTime)), convertToReadableTime(Math.floor(audio.duration - audio.currentTime)));
 		else
-			updateCSS(Math.floor(audio.currentTime) + 's', '0s');
+			updateCSS(convertToReadableTime(Math.floor(audio.currentTime)), '0s');
 	});
 
 	document.getElementById('repeat').addEventListener('click', evt => {
@@ -191,6 +202,21 @@ function load() {
 			}
 
 			return outp;
+		}
+	});
+
+	document.getElementById('showData').addEventListener('click', evt => {
+		const controlsElem = document.getElementById('controls');
+		const elem = evt.currentTarget;
+
+		if (elem.getAttribute('activated') != null) {
+			if (elem.className.indexOf('active') > -1) {
+				elem.className = elem.className.replace('active', '');
+				controlsElem.style.height = '';
+			} else {
+				elem.className += 'active';
+				controlsElem.style.height = '200px';
+			}
 		}
 	});
 
