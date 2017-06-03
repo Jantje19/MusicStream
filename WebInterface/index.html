@@ -9,6 +9,9 @@
 
 	<title>Music Stream</title>
 
+	<link rel="shortcut icon" href="Assets/Icons/favicon.ico"/>
+	<link rel="shortcut icon" href="Assets/Icons/favicon.ico" type="image/vnd.microsoft.icon"/>
+
 	<link rel="apple-touch-icon" sizes="57x57" href="Assets/Icons/apple-icon-57x57.png">
 	<link rel="apple-touch-icon" sizes="60x60" href="Assets/Icons/apple-icon-60x60.png">
 	<link rel="apple-touch-icon" sizes="72x72" href="Assets/Icons/apple-icon-72x72.png">
@@ -23,7 +26,7 @@
 	<link rel="icon" type="image/png" sizes="96x96" href="Assets/Icons/favicon-96x96.png">
 	<link rel="icon" type="image/png" sizes="16x16" href="Assets/Icons/favicon-16x16.png">
 	<link rel="manifest" href="Assets/Icons/manifest.json">
-	<meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
+	<meta name="msapplication-TileImage" content="Assets/Icons/ms-icon-144x144.png">
 
 	<!--Let browser know website is optimized for mobile-->
 	<!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"/> -->
@@ -74,7 +77,7 @@
 			<input type="range" value="0" min="0" max="100" id="seekBar"/>
 
 			<div id="mainControls">
-				<div>
+				<div id="left">
 					<button onclick="previus()"><img src="Assets/ic_skip_previous_white.svg"></button>
 					<button id="toggleBtn"><img src="Assets/ic_play_arrow_white.svg"></button> <!-- onclick="playSong(queue[queueIndex], true)" -->
 					<button onclick="next()"><img src="Assets/ic_skip_next_white.svg"></button>
@@ -82,7 +85,7 @@
 				<div style="width: 50%; white-space: nowrap; overflow: hidden;">
 					<p id="songName" style="width: 100%; text-overflow: ellipsis; overflow: hidden;"></p>
 				</div>
-				<div>
+				<div id="right">
 					<button id="showData"><img src="Assets/ic_keyboard_arrow_up_white.svg"></button>
 					<button id="repeat"><img src="Assets/ic_repeat_white.svg"></button>
 					<button id="shuffle"><img src="Assets/ic_shuffle_white.svg"></button>
