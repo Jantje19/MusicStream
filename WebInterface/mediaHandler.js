@@ -128,7 +128,7 @@ function updateInterface() {
 function mediaSession() {
 	const songName = queue[queueIndex];
 	const arr = songName.split(/\s+-\s+/);
-	const title = arr[0].trim();
+	const title = arr[0].trim().replace(/(\.\w{3})$/, '');
 	const artist = arr[1].trim();
 
 	if ('mediaSession' in navigator) {
@@ -136,12 +136,12 @@ function mediaSession() {
 			title: title,
 			artist: artist,
 			artwork: [
-			{ src: 'https://dummyimage.com/96x96',   sizes: '96x96',   type: 'image/png' },
-			{ src: 'https://dummyimage.com/128x128', sizes: '128x128', type: 'image/png' },
-			{ src: 'https://dummyimage.com/192x192', sizes: '192x192', type: 'image/png' },
-			{ src: 'https://dummyimage.com/256x256', sizes: '256x256', type: 'image/png' },
-			{ src: 'https://dummyimage.com/384x384', sizes: '384x384', type: 'image/png' },
-			{ src: 'https://dummyimage.com/512x512', sizes: '512x512', type: 'image/png' }
+			{ src: 'Assets/Icons/icon-512.png', sizes: '512x512', type: 'image/png' },
+			{ src: 'Assets/Icons/icon-128.png', sizes: '128x128', type: 'image/png' },
+			{ src: 'Assets/Icons/icon-256.png', sizes: '256x256', type: 'image/png' },
+			{ src: 'Assets/Icons/icon-387.png', sizes: '384x384', type: 'image/png' },
+			{ src: 'Assets/Icons/android-icon-96x96.png', sizes: '96x96',   type: 'image/png' },
+			{ src: 'Assets/Icons/android-icon-192x192.png', sizes: '192x192', type: 'image/png' }
 			]
 		});
 
