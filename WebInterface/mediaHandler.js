@@ -126,10 +126,10 @@ function updateInterface() {
 
 // Media Sessions
 function mediaSession() {
-	const songName = queue[queueIndex];
+	const songName = queue[queueIndex].replace(/(\.\w{3})$/, '');
 	const arr = songName.split(/\s+-\s+/);
-	const title = arr[0].trim().replace(/(\.\w{3})$/, '');
-	const artist = arr[1].trim();
+	const artist = arr[0].trim();
+	const title = arr[1].trim();
 
 	if ('mediaSession' in navigator) {
 		navigator.mediaSession.metadata = new MediaMetadata({

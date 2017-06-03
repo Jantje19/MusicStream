@@ -17,8 +17,9 @@ function handlePlaylist(name) {
 	get('/playlist/' + name).then(json => {
 		if (document.getElementById('shuffle')) json.songs.shuffle();
 		deleteQueue();
+		queueIndex = 0;
 		enqueue(...json.songs);
-		playSong(queue[queueIndex], true);
+		playSong(queue[0], true);
 	}).catch( err => {
 		console.error('An error occurred', err);
 	});
