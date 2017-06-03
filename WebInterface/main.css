@@ -311,22 +311,22 @@ main #controls #mainControls div button.active img {
 	transform: rotate(180deg);
 }
 
-main #controls #mainControls div:first-child {
+main #controls #mainControls div#left {
 	float: left;
 	padding-left: 10px;
 }
 
-main #controls #mainControls div:last-child {
+main #controls #mainControls div#right {
 	float: right;
 	padding-right: 10px;
 }
 
-main #controls #mainControls div:last-child button {
+main #controls #mainControls div#right button {
 	transition: opacity .3s ease;
 	opacity: 0.3;
 }
 
-main #controls #mainControls div:last-child button[activated] {
+main #controls #mainControls div#right button[activated] {
 	opacity: 1;
 }
 
