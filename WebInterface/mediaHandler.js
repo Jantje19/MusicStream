@@ -131,6 +131,30 @@ function mediaSession() {
 	const artist = arr[0].trim();
 	const title = arr[1].trim();
 
+	fetchArtistData(artist).then(json => {
+		console.log(json);
+
+		console.log(json.image, 'mediaSession' in navigator, json.image && 'mediaSession' in navigator);
+
+		if (json.image && 'mediaSession' in navigator) {
+			console.log('Setting');
+			navigator.mediaSession.metadata = new MediaMetadata({
+				title: title,
+				artist: artist,
+				artwork: [
+				{ src: json.image[0]['#text'], sizes: '34x32', type: 'image/png' },
+				{ src: json.image[1]['#text'], sizes: '64x64', type: 'image/png' },
+				{ src: json.image[2]['#text'], sizes: '174x174', type: 'image/png' },
+				{ src: json.image[3]['#text'], sizes: '300x300', type: 'image/png' },
+				{ src: json.image[4]['#text'], sizes: '500x498', type: 'image/png' },
+				{ src: json.image[5]['#text'], sizes: '126x126', type: 'image/png' }
+				]
+			});
+		}
+	}).catch(err => {
+		console.log(err);
+	});
+
 	if ('mediaSession' in navigator) {
 		navigator.mediaSession.metadata = new MediaMetadata({
 			title: title,
@@ -151,5 +175,33 @@ function mediaSession() {
 		navigator.mediaSession.setActionHandler('pause', evt => {pauseSong(null, true)});
 		// navigator.mediaSession.setActionHandler('seekforward', function() {  Code excerpted.  });
 		// navigator.mediaSession.setActionHandler('seekbackward', evt => {playSong(null, true)});
+
+
+		let skipTime = 10; // Time to skip in seconds
+
+		navigator.mediaSession.setActionHandler('seekbackward', function() {
+		  // User clicked "Seek Backward" media notification icon.
+		  audio.currentTime = Math.max(audio.currentTime - skipTime, 0);
+		});
+
+		navigator.mediaSession.setActionHandler('seekforward', function() {
+		  // User clicked "Seek Forward" media notification icon.
+		  audio.currentTime = Math.min(audio.currentTime + skipTime, audio.duration);
+		});
 	}
+}
+
+function fetchArtistData(artistName) {
+	artistName = escape(artistName);
+	const url = `https://ws.audioscrobbler.com/2.0/?method=artist.getinfo&artist=${artistName}&api_key=f02456f630621a02581b2143a67372f0&format=json&autocorrect=1`;
+	// const url = `https://ws.audioscrobbler.com/2.0/?method=track.getInfo&api_key=f02456f630621a02581b2143a67372f0&artist=${artistName}&track=${songName}&format=json&autocorrect=1`;
+
+	return new Promise((resolve, reject) => {
+		fetch(url).then(response => {
+			response.json().then(json => {
+				if (json.artist) resolve(json.artist);
+				else reject('Something went wrong with the JSON');
+			});
+		}).catch(err => reject(err));
+	});
 }
