@@ -130,9 +130,9 @@ function updateInterface() {
 // Media Sessions
 function mediaSession() {
 	const songName = queue[queueIndex].replace(/(\.\w{3})$/, '');
-	const arr = songName.split(/\s+?-\s+?/);
-	const artist = arr[0].trim();
-	const title = arr[1].trim();
+	const match = songName.match(/(.+)(\s+)?-(\s+)?(.+)/);
+	const artist = match[1].trim();
+	const title = match[4].trim();
 
 	fetchArtistData(artist).then(json => {
 		console.log(json);
@@ -167,7 +167,7 @@ function mediaSession() {
 			});
 		}
 	}).catch(err => {
-		console.log(err);
+		console.warn(err);
 	});
 
 	if ('mediaSession' in navigator) {
@@ -215,6 +215,7 @@ function fetchArtistData(artistName) {
 		fetch(url).then(response => {
 			response.json().then(json => {
 				if (json.artist) resolve(json.artist);
+				else if (json.error) reject(json.message);
 				else reject('Something went wrong with the JSON');
 			});
 		}).catch(err => reject(err));
