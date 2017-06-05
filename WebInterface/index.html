@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html>
-<head>
+<head lang="en">
 
 	<!--
 		TODO: Add toast API
@@ -42,6 +42,13 @@
 	<script type="text/javascript" src="mediaHandler.js"></script>
 	<script type="text/javascript" src="main.js"></script>
 
+	<script type="text/javascript">
+		if (!('fetch' in window)) {
+			if (confirm('Your browser is not supported. Do you want to go to the old browsers page?'))
+				window.location = '/OldBrowsers/'
+		}
+	</script>
+
 </head>
 <body>
 
@@ -55,7 +62,7 @@
 		<div id="main">
 			<div id="songsContainer">
 				<h3>Songs</h3>
-				<button title="Add whole list to queue" style="float: right;" onclick="addWholeSongsToQueue()"><img src="Assets/ic_playlist_add_black.svg"></button>
+				<button title="Add whole list to queue (only use when you're confident in your system)" style="float: right;" onclick="addWholeSongsToQueue()"><img src="Assets/ic_playlist_add_black.svg"></button>
 				<hr>
 				<div id="songs"></div>
 			</div>
