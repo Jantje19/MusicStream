@@ -162,6 +162,22 @@ module.exports = {
 			});
 		});
 
+		app.get('/OldBrowsers/*', (request, response) => {
+			const url = request.url;
+
+			console.log('Got a request for ' + url + '. HAHA Your browser sucks');
+
+			fileHandler.getJSON(fs, os, fileExtentions, utils).then(json => {
+				let html = '<script>function playSong(songName) {var elem = document.getElementById("audio"); elem.src = "/song/" + songName; elem.play()}</script><audio id="audio">YOUR BROWSER DOESN\'T SUPPORT THE AUDIO ELEMENT</audio>';
+
+				json.songs.forEach((object, key) => {
+					html += `<a onclick="playSong('${object.fileName}')" href="#">${object.fileName}</a><hr>`; // href="/song/${object.fileName}" target="_blank"
+				});
+
+				response.send(html);
+			}).catch(err => response.status(404).send('Error: ' + err));
+		});
+
 		app.get('/', (request, response) => {
 			const url = request.url;
 
