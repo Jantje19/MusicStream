@@ -57,7 +57,7 @@ function songClick(elem) {
 	if (clickTimer) {
 		clearTimeout(clickTimer);
 		clickTimer = null;
-		if (queue.length > 0) queueIndex++;
+		queueIndex = queue.length;
 		enqueue(object);
 		playSong(object, true);
 	} else {
