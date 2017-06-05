@@ -130,7 +130,7 @@ function updateInterface() {
 // Media Sessions
 function mediaSession() {
 	const songName = queue[queueIndex].replace(/(\.\w{3})$/, '');
-	const arr = songName.split(/\s+-\s+/);
+	const arr = songName.split(/\s+?-\s+?/);
 	const artist = arr[0].trim();
 	const title = arr[1].trim();
 

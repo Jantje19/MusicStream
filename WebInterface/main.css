@@ -88,8 +88,8 @@ b {
 }
 
 a {
+	color: #FFFFFF;
 	cursor:pointer;
-	color:#999999;
 	text-decoration:none;
 
 	-webkit-transition:all .5s;
@@ -97,7 +97,7 @@ a {
 }
 
 a:hover {
-	color:#BC80FF;
+	color:#16a085;
 	text-decoration:underline;
 }
 
