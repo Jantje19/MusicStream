@@ -65,10 +65,12 @@ function playSong(songName, notAddToQueue) {
 		}
 	} else {
 		if (!songName) songName = queue[queueIndex];
+
 		audio.src = '/song/' + songName;
+
 		if (!notAddToQueue) {
 			enqueue(songName);
-			queueIndex++;
+			// queueIndex++;
 			updateInterface();
 		}
 
@@ -131,44 +133,50 @@ function updateInterface() {
 function mediaSession() {
 	const songName = queue[queueIndex].replace(/(\.\w{3})$/, '');
 	const match = songName.match(/(.+)(\s+)?-(\s+)?(.+)/);
-	const artist = match[1].trim();
-	const title = match[4].trim();
 
-	fetchArtistData(artist).then(json => {
-		console.log(json);
+	let title = songName;
+	let artist = songName;
 
-		// Display info
-		const dataDiv = document.createElement('div');
+	if (match) {
+		artist = match[1].trim();
+		title = match[4].trim();
 
-		dataDiv.id = 'artistInfo';
-		dataDiv.innerHTML += `<p style="font-size: 120%;"><i>Artist info:</i></p><hr>`;
-		dataDiv.innerHTML += `<p><b>Name:</b> <a href="${json.url}">${json.name}</a></p>`;
-		dataDiv.innerHTML += `<p><b>On tour:</b> ${(json.ontour == 1) ? true : false}</p>`;
-		dataDiv.innerHTML += `<p><b>Playcount:</b> ${json.stats.playcount}</p>`;
-		dataDiv.innerHTML += `<p><b>Listeners:</b> ${json.stats.listeners}</p>`;
-		dataDiv.innerHTML += `<p><b>Tags:</b> ${json.tags.tag.map(obj => {return obj.name})}</p>`;
+		fetchArtistData(artist).then(json => {
+			// console.log(json);
 
-		document.getElementById('mainControls').appendChild(dataDiv);
-		document.getElementById('showData').setAttribute('activated', '');
+			// Display info
+			const dataDiv = document.createElement('div');
 
-		// Edit thumbnail
-		if (json.image && 'mediaSession' in navigator) {
-			navigator.mediaSession.metadata = new MediaMetadata({
-				title: title,
-				artist: artist,
-				artwork: [
-				{ src: json.image[0]['#text'], sizes: '34x32', type: 'image/png' },
-				{ src: json.image[1]['#text'], sizes: '64x64', type: 'image/png' },
-				{ src: json.image[2]['#text'], sizes: '174x174', type: 'image/png' },
-				{ src: json.image[3]['#text'], sizes: '300x300', type: 'image/png' },
-				{ src: json.image[4]['#text'], sizes: '500x498', type: 'image/png' },
-				{ src: json.image[5]['#text'], sizes: '126x126', type: 'image/png' }
-				]
-			});
-		}
-	}).catch(err => {
-		console.warn(err);
-	});
+			dataDiv.id = 'artistInfo';
+			dataDiv.innerHTML += `<p style="font-size: 120%;"><i>Artist info:</i></p><hr>`;
+			dataDiv.innerHTML += `<p><b>Name:</b> <a href="${json.url}">${json.name}</a></p>`;
+			dataDiv.innerHTML += `<p><b>On tour:</b> ${(json.ontour == 1) ? true : false}</p>`;
+			dataDiv.innerHTML += `<p><b>Playcount:</b> ${json.stats.playcount}</p>`;
+			dataDiv.innerHTML += `<p><b>Listeners:</b> ${json.stats.listeners}</p>`;
+			dataDiv.innerHTML += `<p><b>Tags:</b> ${json.tags.tag.map(obj => {return obj.name})}</p>`;
+
+			document.getElementById('mainControls').appendChild(dataDiv);
+			document.getElementById('showData').setAttribute('activated', '');
+
+			// Edit thumbnail
+			if (json.image && 'mediaSession' in navigator) {
+				navigator.mediaSession.metadata = new MediaMetadata({
+					title: title,
+					artist: artist,
+					artwork: [
+					{ src: json.image[0]['#text'], sizes: '34x32', type: 'image/png' },
+					{ src: json.image[1]['#text'], sizes: '64x64', type: 'image/png' },
+					{ src: json.image[2]['#text'], sizes: '174x174', type: 'image/png' },
+					{ src: json.image[3]['#text'], sizes: '300x300', type: 'image/png' },
+					{ src: json.image[4]['#text'], sizes: '500x498', type: 'image/png' },
+					{ src: json.image[5]['#text'], sizes: '126x126', type: 'image/png' }
+					]
+				});
+			}
+		}).catch(err => {
+			console.warn(err);
+		});
+	}
 
 	if ('mediaSession' in navigator) {
 		navigator.mediaSession.metadata = new MediaMetadata({
