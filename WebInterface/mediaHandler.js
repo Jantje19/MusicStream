@@ -47,11 +47,7 @@ function deleteQueue() {
 }
 
 function playSong(songName, notAddToQueue) {
-	if (notAddToQueue) {
-		if (!songName) songName = queue[queueIndex];
-		audio.src = '/song/' + songName;
-		startSong();
-	} else if (audio.currentTime > 0) {
+	if (audio.currentTime > 0) {
 		if (audio.src != '' && audio.src != undefined) {
 			if (audio.paused == true) {
 				audio.play();
@@ -62,7 +58,15 @@ function playSong(songName, notAddToQueue) {
 			} else {
 				console.error('WUT?');
 			}
+		} else if (notAddToQueue) {
+			if (!songName) songName = queue[queueIndex];
+			audio.src = '/song/' + songName;
+			startSong();
 		}
+	} else if (notAddToQueue) {
+		if (!songName) songName = queue[queueIndex];
+		audio.src = '/song/' + songName;
+		startSong();
 	} else {
 		if (!songName) songName = queue[queueIndex];
 
