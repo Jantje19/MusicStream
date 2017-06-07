@@ -157,6 +157,7 @@ function mediaSession() {
 				img.style.top = '60px';
 				img.style.right = '20px';
 				img.style.position = 'absolute';
+				img.style.border = '2px white solid';
 				img.style.boxShadow = '0 0 10px rgba(0, 0, 0, 0.3)';
 				img.src = json.image[1]['#text'];
 				dataDiv.appendChild(img);

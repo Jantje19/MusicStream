@@ -112,6 +112,10 @@ header {
 	box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
 }
 
+header h1 {
+	white-space: nowrap;
+}
+
 header div {
 	margin: 0 20px;
 	display: inline-block;
@@ -361,4 +365,27 @@ main #controls #mainControls #artistInfo p {
 	text-align: left;
 	overflow: hidden;
 	text-overflow: ellipsis;
+}
+
+main #fab {
+	right: 20px;
+	width: 10vw;
+	height: 10vw;
+	bottom: 20px;
+	border: none;
+	display: flex;
+	position: fixed;
+	cursor: pointer;
+	border-radius: 100%;
+	align-items: center;
+	will-change: transform;
+	justify-content: center;
+	transition: all .3s ease;
+	background-color: #16a085;
+	box-shadow: 0 5px 10px rgba(0, 0, 0, 0.5);
+}
+
+main #fab:hover {
+	transform: translateY(-5%);
+	box-shadow: 0 8px 10px rgba(0, 0, 0, 0.3);
 }
