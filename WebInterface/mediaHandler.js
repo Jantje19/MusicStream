@@ -13,7 +13,7 @@ function enqueue(...vals) {
 }
 
 function next() {
-	const newIndex = queueIndex + 1;
+	const newIndex = Number(queueIndex) + 1;
 
 	if (queue.length > newIndex) {
 		queueIndex = newIndex;
@@ -48,21 +48,9 @@ function deleteQueue() {
 
 function playSong(songName, notAddToQueue) {
 	if (audio.currentTime > 0) {
-		if (audio.src != '' && audio.src != undefined) {
-			if (audio.paused == true) {
-				audio.play();
-				document.getElementById('toggleBtn').querySelector('img').src = 'Assets/ic_play_arrow_white.svg';
-			} else if (audio.paused == false) {
-				audio.pause();
-				document.getElementById('toggleBtn').querySelector('img').src = 'Assets/ic_pause_white.svg';
-			} else {
-				console.error('WUT?');
-			}
-		} else if (notAddToQueue) {
-			if (!songName) songName = queue[queueIndex];
-			audio.src = '/song/' + songName;
-			startSong();
-		}
+		if (!songName) songName = queue[queueIndex];
+		audio.src = '/song/' + songName;
+		startSong();
 	} else if (notAddToQueue) {
 		if (!songName) songName = queue[queueIndex];
 		audio.src = '/song/' + songName;
@@ -84,7 +72,7 @@ function playSong(songName, notAddToQueue) {
 
 function startSong() {
 	document.getElementById('toggleBtn').querySelector('img').src = 'Assets/ic_play_arrow_white.svg';
-	document.getElementById('songName').innerText = queue[queueIndex];
+	document.getElementById('songName').innerText = queue[queueIndex].replace(/(\.\w{2,5})$/, '');
 	document.getElementById('showData').removeAttribute('activated');
 	audio.play().then(mediaSession).catch(err => {
 		console.log(err);
@@ -104,6 +92,11 @@ function stopSong() {
 	document.getElementById('seekBar').value = 0;
 	updateCSS('0s', '0s');
 	audio.pause();
+}
+
+function pickRandomSong() {
+	const elems = document.getElementById('songs').querySelectorAll('button');
+	playSong(elems[Math.floor(Math.random() * elems.length)].innerText);
 }
 
 function updateInterface() {
@@ -136,14 +129,14 @@ function updateInterface() {
 // Media Sessions
 function mediaSession() {
 	const songName = queue[queueIndex].replace(/(\.\w{3})$/, '');
-	const match = songName.match(/(.+)(\s+)?-(\s+)?(.+)/);
+	const match = songName.split('-');
 
 	let title = songName;
 	let artist = songName;
 
 	if (match) {
-		artist = match[1].trim();
-		title = match[4].trim();
+		artist = match.splice(0, 1)[0].trim();
+		title = match.join('-').trim();
 
 		fetchArtistData(artist).then(json => {
 			// console.log(json);
@@ -158,6 +151,16 @@ function mediaSession() {
 			dataDiv.innerHTML += `<p><b>Playcount:</b> ${json.stats.playcount}</p>`;
 			dataDiv.innerHTML += `<p><b>Listeners:</b> ${json.stats.listeners}</p>`;
 			dataDiv.innerHTML += `<p><b>Tags:</b> ${json.tags.tag.map(obj => {return obj.name})}</p>`;
+
+			if (window.innerWidth > 500) {
+				const img = document.createElement('img');
+				img.style.top = '60px';
+				img.style.right = '20px';
+				img.style.position = 'absolute';
+				img.style.boxShadow = '0 0 10px rgba(0, 0, 0, 0.3)';
+				img.src = json.image[1]['#text'];
+				dataDiv.appendChild(img);
+			}
 
 			document.getElementById('mainControls').appendChild(dataDiv);
 			document.getElementById('showData').setAttribute('activated', '');

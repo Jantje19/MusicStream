@@ -46,7 +46,7 @@ function queueClick(evt, index) {
 		if (audio.paused || (!audio.paused && index != queueIndex)) updateInterface();
 		else playSong(null, true);
 	} else {
-		queueIndex = index;
+		queueIndex = Number(index);
 		playSong(null, true);
 	}
 }
@@ -125,7 +125,17 @@ function load() {
 	document.getElementById('toggleBtn').addEventListener('click', evt => {
 		if (queue.length > 0) {
 			if (audio.paused == true) {
-				playSong(null, true);
+				if (audio.src != '' && audio.src != undefined) {
+					if (audio.paused == true) {
+						audio.play();
+						document.getElementById('toggleBtn').querySelector('img').src = 'Assets/ic_play_arrow_white.svg';
+					} else if (audio.paused == false) {
+						audio.pause();
+						document.getElementById('toggleBtn').querySelector('img').src = 'Assets/ic_pause_white.svg';
+					} else {
+						console.error('WUT?');
+					}
+				} else playSong(null, true);
 			} else if (audio.paused == false) {
 				pauseSong();
 			} else {
