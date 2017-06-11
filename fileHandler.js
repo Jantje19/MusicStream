@@ -73,7 +73,6 @@ module.exports = {
 
 								if (object != '') {
 									const match = object.match(/(.+)(\/|\\)(.+)$/);
-									console.log(object);
 									if (match) {
 										const songName = match[3].trim();
 										if (findSong(songsArr, songName)) songs.push(songName);
@@ -126,6 +125,15 @@ module.exports = {
 						else resolve(data);
 					});
 				} else reject('File doesn\'t exist');
+			});
+		});
+	},
+
+	getSongInfo: function(path, id3, fs) {
+		return new Promise((resolve, reject) => {
+			fs.exists(path, exists => {
+				if (exists) resolve(id3.read(path));
+				else reject('File does not exist');
 			});
 		});
 	}

@@ -1,5 +1,5 @@
 module.exports = {
-	start: function(dirname, fileHandler, fs, os, fileExtentions, utils, querystring) {
+	start: function(dirname, fileHandler, fs, os, fileExtentions, utils, querystring, id3) {
 		const express = require('express');
 
 		const app = express();
@@ -14,9 +14,30 @@ module.exports = {
 			fileHandler.getJSON(fs, os, fileExtentions, utils).then(json => {
 				const songs = [];
 
-				json.songs.forEach((object, key) => {
-					songs.push(object.fileName);
-				});
+				json.songs.forEach((object, key) => songs.push(object.fileName));
+
+				// getSongs = (json, fs) => {
+				// 	return new Promise((resolve, reject) => {
+				// 		const songs = [];
+				// 		const promises = [];
+
+				// 		json.songs.forEach((object, key) => {
+				// 			promises.push(
+				// 				fileHandler.getSongInfo(object.path + object.fileName, id3, fs).then(tags => {
+				// 					let songInfo = {};
+
+				// 					if (tags) songInfo = tags;
+				// 					console.log(songInfo);
+
+				// 					songInfo.name = object.fileName;
+				// 					songs.push(songInfo);
+				// 				}).catch(err => console.log(err))
+				// 				);
+				// 		});
+
+				// 		Promise.all(promises).then(() => resolve(songs)).catch(err => reject(err));
+				// 	});
+				// }
 
 				getPlaylists = (json, fs) => {
 					return Promise.all([new Promise((resolve, reject) => {
@@ -49,13 +70,10 @@ module.exports = {
 					]);
 				}
 
-				getPlaylists(json, fs).then(playlists => {
-					playlists = playlists[0].concat(playlists[1]);
-					if (playlists.length > 0) response.send({songs: songs, playlists: playlists});
-					else response.send({songs: songs, playlists: []});
-				}).catch(err => {
-					console.error(err);
-				});
+
+				getPlaylists(json, fs)
+				.then(playlists => response.send({songs: songs, playlists: playlists[0].concat(playlists[1])}))
+				.catch(err => response.send({error: "Something went wrong", info: "Either getting the songs or getting the playlists or both went wrong"}));
 			}).catch(err => {
 				console.error('There was an error with getting the info', err);
 				response.send({error: "There was an error with getting the info", info: err});
