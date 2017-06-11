@@ -72,10 +72,10 @@ module.exports = {
 								object = object.trim();
 
 								if (object != '') {
-									const match = object.match(/(.+)\/(.+)$/);
+									const match = object.match(/(.+)(\/|\\)(.+)$/);
+									console.log(object);
 									if (match) {
-										const songName = match[2].trim();
-
+										const songName = match[3].trim();
 										if (findSong(songsArr, songName)) songs.push(songName);
 									}
 								}
