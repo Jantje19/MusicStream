@@ -113,6 +113,8 @@ header {
 }
 
 header h1 {
+	float: left;
+	padding-top: 10px;
 	white-space: nowrap;
 }
 
@@ -121,9 +123,32 @@ header div {
 	display: inline-block;
 }
 
-header div:first-child {
-	float: left;
-	padding-top: 10px;
+header button {
+	top: 16px;
+	left: 10px;
+	width: 20px;
+	height: 20px;
+	border: none;
+	cursor: pointer;
+	position: absolute;
+	background-color: transparent;
+}
+
+header button:before {
+	opacity: 0;
+	width: 40px;
+	height: 40px;
+	content: ' ';
+	display: block;
+	position: absolute;
+	border-radius: 100%;
+	background-color: white;
+	transition: opacity .3s ease;
+	transform: translate(-20%, -20%);
+}
+
+header button:hover:before {
+	opacity: 0.3;
 }
 
 header #searchBar {
@@ -376,6 +401,10 @@ main #fab {
 	display: flex;
 	position: fixed;
 	cursor: pointer;
+	max-width: 80px;
+	min-width: 50px;
+	min-height: 50px;
+	max-height: 80px;
 	border-radius: 100%;
 	align-items: center;
 	will-change: transform;

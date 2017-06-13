@@ -118,6 +118,10 @@
 					}
 				} else alert('The playlist is to short. We cannot accept that :/');
 			});
+
+			document.getElementById('back').addEventListener('click', evt => {
+				window.location = window.location.host;
+			});
 		}
 
 		window.onload = load;
@@ -127,6 +131,7 @@
 <body>
 
 	<header>
+		<button id="back"><img src="Assets/ic_arrow_back_white.svg"></button>
 		<div style="padding-top: 5px"><h1>Manage Playlist</h1></div>
 	</header>
 
