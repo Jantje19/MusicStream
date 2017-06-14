@@ -12,6 +12,21 @@ function enqueue(...vals) {
 	updateInterface();
 }
 
+function end() {
+	const songName = queue[queueIndex];
+
+	fetch('/updateMostListenedPlaylist', {method: 'POST', body: songName}).then(response => {
+		response.json().then(json => {
+			if (json.success) console.log(json.data);
+			else console.warn(json.data);
+		});
+	}).catch( err => {
+		console.error('An error occurred', err);
+	});
+
+	next();
+}
+
 function next() {
 	const newIndex = Number(queueIndex) + 1;
 

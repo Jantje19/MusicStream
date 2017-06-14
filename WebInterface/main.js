@@ -274,6 +274,7 @@ Array.prototype.shuffle = function() {
 }
 
 window.onload = load;
-audio.onended = next;
+
+audio.onended = end;
 audio.onplay = updateInterface;
 audio.onpause = updateInterface;
