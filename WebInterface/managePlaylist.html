@@ -74,7 +74,10 @@
 		function load() {
 			const playlistName = location.hash.replace('#', '');
 
-			if (location.hash == '') return;
+			if (location.hash == '') {
+				alert('No name supplied');
+				return;
+			}
 
 			getData('/data/').then(json => {
 				const songsElem = document.getElementById('songs');
@@ -119,6 +122,25 @@
 				} else alert('The playlist is to short. We cannot accept that :/');
 			});
 
+			document.getElementById('delete').addEventListener('click', evt => {
+				if (confirm('Are you sure you want to delete this playlist?')) {
+					const data = {
+						delete: true,
+						name: location.hash.replace('#', '')
+					}
+
+					fetch('updatePlaylist/', {method: 'POST', body: JSON.stringify(data)}).then(response => {
+						response.json().then(json => {
+							if (json.success == true)
+								window.location = window.location.host;
+							else alert(json.error);
+						}).catch(err => console.log(err));
+					}).catch( err => {
+						console.error('An error occurred', err);
+					});
+				}
+			});
+
 			document.getElementById('back').addEventListener('click', evt => {
 				window.location = window.location.host;
 			});
@@ -133,6 +155,7 @@
 	<header>
 		<button id="back"><img src="Assets/ic_arrow_back_white.svg"></button>
 		<div style="padding-top: 5px"><h1>Manage Playlist</h1></div>
+		<button id="delete" style="right: 30px; left: unset;"><img src="Assets/ic_delete_white.svg"></button>
 	</header>
 
 	<main>
