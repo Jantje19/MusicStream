@@ -162,7 +162,17 @@ function load() {
 		const val = evt.target.getAttribute('activated');
 
 		if (val != null) {
-			evt.target.removeAttribute('activated');
+			const img = evt.target.querySelector('img');
+			const repeatOne = evt.target.getAttribute('repeatOne');
+
+			if (repeatOne != null) {
+				img.src = 'Assets/ic_repeat_white.svg';
+				evt.target.removeAttribute('repeatOne');
+				evt.target.removeAttribute('activated');
+			} else {
+				evt.target.setAttribute('repeatOne', '');
+				img.src = 'Assets/ic_repeat_one_white.svg';
+			}
 		} else {
 			evt.target.setAttribute('activated', '');
 		}

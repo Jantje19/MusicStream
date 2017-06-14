@@ -28,16 +28,21 @@ function end() {
 }
 
 function next() {
-	const newIndex = Number(queueIndex) + 1;
-
-	if (queue.length > newIndex) {
-		queueIndex = newIndex;
+	if (document.getElementById('repeat').getAttribute('activated') && document.getElementById('repeat').getAttribute('repeatOne')) {
+		console.log('YEP');
 	} else {
-		if (document.getElementById('repeat').getAttribute('activated') != null) queueIndex = 0;
-		else return;
+		const newIndex = Number(queueIndex) + 1;
+
+		if (queue.length > newIndex) {
+			queueIndex = newIndex;
+		} else {
+			if (document.getElementById('repeat').getAttribute('activated') != null) queueIndex = 0;
+			else return;
+		}
+
+		updateInterface();
 	}
 
-	updateInterface();
 	playSong(queue[queueIndex], true);
 }
 
