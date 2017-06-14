@@ -1,5 +1,5 @@
 module.exports = {
-	start: function(dirname, fileHandler, fs, os, fileExtentions, utils, querystring, id3) {
+	start: function(dirname, fileHandler, fs, os, fileExtentions, utils, querystring, id3, mostListenedPlaylistName) {
 		const express = require('express');
 
 		const app = express();
@@ -113,9 +113,11 @@ module.exports = {
 							fs.readFile('./playlists.json', 'utf-8', (err, data) => {
 								if (err) response.send({error: 'Cannot read the file', info: err});
 								else {
-
 									data = JSON.parse(data);
-									response.send({songs: data[name]});
+
+									if (name == mostListenedPlaylistName)
+										response.send({songs: utils.sortJSON(data[mostListenedPlaylistName]).map(val => {return val[0]})});
+									else response.send({songs: data[name]});
 								}
 							});
 						} else response.send({error: `The playlist '${name}' was not found`, info: "The 'playlists.json' file had no reference to this file"});
@@ -148,10 +150,7 @@ module.exports = {
 						const song = json.songs[inArray.index];
 						response.sendFile(song.path + song.fileName);
 					} else response.send({error: `The song '${songName}' was not found`, info: "The cached JSON file had no reference to this file"});
-				}).catch(err => {
-					console.error('There was an error with getting the song', err);
-					response.send({error: "There was an error with getting the song", info: err});
-				});
+				}).catch(err => response.send({error: "There was an error with getting the song", info: err}));
 			} else {
 				response.send({error: "No song found"});
 			}
@@ -255,7 +254,6 @@ module.exports = {
 			});
 
 			request.on('end', () => {
-				const jsonPath = 'playlists.json';
 				const url = querystring.unescape(request.url);
 
 				console.log('Got a POST request for ' + url);
@@ -266,43 +264,49 @@ module.exports = {
 					return;
 				}
 
-				fs.exists(__dirname + '/' + jsonPath, exists => {
-					if (exists) {
-						fs.readFile(__dirname + '/' + jsonPath, 'utf-8', (err, data) => {
-							if (err) response.send({success: false, err: 'An error occured', info: err});
-							else {
-								data = JSON.parse(data);
+				fileHandler.updatePlaylist(fs, body, mostListenedPlaylistName).then(data => response.send(data)).catch(err => response.send(err));
+			});
+		});
 
-								if (body.delete == true) {
-									delete data[body.name];
-									write(data, true);
-								} else {
-									if (body.name in data) {
-										data[body.name] = body.songs;
-										write(data, true);
-									} else {
-										data[body.name] = body.songs;
-										write(data, false);
-									}
-								}
-							}
+		app.post('/updateMostListenedPlaylist', (request, response) => {
+			let body = '';
+
+			request.on('data', data => {
+				body += data;
+
+				if (body.length > 1e6) {
+					request.send({success: false, err: 'The amount of data is to high', info: 'The connection was destroyed because the amount of data passed is to much'});
+					request.connection.destroy();
+				}
+			});
+
+			request.on('end', () => {
+				let songs = {};
+				const jsonPath = './playlists.json';
+				const url = querystring.unescape(request.url);
+
+				console.log('Got a POST request for ' + url);
+				fs.exists(jsonPath, exists => {
+					if (exists) {
+						fs.readFile('./playlists.json', 'utf-8', (err, data) => {
+
+							try {data = JSON.parse(data)} catch (err) {return}
+							if (data[mostListenedPlaylistName]) {
+								songs = data[mostListenedPlaylistName];
+
+								if (body in songs) songs[body]++;
+								else songs[body] = 1;
+							} else songs[body] = 1;
+
+							send();
 						});
 					} else {
-						const obj = {};
-						obj[body.name] = body.songs;
-						write(obj, false);
+						songs[body] = 1;
+						send();
 					}
-				});
 
-				function write(content, alreadyExists) {
-					fs.writeFile(__dirname + '/' + jsonPath, JSON.stringify(content), (err) => {
-						try {
-							if (err) response.send({success: false, error: 'There was an error with creating the playlist file', info: err});
-							else if (alreadyExists) response.send({success: true, data: `Playlist with the name '${body.name}' successfuly updated`});
-							else response.send({success: true, data: `Playlist with the name '${body.name}' successfuly added`});
-						} catch (err) {console.warn('Can\'t do that');}
-					});
-				}
+					function send() {fileHandler.updatePlaylist(fs, {name: mostListenedPlaylistName, songs: songs}, mostListenedPlaylistName).then(data => response.send({success: true, data: body + ' successfully added to ' + mostListenedPlaylistName})).catch(err => response.send({success: false, data: 'Something happened when tried to add ' + body + ' to ' + mostListenedPlaylistName}));}
+				});
 			});
 		});
 

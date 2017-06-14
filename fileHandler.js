@@ -96,6 +96,52 @@ module.exports = {
 		}
 	},
 
+	updatePlaylist: function(fs, body, mostListenedPlaylistName) {
+		const jsonPath = 'playlists.json';
+
+		return new Promise((resolve, reject) => {
+			// if (body.name == mostListenedPlaylistName) reject({success: false, error: `Cannot access '${playlistName}'`, info: "This file is not editable"});
+
+			fs.exists(__dirname + '/' + jsonPath, exists => {
+				if (exists) {
+					fs.readFile(__dirname + '/' + jsonPath, 'utf-8', (err, data) => {
+						if (err) reject({success: false, err: 'An error occured', info: err});
+						else {
+							data = JSON.parse(data);
+
+							if (body.delete == true) {
+								delete data[body.name];
+								write(data, true);
+							} else {
+								if (body.name in data) {
+									data[body.name] = body.songs;
+									write(data, true);
+								} else {
+									data[body.name] = body.songs;
+									write(data, false);
+								}
+							}
+						}
+					});
+				} else {
+					const obj = {};
+					obj[body.name] = body.songs;
+					write(obj, false);
+				}
+			});
+
+			function write(content, alreadyExists) {
+				fs.writeFile(__dirname + '/' + jsonPath, JSON.stringify(content), (err) => {
+					try {
+						if (err) reject({success: false, error: 'There was an error with creating the playlist file', info: err});
+						else if (alreadyExists) resolve({success: true, data: `Playlist with the name '${body.name}' successfuly updated`});
+						else resolve({success: true, data: `Playlist with the name '${body.name}' successfuly added`});
+					} catch (err) {console.warn('Can\'t do that'); reject({success: false, error: 'There was an error with creating the playlist file', info: err})}
+				});
+			}
+		});
+	},
+
 	getJSON: function(fs, os, fileExtentions, utils) {
 		return new Promise((resolve, reject) => {
 			const JSONPath = './JSON.json';
