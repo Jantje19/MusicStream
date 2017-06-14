@@ -134,7 +134,7 @@ module.exports = {
 			}
 		});
 
-		app.get('/song/*', (request, response) => {
+		app.get('/song*', (request, response) => {
 			const url = querystring.unescape(request.url);
 
 			console.log('Got a request for ' + url);
@@ -153,7 +153,7 @@ module.exports = {
 					response.send({error: "There was an error with getting the song", info: err});
 				});
 			} else {
-				response.send({"error": "No song found"});
+				response.send({error: "No song found"});
 			}
 
 			function findSong(songs, songName) {
@@ -260,7 +260,12 @@ module.exports = {
 
 				console.log('Got a POST request for ' + url);
 
-				body = JSON.parse(body);
+				try {body = JSON.parse(body);}
+				catch (err) {
+					response.send({error: 'Couldn\'t parse to JSON', info: err});
+					return;
+				}
+
 				fs.exists(__dirname + '/' + jsonPath, exists => {
 					if (exists) {
 						fs.readFile(__dirname + '/' + jsonPath, 'utf-8', (err, data) => {
@@ -268,12 +273,17 @@ module.exports = {
 							else {
 								data = JSON.parse(data);
 
-								if (body.name in data) {
-									data[body.name] = body.songs;
+								if (body.delete == true) {
+									delete data[body.name];
 									write(data, true);
 								} else {
-									data[body.name] = body.songs;
-									write(data, false);
+									if (body.name in data) {
+										data[body.name] = body.songs;
+										write(data, true);
+									} else {
+										data[body.name] = body.songs;
+										write(data, false);
+									}
 								}
 							}
 						});
