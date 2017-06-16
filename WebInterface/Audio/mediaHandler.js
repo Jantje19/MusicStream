@@ -116,7 +116,11 @@ function stopSong() {
 
 function pickRandomSong() {
 	const elems = document.getElementById('songs').querySelectorAll('button');
-	playSong(elems[Math.floor(Math.random() * elems.length)].innerText);
+	const songName = elems[Math.floor(Math.random() * elems.length)].innerText;
+	queue.length = 0;
+	queueIndex = 0;
+	enqueue(songName);
+	playSong(songName, true);
 }
 
 function updateInterface() {
@@ -159,9 +163,8 @@ function mediaSession() {
 		title = match.join('-').trim();
 
 		fetchArtistData(artist).then(json => {
-			// console.log(json);
+			try {document.getElementById('artistInfo').remove()} catch(err) {}
 
-			// Display info
 			const dataDiv = document.createElement('div');
 
 			dataDiv.id = 'artistInfo';
@@ -204,6 +207,53 @@ function mediaSession() {
 		}).catch(err => {
 			console.warn(err);
 		});
+
+		fetch('/songInfo/' + queue[queueIndex]).then(response => {
+			response.json().then(json => {
+				if (json.error) return;
+				try {document.getElementById('artistInfo').remove()} catch(err) {}
+
+				const dataDiv = document.createElement('div');
+
+				dataDiv.id = 'artistInfo';
+				dataDiv.innerHTML += `<p style="font-size: 120%;"><i>Song info:</i></p><hr>`;
+				dataDiv.innerHTML += `<p><b>Title:</b> ${json.title}</p>`;
+				dataDiv.innerHTML += `<p><b>Artist:</b> ${json.artist}</p>`;
+				dataDiv.innerHTML += `<p><b>Album:</b> ${json.album}</p>`;
+				dataDiv.innerHTML += `<p><b>Year:</b> ${json.year}</p>`;
+
+				if (window.innerWidth > 500) {
+					const img = document.createElement('img');
+					const arrayBufferView = new Uint8Array(json.image.imageBuffer.data);
+					const blob = new Blob([arrayBufferView], {type: "image/jpeg"});
+					const urlCreator = window.URL || window.webkitURL;
+					const imageUrl = urlCreator.createObjectURL(blob);
+
+					img.style.top = '40px';
+					img.style.right = '10px';
+					img.style.width = '100px';
+					img.style.height = 'auto';
+					img.style.position = 'absolute';
+					img.style.border = '2px white solid';
+					img.style.boxShadow = '0 0 10px rgba(0, 0, 0, 0.3)';
+					img.src = imageUrl;
+					dataDiv.appendChild(img);
+				}
+
+				document.getElementById('mainControls').appendChild(dataDiv);
+				document.getElementById('showData').setAttribute('activated', '');
+
+				if (json.image && 'mediaSession' in navigator) {
+					navigator.mediaSession.metadata = new MediaMetadata({
+						title: title,
+						artist: artist,
+						artwork: [
+						{ src: imageUrl, type: 'image/jpeg' },
+						]
+					});
+				}
+			}).catch(err => console.warn(err));
+		}).catch(err => console.warn(err));
 	}
 
 	if ('mediaSession' in navigator) {
