@@ -8,7 +8,7 @@ function getData() {
 	return new Promise((resolve, reject) => {
 		get('/data/').then(json => {
 			if (json.error) reject(json);
-			else resolve(json);
+			else resolve(json.audio);
 		}).catch(err => reject(err));
 	});
 }
