@@ -1,13 +1,7 @@
 module.exports = {
-	start: (app, dirname) => {
-		app.get('/videos', (request, response) => {
-			const url = request.url;
-			console.log('Got a request for ' + url);
-			response.sendFile(dirname + 'videoIndex.html');
-		});
-
+	start: (app, dirname, fileHandler, fs, os, audioFileExtentions, videoFileExtentions, utils, querystring) => {
 		app.get('/video/*', (request, response) => {
-			const url = request.url;
+			const url = querystring.unescape(request.url);
 			console.log('Got a request for ' + url);
 
 			if (!url.endsWith('/')) {

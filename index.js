@@ -5,7 +5,7 @@ const server = require('./server.js');
 const querystring = require('querystring');
 const fileHandler = require('./fileHandler.js');
 
-const videoFileExtentions = ['.mp4'];
+const videoFileExtentions = ['.mp4', '.avi'];
 const audioFileExtentions = ['.mp3', '.m3a', '.wav'];
 const mostListenedPlaylistName = 'mostListened';
 

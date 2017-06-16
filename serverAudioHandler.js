@@ -1,5 +1,5 @@
 module.exports = {
-	start: (app, dirname) => {
+	start: (app, dirname, fileHandler, fs, os, audioFileExtentions, videoFileExtentions, utils, querystring, mostListenedPlaylistName) => {
 		app.get('/playlist/*', (request, response) => {
 			const url = querystring.unescape(request.url);
 
@@ -84,34 +84,6 @@ module.exports = {
 			}
 		});
 
-		app.get('/updateJSON/', (request, response) => {
-			console.log('Got a request for ' + request.url);
-
-			fileHandler.searchSystem(fs, os, audioFileExtentions, videoFileExtentions, utils).then(json => {
-				// json.audio.playlists.forEach((object, key) => {
-				// 	console.log(fileHandler.readPlaylist(object.path + object.file));
-				// });
-
-				response.send('JSON updated successfully');
-			}).catch(err => {
-				console.log(err);
-				response.send({error: "There was an error with updating the playlist", info: err});
-			});
-		});
-
-		app.get('/getSettings', (request, response) => {
-			const url = querystring.unescape(request.url);
-
-			console.log('Got a request for ' + url);
-
-			fileHandler.getSettings(fs).then(json => {
-				response.send(json);
-			}).catch(err => {
-				console.log('There was an error with getting the JSON file', err);
-				response.send({error: 'There was an error with getting the JSON file', info: err});
-			});
-		});
-
 		app.get('/OldBrowsers/*', (request, response) => {
 			const url = request.url;
 
@@ -126,39 +98,6 @@ module.exports = {
 
 				response.send(html);
 			}).catch(err => response.status(404).send('Error: ' + err));
-		});
-
-		app.get('/', (request, response) => {
-			const url = request.url;
-
-			console.log('Got a request for ' + url);
-
-			response.sendFile(dirname + url);
-		});
-
-		app.post('/updateSettings', (request, response) => {
-			let body = '';
-
-			request.on('data', data => {
-				body += data;
-
-				if (body.length > 1e6) {
-					request.send({success: false, err: 'The amount of data is to high', info: 'The connection was destroyed because the amount of data passed is to much'});
-					request.connection.destroy();
-				}
-			});
-
-			request.on('end', () => {
-				const jsonPath = 'settings.json';
-				const url = querystring.unescape(request.url);
-
-				console.log('Got a POST request for ' + url);
-
-				fs.writeFile(__dirname + '/' + jsonPath, body, (err) => {
-					if (err) response.send({success: false, error: 'There was an error with creating the settings file', info: err});
-					else response.send({success: true});
-				});
-			});
 		});
 
 		app.post('/updatePlaylist', (request, response) => {
