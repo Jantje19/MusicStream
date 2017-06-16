@@ -46,11 +46,27 @@
 	</header>
 
 	<main>
-		<div id="main">
-			<div id="player"></div>
+		<div>
+			<div id="player">
+				<div id="videoElem">
+					<video></video>
+				</div>
+
+				<div id="controls">
+					<div style="float: left">
+						<button id="playPause"><img src="Assets/ic_play_arrow_white.svg"></button>
+					</div>
+
+					<div style="float: right">
+						<button id="fullScreen"><img src="Assets/ic_fullscreen_white.svg"></button>
+					</div>
+				</div>
+			</div>
+
 			<div id="videoInfo"></div>
-			<div id="videos"></div>
 		</div>
+
+		<div id="videos"></div>
 	</main>
 
 </body>
