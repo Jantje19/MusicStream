@@ -1,0 +1,332 @@
+/* reset */
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed,
+figure, figcaption, footer, header, hgroup,
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	font-size: 100%;
+	font: inherit;
+	vertical-align: baseline;
+}
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section {
+	display: block;
+}
+body {
+	line-height: 1;
+}
+ol, ul {
+	list-style: none;
+}
+blockquote, q {
+	quotes: none;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+	content: '';
+	content: none;
+}
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+
+
+/* Main */
+
+body {
+	top: 0;
+	left: 0;
+	width:100%;
+	height:100%;
+	text-align:center;
+	position: absolute;
+	font-family: 'Arial', sans-serif;
+}
+
+h1 {
+	padding:2%;
+	font-size:250%;
+}
+
+h2 {
+	padding:2%;
+	font-size:200%;
+}
+
+h3 {
+	font-size:150%;
+}
+
+h4 {
+	font-size:100%;
+}
+
+hr {
+	border: none;
+	border-bottom: 1px lightgray solid;
+}
+
+i {
+	font-style: italic;
+}
+
+b {
+	font-weight: bold;
+}
+
+a {
+	color: #FFFFFF;
+	cursor:pointer;
+	text-decoration:none;
+
+	-webkit-transition:all .5s;
+	transition:all .5s;
+}
+
+a:hover {
+	color:#16a085;
+	text-decoration:underline;
+}
+
+/* Identifiers */
+main #main {
+	display: flex;
+	margin-top: 20px;
+	margin-bottom: 80px;
+	flex-direction: row;
+}
+
+main #main > div {
+	flex: 1;
+	width: 30%;
+	margin: 0 5px;
+	text-align: left;
+}
+
+main #main div i {
+	color: gray;
+}
+
+main #main div h3 {
+	display: inline;
+	margin-bottom: 20px;
+}
+
+main #main button {
+	border: none;
+	cursor: pointer;
+	position: relative;
+	background-color: transparent;
+}
+
+main #main button:before {
+	opacity: 0;
+	width: 40px;
+	height: 40px;
+	content: ' ';
+	display: block;
+	position: absolute;
+	border-radius: 100%;
+	background-color: black;
+	transition: opacity .3s ease;
+	transform: translate(-20%, -20%);
+}
+
+main #main button:hover:before {
+	opacity: 0.15;
+}
+
+main #main > div > hr {
+	border-bottom: 1px gray solid;
+}
+
+main #main div div hr {
+	margin: 0;
+}
+
+main #main div div button {
+	margin: 0;
+	width: 100%;
+	border: none;
+	cursor: pointer;
+	text-align: left;
+	overflow: hidden;
+	padding: 10px 5px;
+	text-overflow: ellipsis;
+	background-color: transparent;
+	transition: background-color .3s ease;
+
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+main #main div div button:before {
+	display: none;
+}
+
+main #main div div button:hover {
+	background-color: rgba(0, 0, 0, 0.15);
+}
+
+main #main #queueContainer #queue button {
+	display: flex;
+	overflow: hidden;
+}
+
+main #main #queueContainer #queue button span {
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+main #main #queueContainer #queue button span:first-child {
+	overflow: visible;
+	margin-right: 10%;
+}
+
+main #controls {
+	left: 0;
+	bottom: 0;
+	width: 100%;
+	height: 60px;
+	position: fixed;
+	background-color: #16a085;
+	transition: height .5s ease;
+	box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+main #controls #seekBar {
+	left: 0;
+	margin: 0;
+	top: -20px;
+	width: 100%;
+	height: 20px;
+	cursor: pointer;
+	position: absolute;
+}
+
+main #controls #seekBar:before, main #controls #seekBar:after {
+	color: white;
+	display: block;
+	padding: 0 5px;
+	content: '00:00';
+	padding-top: 2px;
+	background-color: #12876F;
+}
+
+main #controls #mainControls {
+	color: white;
+	margin-top: 15px;
+}
+
+main #controls #mainControls div {
+	display: inline-block;
+}
+
+main #controls #mainControls div button {
+	border: none;
+	cursor: pointer;
+	position: relative;
+	background-color: transparent;
+}
+
+main #controls #mainControls div button img {
+	transition: transform .3s ease;
+}
+
+main #controls #mainControls div button.active img {
+	transform: rotate(180deg);
+}
+
+main #controls #mainControls div#left {
+	float: left;
+	padding-left: 10px;
+}
+
+main #controls #mainControls div#right {
+	float: right;
+	padding-right: 10px;
+}
+
+main #controls #mainControls div#right button {
+	transition: opacity .3s ease;
+	opacity: 0.3;
+}
+
+main #controls #mainControls div#right button[activated] {
+	opacity: 1;
+}
+
+main #controls #mainControls div button:before {
+	opacity: 0;
+	width: 40px;
+	height: 40px;
+	content: ' ';
+	display: block;
+	position: absolute;
+	border-radius: 100%;
+	background-color: white;
+	transition: opacity .3s ease;
+	transform: translate(-20%, -20%);
+}
+
+main #controls #mainControls div button:hover:before {
+	opacity: 0.3;
+}
+
+main #controls #mainControls #artistInfo {
+	width: 90%;
+	float: unset;
+	margin: auto;
+	overflow: hidden;
+	padding-bottom: 100px;
+	transform: translateY(30px);
+}
+
+main #controls #mainControls #artistInfo p {
+	margin: 5px 0;
+	text-align: left;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+main #fab {
+	right: 20px;
+	width: 10vw;
+	height: 10vw;
+	bottom: 20px;
+	border: none;
+	display: flex;
+	position: fixed;
+	cursor: pointer;
+	max-width: 80px;
+	min-width: 50px;
+	min-height: 50px;
+	max-height: 80px;
+	border-radius: 100%;
+	align-items: center;
+	will-change: transform;
+	justify-content: center;
+	transition: all .3s ease;
+	background-color: #16a085;
+	box-shadow: 0 5px 10px rgba(0, 0, 0, 0.5);
+}
+
+main #fab:hover {
+	transform: translateY(-5%);
+	box-shadow: 0 8px 10px rgba(0, 0, 0, 0.3);
+}
