@@ -1,5 +1,5 @@
 module.exports = {
-	start: (app, dirname, fileHandler, fs, os, audioFileExtentions, videoFileExtentions, utils, querystring, mostListenedPlaylistName) => {
+	start: (app, dirname, fileHandler, fs, os, audioFileExtentions, videoFileExtentions, utils, querystring, id3, mostListenedPlaylistName) => {
 		app.get('/playlist/*', (request, response) => {
 			const url = querystring.unescape(request.url);
 
@@ -69,6 +69,33 @@ module.exports = {
 					if (inArray.val == true) {
 						const song = json.audio.songs[inArray.index];
 						response.sendFile(song.path + song.fileName);
+					} else response.send({error: `The song '${songName}' was not found`, info: "The cached JSON file had no reference to this file"});
+				}).catch(err => response.send({error: "There was an error with getting the song", info: err}));
+			} else {
+				response.send({error: "No song found"});
+			}
+
+			function findSong(songs, songName) {
+				for (let i = 0; i < songs.length; i++) {
+					if (songs[i].fileName == songName) return {val: true, index: i};
+				}
+
+				return {val: false, index: -1};
+			}
+		});
+
+		app.get('/songInfo/*', (request, response) => {
+			const url = querystring.unescape(request.url);
+			console.log('Got a request for ' + url);
+
+			if (!url.endsWith('/')) {
+				fileHandler.getJSON(fs, os, audioFileExtentions, videoFileExtentions, utils).then(json => {
+					const songName = url.match(/(.+)\/(.+)$/)[2].trim();
+					const inArray = findSong(json.audio.songs, songName);
+
+					if (inArray.val == true) {
+						const song = json.audio.songs[inArray.index];
+						fileHandler.getSongInfo(song.path + song.fileName, id3, fs).then(tags => response.send(tags)).catch(err => response.send({error: 'Couldn\'t find ID3 tags', info: err}));
 					} else response.send({error: `The song '${songName}' was not found`, info: "The cached JSON file had no reference to this file"});
 				}).catch(err => response.send({error: "There was an error with getting the song", info: err}));
 			} else {

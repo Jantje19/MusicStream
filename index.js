@@ -1,6 +1,6 @@
 const fs = require('fs');
 const os = require('os');
-// const id3 = require('node-id3');
+const id3 = require('node-id3');
 const server = require('./server.js');
 const querystring = require('querystring');
 const fileHandler = require('./fileHandler.js');
@@ -29,4 +29,4 @@ const utils = {
 	}
 }
 
-server.start(__dirname + '/WebInterface/', fileHandler, fs, os, audioFileExtentions, videoFileExtentions, utils, querystring, null, mostListenedPlaylistName);
+server.start(__dirname + '/WebInterface/', fileHandler, fs, os, audioFileExtentions, videoFileExtentions, utils, querystring, id3, mostListenedPlaylistName);

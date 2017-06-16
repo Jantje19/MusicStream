@@ -119,7 +119,7 @@ module.exports = {
 		});
 
 		require('./serverVideoHandler.js').start(app, dirname, fileHandler, fs, os, audioFileExtentions, videoFileExtentions, utils, querystring);
-		require('./serverAudioHandler.js').start(app, dirname, fileHandler, fs, os, audioFileExtentions, videoFileExtentions, utils, querystring, mostListenedPlaylistName);
+		require('./serverAudioHandler.js').start(app, dirname, fileHandler, fs, os, audioFileExtentions, videoFileExtentions, utils, querystring, id3, mostListenedPlaylistName);
 
 		app.get('/*', (request, response) => {
 			let url = request.url;
