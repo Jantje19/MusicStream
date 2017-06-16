@@ -1,14 +1,16 @@
 module.exports = {
-	searchSystem: function(fs, os, fileExtentions, utils) {
+	searchSystem: function(fs, os, audioFileExtentions, videoFileExtentions, utils) {
 		const songsArr = [];
+		const videosArr = [];
 		const playlistsArr = [];
-		const folderPath = os.homedir() + '/Music/';
+		const audioFolderPath = os.homedir() + '/Music/';
+		const videoFolderPath = os.homedir() + '/Videos/';
 
+		console.log('Starting checking files');
 		return new Promise((resolve, reject) => {
-			console.log('Starting checking files');
-			return handleFolders(folderPath, utils).then(() => {
+			Promise.all([handleFolders(audioFolderPath, utils), handleFolders(videoFolderPath, utils)]).then(() => {
 				setTimeout(() => {
-					jsonFileArr = {songs: songsArr, playlists: playlistsArr};
+					jsonFileArr = {audio: {songs: songsArr, playlists: playlistsArr}, video: {videos: videosArr}};
 
 					fs.writeFile(__dirname + '/JSON.json', JSON.stringify(jsonFileArr), (err) => {
 						if (err) throw err;
@@ -16,7 +18,7 @@ module.exports = {
 					});
 
 					resolve(jsonFileArr);
-				}, 500);
+				}, 1000);
 			}).catch(err => {
 				reject(err);
 			});
@@ -36,10 +38,11 @@ module.exports = {
 								if (object.toLowerCase() != 'desktop.ini') {
 									const fileExtention = utils.getFileExtention(object.toLowerCase());
 
-									if (fileExtentions.contains(fileExtention)) songsArr.push({path: path, fileName: object});
+									if (audioFileExtentions.includes(fileExtention)) songsArr.push({path: path, fileName: object});
+									else if (videoFileExtentions.includes(fileExtention)) videosArr.push({path: path, fileName: object});
 									else if (fileExtention == '.m3u') playlistsArr.push({path: path, fileName: object});
 									else if (fileExtention) console.log('File extention not supported', object);
-									else if (!fileExtention) handleFolders(path + object + '/', utils);
+									else if (!fileExtention || fs.lstatSync(path + object).isDirectory()) handleFolders(path + object + '/', utils);
 									else console.warn('Something is weird...', object, fileExtention);
 								}
 							});
@@ -142,7 +145,7 @@ module.exports = {
 		});
 	},
 
-	getJSON: function(fs, os, fileExtentions, utils) {
+	getJSON: function(fs, os, audioFileExtentions, videoFileExtentions, utils) {
 		return new Promise((resolve, reject) => {
 			const JSONPath = './JSON.json';
 
@@ -154,7 +157,7 @@ module.exports = {
 					});
 				} else {
 					console.log('Nope');
-					resolve(this.searchSystem(fs, os, fileExtentions, utils));
+					resolve(this.searchSystem(fs, os, audioFileExtentions, videoFileExtentions, utils));
 				}
 			});
 		});

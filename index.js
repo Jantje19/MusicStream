@@ -5,12 +5,13 @@ const server = require('./server.js');
 const querystring = require('querystring');
 const fileHandler = require('./fileHandler.js');
 
-const fileExtentions = ['.mp3', '.m3a', '.wav'];
+const videoFileExtentions = ['.mp4'];
+const audioFileExtentions = ['.mp3', '.m3a', '.wav'];
 const mostListenedPlaylistName = 'mostListened';
 
 const utils = {
 	getFileExtention: function(fileName) {
-		const match = fileName.match(/.+(\.\w+)$/);
+		const match = fileName.match(/.+(\.\w+)$/i);
 
 		if (match) return match[1];
 		else return;
@@ -28,4 +29,4 @@ const utils = {
 	}
 }
 
-server.start(__dirname + '/WebInterface/', fileHandler, fs, os, fileExtentions, utils, querystring, null, mostListenedPlaylistName);
+server.start(__dirname + '/WebInterface/', fileHandler, fs, os, audioFileExtentions, videoFileExtentions, utils, querystring, null, mostListenedPlaylistName);
