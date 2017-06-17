@@ -117,10 +117,10 @@ function stopSong() {
 function pickRandomSong() {
 	const elems = document.getElementById('songs').querySelectorAll('button');
 	const songName = elems[Math.floor(Math.random() * elems.length)].innerText;
-	queue.length = 0;
-	queueIndex = 0;
-	enqueue(songName);
-	playSong(songName, true);
+	// queue.length = 0;
+	// queueIndex = 0;
+	// enqueue(songName);
+	playSong(songName/*, true*/);
 }
 
 function updateInterface() {
@@ -213,6 +213,8 @@ function mediaSession() {
 				if (json.error) return;
 				try {document.getElementById('artistInfo').remove()} catch(err) {}
 
+				let imageUrl;
+				const img = new Image();
 				const dataDiv = document.createElement('div');
 
 				dataDiv.id = 'artistInfo';
@@ -223,12 +225,11 @@ function mediaSession() {
 				dataDiv.innerHTML += `<p><b>Year:</b> ${json.year}</p>`;
 
 				if (window.innerWidth > 500) {
-					const img = document.createElement('img');
 					const arrayBufferView = new Uint8Array(json.image.imageBuffer.data);
 					const blob = new Blob([arrayBufferView], {type: "image/jpeg"});
 					const urlCreator = window.URL || window.webkitURL;
-					const imageUrl = urlCreator.createObjectURL(blob);
 
+					imageUrl = urlCreator.createObjectURL(blob);
 					img.style.top = '40px';
 					img.style.right = '10px';
 					img.style.width = '100px';
@@ -243,14 +244,18 @@ function mediaSession() {
 				document.getElementById('mainControls').appendChild(dataDiv);
 				document.getElementById('showData').setAttribute('activated', '');
 
-				if (json.image && 'mediaSession' in navigator) {
-					navigator.mediaSession.metadata = new MediaMetadata({
-						title: title,
-						artist: artist,
-						artwork: [
-						{ src: imageUrl, type: 'image/jpeg' },
-						]
-					});
+				if ('mediaSession' in navigator) {
+					navigator.mediaSession.metadata.title = json.title;
+					navigator.mediaSession.metadata.album = json.album;
+					navigator.mediaSession.metadata.artist = json.artist;
+
+					img.onload = evt => {
+						console.log(evt);
+						navigator.mediaSession.metadata.artwork.length = 0;
+						navigator.mediaSession.metadata.artwork = [
+						{ src: imageUrl, sizes: '512x512', type: 'image/jpeg' },
+						];
+					}
 				}
 			}).catch(err => console.warn(err));
 		}).catch(err => console.warn(err));
