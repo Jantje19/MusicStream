@@ -257,6 +257,7 @@ function load() {
 		data = json;
 
 		if (json.songs.length > 0) {
+			songsElem.innerHTML = '';
 			json.songs.forEach((object, key) => {
 				songsElem.innerHTML += `<button title="${object}" class="song ${key}" onclick="songClick(this)">${object}</button><hr>`;
 			});

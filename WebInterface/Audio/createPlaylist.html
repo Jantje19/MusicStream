@@ -31,8 +31,8 @@
 	<meta name="msapplication-navbutton-color" content="#16a085"/>
 	<meta name="apple-mobile-web-app-status-bar-style" content="#16a085"/>
 
+	<link href="all.css" rel="stylesheet" type="text/css" media="screen"/>
 	<link href="main.css" rel="stylesheet" type="text/css" media="screen"/>
-	<link href="header.css" rel="stylesheet" type="text/css" media="screen"/>
 	<link href="seekbarStyle.css" rel="stylesheet" type="text/css" media="screen"/>
 
 	<script type="text/javascript">
@@ -46,7 +46,7 @@
 					else {
 						response.json().then(json => {
 							if (json.error) reject(json.info);
-							else resolve(json);
+							else resolve(json.audio);
 						});
 					}
 				}).catch(err => reject(err));
@@ -76,6 +76,7 @@
 			getData().then(json => {
 				const songsElem = document.getElementById('songs');
 
+				songsElem.innerHTML = '';
 				json.songs.forEach((object, key) => {
 					songsElem.innerHTML += `<button title="${object}" class="song ${key}" onclick="songClick('${object}')">${object}</button><hr>`;
 				});
@@ -109,7 +110,7 @@
 			});
 
 			document.getElementById('back').addEventListener('click', evt => {
-				window.location = window.location.host;
+				window.location = window.location.origin;
 			});
 		}
 
@@ -129,7 +130,9 @@
 			<div id="songsContainer">
 				<h3>Songs</h3>
 				<hr>
-				<div id="songs"></div>
+				<div id="songs">
+					<div class="ball-scale-multiple"><div></div><div></div><div></div></div>
+				</div>
 			</div>
 			<div id="playlistsContainer">
 				<h3>Playlist</h3>
