@@ -46,7 +46,8 @@
 					else {
 						response.json().then(json => {
 							if (json.error) reject(json.info);
-							else resolve(json.audio);
+							else if (json.audio) resolve(json.audio);
+							else resolve(json);
 						});
 					}
 				}).catch(err => reject(err));
@@ -87,7 +88,9 @@
 					getData('/playlist/' + location.hash.replace('#', '')).then(data => {
 						const playlistElem = document.getElementById('playlist');
 
-						playlist = data.songs;
+						alert(data);
+
+						playlist = data;
 						data.songs.forEach((object, key) => {
 							playlistElem.innerHTML += `<button title="${object}" class="listElem ${key}" onclick="handlePlaylist('${key}')">${object}</button><hr>`;
 						});
