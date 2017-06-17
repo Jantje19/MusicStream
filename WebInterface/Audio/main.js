@@ -103,8 +103,13 @@ function updateCSS(newValBefore, newValAfter) {
 
 	if (cssRules.length > 0) {
 		cssRules.forEach((object, key) => {
+			let rule;
+			const styleSheet = document.styleSheets[0];
 			const type = (key == 0) ? 'before' : 'after';
-			const rule = document.styleSheets[0].rules[object];
+
+			if ('rules' in styleSheet) rule = styleSheet.rules[object];
+			else if ('cssRules' in styleSheet) rule = styleSheet.cssRules[object];
+			else return;
 
 			rule.style.content = `'${arguments[key]}' !important`;
 			rule.style.cssText = `content: "${arguments[key]}" !important;`;
