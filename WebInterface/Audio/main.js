@@ -83,6 +83,31 @@ function moveQueueItem(oldIndex, newIndex) {
 	updateInterface();
 }
 
+function saveQueueToPlaylist() {
+	const playlistName = prompt('What should the eplaylist name be?').trim();
+
+	if (playlistName != '') {
+		if (queue.length > 1) {
+			if (confirm('Are you sure the playlist is okay like this?')) {
+				const jsonData = {name: playlistName, songs: queue};
+
+				fetch('/updatePlaylist/', {method: "POST", body: JSON.stringify(jsonData)}).then(response => {
+					response.json().then(json => {
+						if (json.success) {
+							if (json.error) alert('Something on the server went wrong.\n' + json.info);
+							else if (json.data.toLowerCase().startsWith('playlist with the name ')) {
+								alert(json.data);
+							} else alert('Something went wrong', json.data);
+						} else alert(json.info);
+					});
+				}).catch( err => {
+					console.error('An error occurred', err);
+				});
+			}
+		} else alert('The playlist is to short. We cannot accept that :/');
+	} else alert('Your playlist name is empty');
+}
+
 function convertToReadableTime(int) {
 	let outp = '';
 	let hours   = Math.floor(int / 3600);
