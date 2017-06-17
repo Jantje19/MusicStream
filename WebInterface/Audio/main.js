@@ -13,16 +13,21 @@ function getData() {
 	});
 }
 
-function handlePlaylist(name) {
-	get('/playlist/' + name).then(json => {
-		if (document.getElementById('shuffle')) json.songs.shuffle();
-		deleteQueue();
-		queueIndex = 0;
-		enqueue(...json.songs);
-		playSong(queue[0], true);
-	}).catch( err => {
-		console.error('An error occurred', err);
-	});
+function handlePlaylist(evt, name) {
+	if (evt.ctrlKey) {
+		if (!name.match(/(.+)\.((\w+|[0-9]+){2,5})$/))
+			window.location = '/managePlaylist.html#' + name;
+	} else {
+		get('/playlist/' + name).then(json => {
+			if (document.getElementById('shuffle')) json.songs.shuffle();
+			deleteQueue();
+			queueIndex = 0;
+			enqueue(...json.songs);
+			playSong(queue[0], true);
+		}).catch( err => {
+			console.error('An error occurred', err);
+		});
+	}
 }
 
 function get(url) {
@@ -253,7 +258,7 @@ function load() {
 		});
 
 		playlistArr.forEach((object, key) => {
-			playlistsElem.innerHTML += `<button class="listElem ${key}" onclick="handlePlaylist('${object}')">${object}</button><hr>`;
+			playlistsElem.innerHTML += `<button class="listElem ${key}" onclick="handlePlaylist(event, '${object}')">${object}</button><hr>`;
 		});
 
 		function searchArr(query, array) {
@@ -312,7 +317,7 @@ function load() {
 
 		if (json.playlists.length > 0) {
 			json.playlists.forEach((object, key) => {
-				playlistsElem.innerHTML += `<button title="${object}" class="listElem ${key}" onclick="handlePlaylist('${object}')">${object}</button><hr>`;
+				playlistsElem.innerHTML += `<button title="${object}" class="listElem ${key}" onclick="handlePlaylist(event, '${object}')">${object}</button><hr>`;
 			});
 		} else playlistsElem.innerHTML = '<i>No playlists found</i>';
 	}).catch(err => {
