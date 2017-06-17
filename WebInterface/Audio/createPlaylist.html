@@ -36,7 +36,7 @@
 	<link href="seekbarStyle.css" rel="stylesheet" type="text/css" media="screen"/>
 
 	<script type="text/javascript">
-		const playlist = [];
+		let playlist = [];
 
 		function getData() {
 			return new Promise((resolve, reject) => {
@@ -73,9 +73,12 @@
 		}
 
 		function load() {
+			let songs;
+
 			getData().then(json => {
 				const songsElem = document.getElementById('songs');
 
+				songs = json.songs;
 				songsElem.innerHTML = '';
 				json.songs.forEach((object, key) => {
 					songsElem.innerHTML += `<button title="${object}" class="song ${key}" onclick="songClick('${object}')">${object}</button><hr>`;
@@ -109,9 +112,50 @@
 				} else alert('Your playlist name is empty');
 			});
 
+			document.getElementById('searchBtn').addEventListener('click', evt => {
+				const searchBar = document.getElementById('searchBar');
+				const searchInp = document.getElementById('searchInp');
+
+				if (searchBar.style.display == 'inline-block') {
+					searchInp.blur();
+					searchInp.value = '';
+					searchBar.style.display = 'none';
+				} else {
+					searchBar.style.display = 'inline-block';
+					searchInp.focus();
+				}
+			});
+
+			document.getElementById('searchInp').addEventListener('keyup', evt => {
+				const string = evt.target.value;
+				const songArr = searchArr(string, songs);
+				const songsElem = document.getElementById('songs');
+
+				songsElem.innerHTML = '';
+				songArr.forEach((object, key) => {
+					songsElem.innerHTML += `<button title="${object}" class="song ${key}" onclick="songClick('${object}')">${object}</button><hr>`;
+				});
+
+				function searchArr(query, array) {
+					const outp = [];
+
+					for (let i = 0; i < array.length; i++) {
+						const item = array[i];
+						if (item.toString().toLowerCase().indexOf(query.toString().toLowerCase()) > -1) outp.push(item);
+					}
+
+					return outp;
+				}
+			});
+
 			document.getElementById('back').addEventListener('click', evt => {
 				window.location = window.location.origin;
 			});
+		}
+
+		function addWholeSongsToQueue() {
+			playlist = Array.from(document.getElementById('songs').querySelectorAll('button')).map(val => {return val.innerText});
+			updateInterface();
 		}
 
 		window.onload = load;
@@ -123,12 +167,15 @@
 	<header>
 		<button id="back"><img src="Assets/ic_arrow_back_white.svg"></button>
 		<div style="padding-top: 5px"><h1>Create Playlist</h1></div>
+		<div id="searchBar"><input type="text" id="searchInp"></div>
+		<div id="searchBtn"><img src="Assets/ic_search_white.svg"></div>
 	</header>
 
 	<main>
 		<div id="main">
 			<div id="songsContainer">
 				<h3>Songs</h3>
+				<button title="Add whole list to queue (only use when you're confident in your system)" style="float: right;" onclick="addWholeSongsToQueue()"><img src="Assets/ic_playlist_add_black.svg"></button>
 				<hr>
 				<div id="songs">
 					<div class="ball-scale-multiple"><div></div><div></div><div></div></div>
