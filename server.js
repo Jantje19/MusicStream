@@ -5,8 +5,8 @@ module.exports = {
 		const port = 8000;
 
 		// Data request
-		app.get('*/header.css', (request, response) => {
-			response.sendFile(dirname + 'header.css');
+		app.get('*/all.css', (request, response) => {
+			response.sendFile(dirname + 'all.css');
 		});
 
 		app.get('*/Assets/*', (request, response) => {
