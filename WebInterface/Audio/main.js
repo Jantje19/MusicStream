@@ -71,7 +71,7 @@ function songClick(elem) {
 function addWholeSongsToQueue() {
 	const buttons = document.getElementById('songs').querySelectorAll('button');
 
-	if (document.getElementById('shuffle').getAttribute('activated') != null) buttons.shuffle();
+	if (document.getElementById('shuffle').getAttribute('activated') != null) Array.from(buttons).shuffle();
 
 	buttons.forEach((object, key) => {
 		enqueue(object.innerText);
@@ -251,6 +251,23 @@ function load() {
 				controlsElem.style.height = '230px';
 			}
 		}
+	});
+
+	document.getElementById('volumeToggle').addEventListener('click', evt => {
+		const popUp = document.getElementById('volumePopUp');
+
+		if (popUp.style.display == 'block') popUp.style.display = 'none';
+		else popUp.style.display = 'block';
+	});
+
+	document.getElementById('muteBtn').addEventListener('click', evt => {
+		audio.volume = 0;
+		document.getElementById('volumeSlider').value = 0;
+		document.getElementById('volumePopUp').style.display = 'none';
+	});
+
+	document.getElementById('volumeSlider').addEventListener('change', evt => {
+		audio.volume = Number(evt.target.value) / 100;
 	});
 
 	getData().then(json => {

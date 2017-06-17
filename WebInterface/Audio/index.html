@@ -87,8 +87,15 @@
 					<button onclick="previus()"><img src="Assets/ic_skip_previous_white.svg"></button>
 					<button id="toggleBtn"><img src="Assets/ic_play_arrow_white.svg"></button> <!-- onclick="playSong(queue[queueIndex], true)" -->
 					<button onclick="next()"><img src="Assets/ic_skip_next_white.svg"></button>
+					<div id="volume">
+						<button id="volumeToggle"><img src="Assets/ic_volume_up_white.svg"></button>
+						<div id="volumePopUp">
+							<button id="muteBtn"><img src="Assets/ic_volume_off_black.svg"></button>
+							<input id="volumeSlider" type="range" min="0" max="100" value="100">
+						</div>
+					</div>
 				</div>
-				<div style="width: 50%; white-space: nowrap; overflow: hidden;">
+				<div style="width: 45%; white-space: nowrap; overflow: hidden;">
 					<p id="songName" style="width: 100%; text-overflow: ellipsis; overflow: hidden; padding: 5px 0"></p>
 				</div>
 				<div id="right">
