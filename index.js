@@ -1,13 +1,14 @@
 const fs = require('fs');
 const os = require('os');
 const id3 = require('node-id3');
+const ytdl = require('ytdl-core');
 const server = require('./server.js');
 const querystring = require('querystring');
 const fileHandler = require('./fileHandler.js');
 
-const videoFileExtentions = ['.mp4', '.avi'];
+const videoFileExtentions = ['.mp4'];
 const audioFileExtentions = ['.mp3', '.m3a', '.wav'];
-const mostListenedPlaylistName = 'mostListened';
+const mostListenedPlaylistName = 'MostListened';
 
 const utils = {
 	getFileExtention: function(fileName) {
@@ -29,4 +30,4 @@ const utils = {
 	}
 }
 
-server.start(__dirname + '/WebInterface/', fileHandler, fs, os, audioFileExtentions, videoFileExtentions, utils, querystring, id3, mostListenedPlaylistName);
+server.start(__dirname + '/WebInterface/', fileHandler, fs, os, audioFileExtentions, videoFileExtentions, utils, querystring, id3, mostListenedPlaylistName, ytdl);
