@@ -15,7 +15,8 @@
   "license": "Apache-2.0",
   "dependencies": {
     "express": "^4.14.0",
-    "node-id3": "0.0.9"
+    "node-id3": "0.0.9",
+    "ytdl-core": "^0.14.4"
   },
   "devDependencies": {},
   "repository": {
