@@ -99,102 +99,102 @@ module.exports = {
 			response.sendFile(dirname + 'downloadYoutube.html');
 		});
 
-		// app.post('/ytdl*', (request, response) => {
-		// 	let body = '';
+		app.post('/ytdl*', (request, response) => {
+			let body = '';
 
-		// 	request.on('data', data => {
-		// 		body += data;
+			request.on('data', data => {
+				body += data;
 
-		// 		if (body.length > 1e6) {
-		// 			request.send({success: false, err: 'The amount of data is to much', info: 'The connection was destroyed because the amount of data passed is to much'});
-		// 			request.connection.destroy();
-		// 		}
-		// 	});
+				if (body.length > 1e6) {
+					request.send({success: false, err: 'The amount of data is to much', info: 'The connection was destroyed because the amount of data passed is to much'});
+					request.connection.destroy();
+				}
+			});
 
-		// 	request.on('end', () => {
-		// 		const json = JSON.parse(body);
+			request.on('end', () => {
+				const json = JSON.parse(body);
 
-		// 		const url = request.url;
-		// 		console.log('Got a request for ' + url);
+				const url = request.url;
+				console.log('Got a request for ' + url);
 
-		// 		if (json.url && json.type) {
-		// 			let video, info;
-		// 			let options = {};
-		// 			// Let user specify video or audio // {filter: 'audioonly'}
-		// 			// Let user specify fileName, but default to info evt title
-		// 			// Let user specify begin time
-		// 			// Look at this: https://github.com/jpweeks/ytdl-audio/blob/master/index.js
+				if (json.url && json.type) {
+					let video, info;
+					let options = {};
+					// Let user specify video or audio // {filter: 'audioonly'}
+					// Let user specify fileName, but default to info evt title
+					// Let user specify begin time
+					// Look at this: https://github.com/jpweeks/ytdl-audio/blob/master/index.js
 
-		// 			if (json.type != 'audio' && json.type != 'video') {sendError('Type not correct'); return;}
-		// 			if (json.url.indexOf('youtube.com') < 0 && json.url.indexOf('youtu.be') < 0) {sendError('Invalid url'); return;}
-		// 			if (json.beginTime) options.begin = json.beginTime;
-		// 			if (json.type == 'video') {options.filter = format => { return format.container === 'mp4'; }}
-		// 			else if (json.type =='audio') options.filter = 'audioonly';
+					if (json.type != 'audio' && json.type != 'video') {sendError('Type not correct'); return;}
+					if (json.url.indexOf('youtube.com') < 0 && json.url.indexOf('youtu.be') < 0) {sendError('Invalid url'); return;}
+					if (json.beginTime) options.begin = json.beginTime;
+					if (json.type == 'video') {options.filter = format => { return format.container === 'mp4'; }}
+					else if (json.type =='audio') options.filter = 'audioonly';
 
-		// 			video = ytdl(json.url, { filter: format => { return format.container === 'mp4'; }});
-		// 			video.pipe(fs.createWriteStream(os.homedir() + '/Videos/' + json.fileName));
-		// 			video.on('info', info => {
-		// 				info = info;
-		// 			});
+					video = ytdl(json.url, { filter: format => { return format.container === 'mp4'; }});
+					video.pipe(fs.createWriteStream(os.homedir() + '/Videos/' + json.fileName));
+					video.on('info', info => {
+						info = info;
+					});
 
-		// 			video.on('progress', (chunkLength, downloaded, total) => {
-		// 				process.stdout.cursorTo(0);
-		// 				process.stdout.clearLine(1);
-		// 				process.stdout.write("DOWNLOADING: " + (downloaded / total * 100).toFixed(2) + '% ');
-		// 			});
+					video.on('progress', (chunkLength, downloaded, total) => {
+						process.stdout.cursorTo(0);
+						process.stdout.clearLine(1);
+						process.stdout.write("DOWNLOADING: " + (downloaded / total * 100).toFixed(2) + '% ');
+					});
 
-		// 			video.on('end', () => {
-		// 				let fileName;
-		// 				process.stdout.write('\n');
+					video.on('end', () => {
+						let fileName;
+						process.stdout.write('\n');
 
-		// 				if (json.fileName) fileName = json.fileName;
-		// 				else fileName = info.title.replace('"', '\\"') + '.mp4';
+						if (json.fileName) fileName = json.fileName;
+						else fileName = info.title.replace('"', '\\"') + '.mp4';
 
-		// 				if (json.type == 'audio') {
-		// 					const writer = require('fluent-ffmpeg')(reader)
-		// 					.format('mp3')
-		// 					.audioBitrate(128);
+						if (json.type == 'audio') {
+							const writer = require('fluent-ffmpeg')(reader)
+							.format('mp3')
+							.audioBitrate(128);
 
-		// 					// if (args.seek) writer.seekInput(formatTime(args.seek));
-		// 					// if (args.duration) writer.duration(args.duration);
+							// if (args.seek) writer.seekInput(formatTime(args.seek));
+							// if (args.duration) writer.duration(args.duration);
 
-		// 					// writer.output(process.stdout).run();
-		// 					writer.output(os.homedir() + '/Music/' + fileName).run();
-		// 					writer.on('finish', done);
-		// 				} else if (json.type == 'video') {
-		// 					const stream = video.pipe(fs.createWriteStream(os.homedir() + '/Videos/' + fileName));
-		// 					console.log(os.homedir() + '/Videos/' + fileName);
-		// 					request.pipe(stream);
-		// 					stream.on('finish', done);
-		// 					stream.on('error', sendError);
-		// 				}
+							// writer.output(process.stdout).run();
+							writer.output(os.homedir() + '/Music/' + fileName).run();
+							writer.on('finish', done);
+						} else if (json.type == 'video') {
+							const stream = video.pipe(fs.createWriteStream(os.homedir() + '/Videos/' + fileName));
+							console.log(os.homedir() + '/Videos/' + fileName);
+							request.pipe(stream);
+							stream.on('finish', done);
+							stream.on('error', sendError);
+						}
 
-		// 				function done() {
-		// 					let path;
+						function done() {
+							let path;
 
-		// 					if (json.type == 'video') path = os.homedir() + '/Videos/' + fileName;
-		// 					else if (json.type == 'audio') path = os.homedir() + '/Music/' + fileName;
+							if (json.type == 'video') path = os.homedir() + '/Videos/' + fileName;
+							else if (json.type == 'audio') path = os.homedir() + '/Music/' + fileName;
 
-		// 					fs.exists(path, exists => {
-		// 						if (exists) {
-		// 							console.log(fileName + ' downloaded');
-		// 							fileHandler.searchSystem(fs, os, audioFileExtentions, videoFileExtentions, utils).then(json => {
-		// 								response.send({success: true, fileName: fileName, jsonUpdated: true});
-		// 							}).catch(err => response.send({success: true, fileName: fileName, jsonUpdated: false}));
-		// 						} else sendError('File does not exist. This is a weird problem... You should investigate.');
-		// 					});
-		// 				}
-		// 			});
+							fs.exists(path, exists => {
+								if (exists) {
+									console.log(fileName + ' downloaded');
+									fileHandler.searchSystem(fs, os, audioFileExtentions, videoFileExtentions, utils).then(json => {
+										response.send({success: true, fileName: fileName, jsonUpdated: true});
+									}).catch(err => response.send({success: true, fileName: fileName, jsonUpdated: false}));
+								} else sendError('File does not exist. This is a weird problem... You should investigate.');
+							});
+						}
+					});
 
-		// 			video.on('error', sendError);
-		// 		}
-		// 	});
-		//
-		// 	const sendError = err => {
-		// 		try {response.send({success: false, error: err}); }
-		// 		catch (err) {}
-		// 	}
-		// });
+					video.on('error', sendError);
+				}
+			});
+
+			const sendError = err => {
+				try {response.send({success: false, error: err}); }
+				catch (err) {}
+			}
+		});
 
 		app.post('/updateSettings', (request, response) => {
 			let body = '';
