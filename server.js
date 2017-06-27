@@ -13,13 +13,20 @@ module.exports = {
 			response.sendFile(dirname + request.url.replace('videos/', ''));
 		});
 
-		app.get('*/data/', (request, response) => {
+		app.get('*/data/*', (request, response) => {
+			let sort = false;
 			const url = request.url;
 			console.log('Got a request for ' + url);
 
+			if (url.toLowerCase().indexOf('sort=') > -1) sort = true;
 			fileHandler.getJSON(fs, os, audioFileExtentions, videoFileExtentions, utils).then(json => {
 				const songs = [];
 				const videos = [];
+
+				if (sort) {
+					json.audio.songs.sort(sortFunc);
+					json.video.videos.sort(sortFunc);
+				}
 
 				json.audio.songs.forEach((object, key) => songs.push(object.fileName));
 				json.video.videos.forEach((object, key) => videos.push(object.fileName));
@@ -28,6 +35,7 @@ module.exports = {
 					return Promise.all([new Promise((resolve, reject) => {
 						const playlists = [];
 
+						if (sort) playlists.sort(sortFunc);
 						json.audio.playlists.forEach((object, key) => {
 							fileHandler.readPlayList(fs, object.path + object.fileName, json.audio.songs).then(songsArr => {
 								if (songsArr.length > 0) playlists.push(object.fileName);
@@ -56,12 +64,30 @@ module.exports = {
 				}
 
 				getPlaylists(json, fs)
-				.then(playlists => response.send({audio: {songs: songs, playlists: playlists[0].concat(playlists[1])}, video: {videos: videos}}))
-				.catch(err => response.send({error: "Something went wrong", info: "Either getting the songs or getting the playlists or both went wrong"}));
+				.then(playlists => {
+					// Needed for some reason. Slow processing? IDK. :/
+					setTimeout(() => {
+						playlists = playlists[0].concat(playlists[1]);
+
+						if (url.toLowerCase().indexOf('sort=oldest') > -1) {
+							songs.reverse();
+							videos.reverse();
+							playlists.reverse();
+						}
+
+						response.send({audio: {songs: songs, playlists: playlists}, video: {videos: videos}});
+					}, 100);
+				}).catch(err => response.send({error: "Something went wrong", info: "Either getting the songs or getting the playlists or both went wrong"}));
 			}).catch(err => {
 				console.error('There was an error with getting the info', err);
 				response.send({error: "There was an error with getting the info", info: err});
 			});
+
+			const sortFunc = (a, b) => {
+				const dateA = new Date(a.lastChanged);
+				const dateB = new Date(b.lastChanged);
+				return dateB - dateA;
+			}
 		});
 
 		app.get('/updateJSON/', (request, response) => {

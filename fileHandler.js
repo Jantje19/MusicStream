@@ -38,12 +38,16 @@ module.exports = {
 								if (object.toLowerCase() != 'desktop.ini') {
 									const fileExtention = utils.getFileExtention(object.toLowerCase());
 
-									if (audioFileExtentions.includes(fileExtention)) songsArr.push({path: path, fileName: object});
-									else if (videoFileExtentions.includes(fileExtention)) videosArr.push({path: path, fileName: object});
-									else if (fileExtention == '.m3u') playlistsArr.push({path: path, fileName: object});
-									else if (fileExtention) console.log('File extention not supported', object);
-									else if (!fileExtention || fs.lstatSync(path + object).isDirectory()) handleFolders(path + object + '/', utils);
-									else console.warn('Something is weird...', object, fileExtention);
+									fs.stat(path + object, (err, stats) => {
+										const ctime = new Date(stats.ctime.toString());
+
+										if (audioFileExtentions.includes(fileExtention)) songsArr.push({path: path, fileName: object, lastChanged: ctime});
+										else if (videoFileExtentions.includes(fileExtention)) videosArr.push({path: path, fileName: object, lastChanged: ctime});
+										else if (fileExtention == '.m3u') playlistsArr.push({path: path, fileName: object, lastChanged: ctime});
+										else if (fileExtention) console.log('File extention not supported', object);
+										else if (!fileExtention && fs.lstatSync(path + object).isDirectory()) handleFolders(path + object + '/', utils);
+										else console.warn('Something is weird...', 'FILENAME:' + object, 'EXTENSION:' + fileExtention);
+									});
 								}
 							});
 
