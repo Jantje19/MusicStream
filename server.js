@@ -23,10 +23,10 @@ module.exports = {
 				const songs = [];
 				const videos = [];
 
-				if (sort) {
-					json.audio.songs.sort(sortFunc);
-					json.video.videos.sort(sortFunc);
-				}
+				// if (sort) {
+				// 	json.audio.songs.sort(sortFunc);
+				// 	json.video.videos.sort(sortFunc);
+				// }
 
 				json.audio.songs.forEach((object, key) => songs.push(object.fileName));
 				json.video.videos.forEach((object, key) => videos.push(object.fileName));
@@ -65,18 +65,15 @@ module.exports = {
 
 				getPlaylists(json, fs)
 				.then(playlists => {
-					// Needed for some reason. Slow processing? IDK. :/
-					setTimeout(() => {
-						playlists = playlists[0].concat(playlists[1]);
+					playlists = playlists[0].concat(playlists[1]);
 
-						if (url.toLowerCase().indexOf('sort=oldest') > -1) {
-							songs.reverse();
-							videos.reverse();
-							playlists.reverse();
-						}
+					// if (url.toLowerCase().indexOf('sort=oldest') > -1) {
+					// 	songs.reverse();
+					// 	videos.reverse();
+					// 	playlists.reverse();
+					// }
 
-						response.send({audio: {songs: songs, playlists: playlists}, video: {videos: videos}});
-					}, 100);
+					response.send({audio: {songs: songs, playlists: playlists}, video: {videos: videos}});
 				}).catch(err => response.send({error: "Something went wrong", info: "Either getting the songs or getting the playlists or both went wrong"}));
 			}).catch(err => {
 				console.error('There was an error with getting the info', err);
