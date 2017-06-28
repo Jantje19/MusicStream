@@ -88,9 +88,7 @@
 					getData('/playlist/' + location.hash.replace('#', '')).then(data => {
 						const playlistElem = document.getElementById('playlist');
 
-						alert(data);
-
-						playlist = data;
+						playlist = data.songs;
 						data.songs.forEach((object, key) => {
 							playlistElem.innerHTML += `<button title="${object}" class="listElem ${key}" onclick="handlePlaylist('${key}')">${object}</button><hr>`;
 						});

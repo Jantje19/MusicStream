@@ -125,6 +125,11 @@ main #main div h3 {
 	margin-bottom: 20px;
 }
 
+main #main div > span {
+	font-size: 50%;
+	font-style: italic;
+}
+
 main #main button {
 	border: none;
 	cursor: pointer;
@@ -266,6 +271,7 @@ main #controls #mainControls div#left #volumePopUp {
 	z-index: 1000;
 	display: none;
 	position: fixed;
+	border-radius: 50px;
 	background-color: white;
 	box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
 }
@@ -315,7 +321,7 @@ main #controls #mainControls #artistInfo {
 	width: 90%;
 	float: unset;
 	margin: auto;
-	overflow: hidden;
+	/*overflow: hidden;*/
 	padding-bottom: 100px;
 	transform: translateY(30px);
 }
@@ -325,6 +331,16 @@ main #controls #mainControls #artistInfo p {
 	text-align: left;
 	overflow: hidden;
 	text-overflow: ellipsis;
+}
+
+main #controls #mainControls #artistInfo #thumbnail {
+	cursor: zoom-in;
+	transform: scale(1);
+	transition: transform .3s ease;
+}
+
+main #controls #mainControls #artistInfo #thumbnail:hover {
+	transform: scale(3) translate(-30px, -40px);
 }
 
 main #fab {

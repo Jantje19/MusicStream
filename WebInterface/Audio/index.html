@@ -58,6 +58,7 @@
 		<div id="main">
 			<div id="songsContainer">
 				<h3>Songs</h3>
+				<span id="songCount"></span>
 				<button title="Add whole list to queue (only use when you're confident in your system)" style="float: right;" onclick="addWholeSongsToQueue()"><img src="Assets/ic_playlist_add_black.svg"></button>
 				<button title="Pick random" style="float: right;" onclick="pickRandomSong()"><img src="Assets/ic_random_black.svg"></button>
 				<hr>
@@ -73,6 +74,7 @@
 			</div>
 			<div id="queueContainer">
 				<h3>Queue</h3>
+				<span id="queueCount"></span>
 				<button title="Empty queue" style="float: right;" onclick="deleteQueue()"><img src="Assets/ic_clear_all_black.svg"/></button>
 				<button title="Save to playlist" style="float: right;" onclick="saveQueueToPlaylist()"><img src="Assets/ic_save_black.svg"/></button>
 				<hr>
@@ -86,7 +88,7 @@
 
 			<div id="mainControls">
 				<div id="left">
-					<button onclick="previus()"><img src="Assets/ic_skip_previous_white.svg"></button>
+					<button onclick="previous()"><img src="Assets/ic_skip_previous_white.svg"></button>
 					<button id="toggleBtn"><img src="Assets/ic_play_arrow_white.svg"></button> <!-- onclick="playSong(queue[queueIndex], true)" -->
 					<button onclick="next()"><img src="Assets/ic_skip_next_white.svg"></button>
 					<div id="volume">
