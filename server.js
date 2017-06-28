@@ -124,6 +124,33 @@ module.exports = {
 			response.sendFile(dirname + 'downloadYoutube.html');
 		});
 
+		app.get('/ytdl/*', (request, response) => {
+			const url = querystring.unescape(request.url);
+			const arr = url.split('/');
+			const id = arr[arr.length - 1];
+			console.log('Got a request for ' + url);
+
+			if (id.length == 11) {
+				try {
+					ytdl.getInfo(id, (err, info) => {
+						// Filter
+						/*
+						keywords
+						view_count
+						author
+						title
+						thubnail_url
+						description
+						iurlmaxres
+						*/
+
+						if (err) response.send({success: false, error: 'No info', info: err});
+						else response.send({success: true, info: info});
+					});
+				} catch (err) {response.send({success: false, error: 'Something went wrong', info: err})};
+			} else response.send({success: false, error: 'No valid video id', info: 'The video id supplied cannot be from a youtube video'});
+		});
+
 		app.post('/ytdl*', (request, response) => {
 			let body = '';
 
