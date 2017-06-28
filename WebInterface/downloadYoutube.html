@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+
+	<title>Download YouTube</title>
+
+	<link rel="shortcut icon" href="Assets/Icons/favicon.ico"/>
+	<link rel="shortcut icon" href="Assets/Icons/favicon.ico" type="image/vnd.microsoft.icon"/>
+
+	<link rel="apple-touch-icon" sizes="57x57" href="Assets/Icons/apple-icon-57x57.png">
+	<link rel="apple-touch-icon" sizes="60x60" href="Assets/Icons/apple-icon-60x60.png">
+	<link rel="apple-touch-icon" sizes="72x72" href="Assets/Icons/apple-icon-72x72.png">
+	<link rel="apple-touch-icon" sizes="76x76" href="Assets/Icons/apple-icon-76x76.png">
+	<link rel="apple-touch-icon" sizes="114x114" href="Assets/Icons/apple-icon-114x114.png">
+	<link rel="apple-touch-icon" sizes="120x120" href="Assets/Icons/apple-icon-120x120.png">
+	<link rel="apple-touch-icon" sizes="144x144" href="Assets/Icons/apple-icon-144x144.png">
+	<link rel="apple-touch-icon" sizes="152x152" href="Assets/Icons/apple-icon-152x152.png">
+	<link rel="apple-touch-icon" sizes="180x180" href="Assets/Icons/apple-icon-180x180.png">
+	<link rel="icon" type="image/png" sizes="192x192"  href="Assets/Icons/android-icon-192x192.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="Assets/Icons/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="96x96" href="Assets/Icons/favicon-96x96.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="Assets/Icons/favicon-16x16.png">
+	<link rel="manifest" href="Assets/Icons/manifest.json">
+	<meta name="msapplication-TileImage" content="Assets/Icons/ms-icon-144x144.png">
+
+	<!--Let browser know website is optimized for mobile-->
+	<!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"/> -->
+	<!-- <meta name="mobile-web-app-capable" content="yes"/> -->
+	<meta name="theme-color" content="#16a085"/>
+	<meta name="msapplication-TileColor" content="#16a085">
+	<meta name="msapplication-navbutton-color" content="#16a085"/>
+	<meta name="apple-mobile-web-app-status-bar-style" content="#16a085"/>
+
+	<link href="all.css" rel="stylesheet" type="text/css" media="screen"/>
+	<link href="main.css" rel="stylesheet" type="text/css" media="screen"/>
+
+	<style type="text/css">
+		main {
+			width: 100%;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			height: calc(100% - 60px);
+			background-color: rgba(0, 0, 0, 0.1);
+		}
+
+		main form {
+			width: 100%;
+		}
+
+		main form #link {
+			width: 80%;
+			height: 150px;
+			display: block;
+			padding: 0 20px;
+			margin: 5% auto;
+			background: none;
+			max-width: 500px;
+			max-height: 50px;
+			text-align: center;
+			border-radius: 30px;
+			border: 2px solid #16a085;
+			background-color: rgba(255, 255, 255, 0.4);
+
+			font-size: 150%;
+			color: rgba(0, 0, 0, 0.5);
+			box-shadow: 0 0 20px rgba(0, 0, 0, 0.3)
+		}
+
+		main form #searchBtn {
+			width: 60%;
+			border: none;
+			margin: auto;
+			height: 150px;
+			display: block;
+			cursor: pointer;
+			background: none;
+			max-width: 500px;
+			max-height: 50px;
+			text-align: center;
+			border-radius: 30px;
+			will-change: transform;
+			background-color: #16a085;
+			transition: transform .3s ease;
+
+			font-size: 150%;
+			color: rgba(0, 0, 0, 0.5);
+			box-shadow: 0 0 20px rgba(0, 0, 0, 0.3)
+		}
+
+		main form #searchBtn:hover {
+			transform: scale(1.01) translateY(-4%);
+		}
+	</style>
+
+	<script type="text/javascript">
+		function submit(evt) {
+			evt.preventDefault();
+			const url = document.getElementById('link').value;
+
+			if (url.indexOf('youtube.com') > 0 || url.indexOf('youtu.be') > 0) {
+
+			} else /*Display toast or something..*/;
+
+			return false;
+		}
+	</script>
+
+</head>
+<body>
+
+	<header>
+		<div><h1>Download YouTube</h1></div>
+		<div id="searchBar"><input type="text" id="searchInp"></div>
+		<div id="searchBtn"><img src="Assets/ic_search_white.svg"></div>
+	</header>
+
+	<main>
+
+		<form id="form" onsubmit="submit()" action="#">
+			<input type="url" id="link" placeholder="https://www.youtube.com/watch?v=gLmcGkvJ-e0">
+			<input type="submit" id="searchBtn" value="Search">
+		</form>
+
+	</main>
+
+</body>
+</html>
