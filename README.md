@@ -22,6 +22,6 @@ Supported browsers with build numbers:
 
 **Internet Explorer won't work.** *but why would you use it anyway.*
 
-**You can still use it on old browsers. On the frontpage it will ask you to move to the old browsers page. The features are very limited tho**
+**You can still use it on old browsers. On the frontpage it will ask you to move to the old browsers page. The features are very limited tho.**
 
 **Only tested (and used) on Chrome Canary 60 and Android Chrome 58**
