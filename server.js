@@ -23,13 +23,15 @@ module.exports = {
 				const songs = [];
 				const videos = [];
 
-				// if (sort) {
-				// 	json.audio.songs.sort(sortFunc);
-				// 	json.video.videos.sort(sortFunc);
-				// }
-
-				json.audio.songs.forEach((object, key) => songs.push(object.fileName));
-				json.video.videos.forEach((object, key) => videos.push(object.fileName));
+				if (sort) {
+					json.audio.songs.sort(sortFunc);
+					json.video.videos.sort(sortFunc);
+					json.audio.songs.forEach((object, key) => songs.push(object.fileName));
+					json.video.videos.forEach((object, key) => videos.push(object.fileName));
+				} else {
+					json.audio.songs.forEach((object, key) => songs.push(object.fileName));
+					json.video.videos.forEach((object, key) => videos.push(object.fileName));
+				}
 
 				getPlaylists = (json, fs) => {
 					return Promise.all([new Promise((resolve, reject) => {
@@ -67,11 +69,11 @@ module.exports = {
 				.then(playlists => {
 					playlists = playlists[0].concat(playlists[1]);
 
-					// if (url.toLowerCase().indexOf('sort=oldest') > -1) {
-					// 	songs.reverse();
-					// 	videos.reverse();
-					// 	playlists.reverse();
-					// }
+					if (url.toLowerCase().indexOf('sort=oldest') > -1) {
+						songs.reverse();
+						videos.reverse();
+						playlists.reverse();
+					}
 
 					response.send({audio: {songs: songs, playlists: playlists}, video: {videos: videos}});
 				}).catch(err => response.send({error: "Something went wrong", info: "Either getting the songs or getting the playlists or both went wrong"}));
