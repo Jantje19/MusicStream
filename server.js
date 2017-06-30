@@ -133,19 +133,23 @@ module.exports = {
 			if (id.length == 11) {
 				try {
 					ytdl.getInfo(id, (err, info) => {
-						// Filter
-						/*
-						keywords
-						view_count
-						author
-						title
-						thubnail_url
-						description
-						iurlmaxres
-						*/
+						// For some weird JS reason the type of the parsed info is an object, but the prototype does not work...
+						info = JSON.parse(JSON.stringify(info));
+						const allowed = ['keywords', 'view_count', 'author', 'title', 'thubnail_url', 'description', 'iurlmaxres'];
+
+						Object.prototype.filter = function(arr) {
+							if (this.constructor === {}.constructor) {
+								const newObj = {};
+								for (key in this) {
+									if (arr.includes(key)) newObj[key] = this[key];
+								}
+
+								return newObj;
+							} else this;
+						}
 
 						if (err) response.send({success: false, error: 'No info', info: err});
-						else response.send({success: true, info: info});
+						else response.send({success: true, info: info.filter(allowed)});
 					});
 				} catch (err) {response.send({success: false, error: 'Something went wrong', info: err})};
 			} else response.send({success: false, error: 'No valid video id', info: 'The video id supplied cannot be from a youtube video'});
