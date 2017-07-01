@@ -35,28 +35,37 @@
 	<link href="main.css" rel="stylesheet" type="text/css" media="screen"/>
 
 	<style type="text/css">
+		header {
+			z-index: 1000;
+		}
+
 		main {
 			width: 100%;
-			display: flex;
-			align-items: center;
-			justify-content: center;
+			overflow: hidden;
+			position: relative;
 			height: calc(100% - 60px);
 			background-color: rgba(0, 0, 0, 0.1);
 		}
 
-		main form {
+		main > div {
+			top: 50%;
+			left: 50%;
 			width: 100%;
+			position: absolute;
+			will-change: transform;
+			transition: transform 1s ease;
+			transform: translate(-50%, -50%);
 		}
 
-		main form #link {
+		main div #link {
 			width: 80%;
 			height: 150px;
 			display: block;
 			padding: 0 20px;
-			margin: 5% auto;
 			background: none;
 			max-width: 500px;
 			max-height: 50px;
+			margin: 30px auto;
 			text-align: center;
 			border-radius: 30px;
 			border: 2px solid #16a085;
@@ -67,7 +76,7 @@
 			box-shadow: 0 0 20px rgba(0, 0, 0, 0.3)
 		}
 
-		main form #searchBtn {
+		main div #searchBtn {
 			width: 60%;
 			border: none;
 			margin: auto;
@@ -75,7 +84,7 @@
 			display: block;
 			cursor: pointer;
 			background: none;
-			max-width: 500px;
+			max-width: 350px;
 			max-height: 50px;
 			text-align: center;
 			border-radius: 30px;
@@ -88,22 +97,185 @@
 			box-shadow: 0 0 20px rgba(0, 0, 0, 0.3)
 		}
 
-		main form #searchBtn:hover {
+		main div #searchBtn:hover {
 			transform: scale(1.01) translateY(-4%);
+		}
+
+		main #editContent {
+			display: flex;
+			transform: translate(-50%, 110vh);
+		}
+
+		main #editContent > div {
+			flex: 1;
+			margin: 0 2%;
+			text-align: left;
+		}
+
+		main #editContent div h2 {
+			padding: 20px 0;
+		}
+
+		main #editContent div h3 {
+			font-size: 130%;
+			padding: 10px 0;
+		}
+
+		main #editContent div img[alt=thumbnail] {
+			width: 80%;
+			max-width: 300px;
+			border-radius: 20px;
+		}
+
+		main #editContent div img:not([alt=thumbnail]) {
+			width: 30px;
+			height: 30px;
+			margin-right: 20px;
+			border-radius: 100%;
+		}
+
+		main #editContent div span {
+			display: inline-block;
+			transform: translateY(-10px);
+		}
+
+		main #editContent div input {
+			margin: 5px;
+			outline: none;
+			padding: 5px 15px;
+			border-radius: 20px;
+			border: 1px #16a085 solid;
+			background-color: rgba(255, 255, 255, 0.5)
+		}
+
+		main #editContent div input:active {
+			background-color: rgba(255, 255, 255, 0.8);
+		}
+
+		main #editContent div #save {
+			width: 80%;
+			color: white;
+			display: block;
+			cursor: pointer;
+			margin: 10px  auto;
+			padding: 5px 15px;
+			border-radius: 20px;
+			border: 1px #16a085 solid;
+			background-color: #16a085;
+			transition: transform .3s ease;
+		}
+
+		main #editContent div #save:hover {
+			transform: scale(1.01) translateY(-4%);
+		}
+
+		main #editContent div #description {
+			padding: 10px 0;
+			max-height: 25vh;
+			overflow-y: auto;
 		}
 	</style>
 
 	<script type="text/javascript">
-		function submit(evt) {
-			evt.preventDefault();
-			const url = document.getElementById('link').value;
+		function load() {
+			document.getElementById('searchBtn').addEventListener('click', evt => {
+				const url = document.getElementById('link').value;
 
-			if (url.indexOf('youtube.com') > 0 || url.indexOf('youtu.be') > 0) {
+				evt.target.style.opacity = '0.3';
+				evt.target.style.pointerEvents = 'none';
 
-			} else /*Display toast or something..*/;
+				if (url.indexOf('youtube.com') > 0 || url.indexOf('youtu.be') > 0) {
+					fetch('/ytdl/' + url.match(/(.+)v\=((\w+|[0-9]+|\-|\_)+)$/i)[2]).then(response => {
+						response.json().then(json => {
+							if (json.success) {
+								json = json.info;
 
-			return false;
+								const videoInfo = document.getElementById('videoInfo');
+								const nodes = document.querySelector('main').childNodes;
+
+								videoInfo.innerHTML += `<img alt="thumbnail" src="${json.thumbnail_url}" />`;
+								videoInfo.innerHTML += `<h3>${json.title}</h3>`;
+								videoInfo.innerHTML += `<div><img alt="author" src="${json.author.avatar}"><span>${json.author.user}</span></div>`;
+								videoInfo.innerHTML += `<p><b>View Count:</b> ${json.view_count}</p>`;
+								videoInfo.innerHTML += '<hr>';
+								videoInfo.innerHTML += `<p id="description">${json.description.replace(/\n/g, '<br>')}</p>`;
+
+								// Set values
+								let title = '';
+								let album = '';
+								let artist = '';
+
+								const vals = analyzeDescription(json.description);
+
+								if (vals.title) title = vals.title;
+								if (vals.album) album = vals.album;
+								if (vals.artist) artist = vals.artist;
+
+								if (!title || !artist) {
+									const match = json.title.split(/(\-|\–)/).filter(val => {return (val.length > 1 && val.indexOf(/(\-|\–)/) < 0)});;
+									const val = match.splice(0, 1)[0].trim();
+
+									if (!artist) artist = val;
+									if (!title) title = match.join('-').trim();
+								}
+
+								document.getElementById('title').value = title;
+								document.getElementById('album').value = album;
+								document.getElementById('artist').value = artist;
+
+								setTimeout(() => {
+									nodes[3].style.transform = 'translate(-50%, -50%)';
+									nodes[1].style.transform = 'translate(-50%, -110vh)';
+									nodes[3].style.display = 'flex';
+								}, 300);
+							} else alert(json.info);
+						});
+					}).catch(err => alert(err));
+				} else alert('Link does not match a youtube url')/*Display toast or something..*/;
+			});
+
+			function analyzeDescription(text) {
+				const val = {};
+				const arr = text.split('\n');
+
+				arr.forEach((object, key) => {
+					const match = object.match(/(artist|title|album)\s?\:(.+)/i);
+					if (match) val[match[1].toLowerCase()] = match[2].trim();
+				});
+
+				return val;
+			}
+
+			document.getElementById('save').addEventListener('click', evt => {
+				evt.target.style.opacity = '0.3';
+				evt.target.style.pointerEvents = 'none';
+
+				const data = {
+					url: document.getElementById('link').value,
+					fileName: document.getElementById('artist').value + ' - ' + document.getElementById('title').value,
+					tags: {
+						title: document.getElementById('title').value,
+						album: document.getElementById('album').value,
+						artist: document.getElementById('artist').value
+					}
+				}
+
+				if (document.getElementById('uiac').checked) data.tags.image = document.querySelector('img').src;
+				document.getElementById('videoInput').innerHTML = '<b>Downloading... This may take a while.</b>';
+				fetch('/ytdl', {method: "POST", body: JSON.stringify(data)}).then(response => {
+					response.json().then(json => {
+						console.log(json);
+						if (json.success) {
+							if (confirm('Everything went according to plan. Do you want to go to the home page?')) window.location = window.location.origin;
+						} else alert('Error: ' + json.error)/*Display toast or something..*/;
+					});
+				}).catch( err => {
+					console.error('An error occurred', err);
+				});
+			});
 		}
+
+		window.onload = load;
 	</script>
 
 </head>
@@ -111,17 +283,34 @@
 
 	<header>
 		<div><h1>Download YouTube</h1></div>
-		<div id="searchBar"><input type="text" id="searchInp"></div>
-		<div id="searchBtn"><img src="Assets/ic_search_white.svg"></div>
 	</header>
 
 	<main>
-
-		<form id="form" onsubmit="submit()" action="#">
+		<div>
 			<input type="url" id="link" placeholder="https://www.youtube.com/watch?v=gLmcGkvJ-e0">
 			<input type="submit" id="searchBtn" value="Search">
-		</form>
+		</div>
 
+		<div id="editContent">
+			<div id="videoInfo">
+				<h2>Video Info</h2>
+			</div>
+
+			<div id="videoInput">
+				<h2>Video Tags</h2>
+
+				<label for="title">Title</label>
+				<input type="text" id="title"><br>
+				<label for="artist">Artist</label>
+				<input type="text" id="artist"><br>
+				<label for="album">Album</label>
+				<input type="text" id="album"><br>
+				<input type="checkbox" id="uiac" checked>
+				<label for="uiac">Use image as cover</label>
+
+				<button id="save">Save</button>
+			</div>
+		</div>
 	</main>
 
 </body>
