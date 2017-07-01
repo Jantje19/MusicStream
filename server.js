@@ -67,8 +67,11 @@ module.exports = {
 
 				getPlaylists(json, fs)
 				.then(playlists => {
-					playlists = playlists[0].concat(playlists[1]);
+					function flatten(arr) {
+						return Array.prototype.concat.apply([], arr);
+					}
 
+					playlists = flatten(playlists);
 					if (url.toLowerCase().indexOf('sort=oldest') > -1) {
 						songs.reverse();
 						videos.reverse();
@@ -161,6 +164,9 @@ module.exports = {
 		app.post('/ytdl*', (request, response) => {
 			let body = '';
 
+			const url = querystring.unescape(request.url);
+			console.log('Got a POST request for ' + url);
+
 			request.on('data', data => {
 				body += data;
 
@@ -171,69 +177,73 @@ module.exports = {
 			});
 
 			request.on('end', () => {
-				/*
-				Image Support?
-				*/
-
-				const json = JSON.parse(body);
-
-				const url = request.url;
-				console.log('Got a request for ' + url);
+				let json;
 
 				const sendError = err => {
-					try {response.send({success: false, error: err})}
+					try {response.send({success: false, error: err, jsonUpdated: false, addedTags: false})}
 					catch (err) {}
 				}
 
-				if (json.url && json.fileName && json.tags) {
-					const options = {};
-					const ffmpeg = require('fluent-ffmpeg');
-					const path = os.homedir() + '/Music/' + json.fileName + '.mp3';
-
-					if (json.url.indexOf('youtube.com') < 0 && json.url.indexOf('youtu.be') < 0) {sendError('Invalid url'); return;}
-					if (json.beginTime) options.begin = json.beginTime;
-
-					options.filter = 'audioonly';
-
-					const video = ytdl(json.url, options);
-					const writer = ffmpeg(video)
-					.format('mp3')
-					.audioBitrate(128);
-
-					const args = {
-						seek: 0,
-						duration: null
-					}
-
-					if (args.seek) writer.seekInput(formatTime(args.seek));
-					if (args.duration) writer.duration(args.duration);
-
-					video.on('progress', (chunkLength, downloaded, total) => {
-						process.stdout.cursorTo(0);
-						process.stdout.clearLine(1);
-						process.stdout.write("DOWNLOADING: " + (downloaded / total * 100).toFixed(2) + '% ');
-					});
-
-					video.on('end', () => {
-						process.stdout.write('\n');
-
-						fs.exists(path, exists => {
-							if (exists) {
-								console.log(`'${json.fileName}'` + ' downloaded');
-
-								// Tags
-								if (id3.write(json.tags, path)) {
-									fileHandler.searchSystem(fs, os, audioFileExtentions, videoFileExtentions, utils).then(json => {
-										response.send({success: true, fileName: json.fileName, jsonUpdated: true, addedTags: true});
-									}).catch(err => response.send({success: true, fileName: json.fileName, jsonUpdated: false, addedTags: true}));
-								} else response.send({success: true, fileName: json.fileName, jsonUpdated: false, addedTags: false});
-							} else sendError('File does not exist. This is a weird problem... You should investigate.');
-						});
-					});
-
-					writer.output(path).run();
-					video.on('error', err => {console.log(err); sendError(err)});
+				try {
+					json = JSON.parse(body);
+				} catch (err) {
+					sendError(err);
+					return;
 				}
+
+				if (json) {
+					if (json.url && json.fileName && json.tags) {
+						const options = {};
+						const ffmpeg = require('fluent-ffmpeg');
+						const path = os.homedir() + '/Music/' + json.fileName + '.mp3';
+
+						if (json.url.indexOf('youtube.com') < 0 && json.url.indexOf('youtu.be') < 0) {sendError('Invalid url'); return;}
+						if (json.beginTime) options.begin = json.beginTime;
+
+						options.filter = 'audioonly';
+
+						console.log(json);
+
+						const video = ytdl(json.url, options);
+						const writer = ffmpeg(video)
+						.format('mp3')
+						.audioBitrate(128);
+
+						const args = {
+							seek: 0,
+							duration: null
+						}
+
+						if (args.seek) writer.seekInput(formatTime(args.seek));
+						if (args.duration) writer.duration(args.duration);
+
+						video.on('progress', (chunkLength, downloaded, total) => {
+							process.stdout.cursorTo(0);
+							process.stdout.clearLine(1);
+							process.stdout.write("DOWNLOADING: " + (downloaded / total * 100).toFixed(2) + '% ');
+						});
+
+						video.on('end', () => {
+							process.stdout.write('\n');
+
+							fs.exists(path, exists => {
+								if (exists) {
+									console.log(`'${json.fileName}'` + ' downloaded');
+
+									// Tags
+									if (id3.write(json.tags, path)) {
+										fileHandler.searchSystem(fs, os, audioFileExtentions, videoFileExtentions, utils).then(json => {
+											response.send({success: true, fileName: json.fileName, jsonUpdated: true, addedTags: true});
+										}).catch(err => response.send({success: true, fileName: json.fileName, jsonUpdated: false, addedTags: true}));
+									} else response.send({success: true, fileName: json.fileName, jsonUpdated: false, addedTags: false});
+								} else sendError('File does not exist. This is a weird problem... You should investigate.');
+							});
+						});
+
+						writer.output(path).run();
+						video.on('error', err => {console.log(err); sendError(err)});
+					} else sendError('Tags not found. Expected url, fileName and tags.');
+				} else sendError('No JSON found');
 			});
 		});
 
