@@ -130,12 +130,15 @@ module.exports = {
 			const id = arr[arr.length - 1];
 			console.log('Got a request for ' + url);
 
+			// response.send({"success":true, "info": {"keywords":["techno","chicken","10","hours","loop","kiptokren","funny","dance","disco","music","laser","lights","red","bluepoultry","bok","song","yt:crop=16:9"], "view_count":"1297674", "author": {"id":"UCZDLYzePJ7YFda3b_KjpWoQ", "name":"Kipper", "avatar":"https://yt3.ggpht.com/-oQaJt0ET6zs/AAAAAAAAAAI/AAAAAAAAAAA/vUf0tpkdj20/s88-c-k-no-mo-rj-c0xffffff/photo.jpg", "user":"kiptokren", "channel_url":"https://www.youtube.com/channel/UCZDLYzePJ7YFda3b_KjpWoQ","user_url":"https://www.youtube.com/user/kiptokren"}, "thumbnail_url":"https://i.ytimg.com/vi/gLmcGkvJ-e0/default.jpg", "title":"Techno Chicken [10 hours]", "description":"Song made by Oli Chang.\n\nOriginal: http://www.youtube.com/watch?v=p_2_EJ..."} });
+			// return;
+
 			if (id.length == 11) {
 				try {
 					ytdl.getInfo(id, (err, info) => {
 						// For some weird JS reason the type of the parsed info is an object, but the prototype does not work...
 						info = JSON.parse(JSON.stringify(info));
-						const allowed = ['keywords', 'view_count', 'author', 'title', 'thubnail_url', 'description', 'iurlmaxres'];
+						const allowed = ['keywords', 'view_count', 'author', 'title', 'thubnail_url', 'description', 'thumbnail_url'];
 
 						Object.prototype.filter = function(arr) {
 							if (this.constructor === {}.constructor) {
@@ -173,25 +176,33 @@ module.exports = {
 				const url = request.url;
 				console.log('Got a request for ' + url);
 
-				if (json.url && json.type) {
-					let video, info;
-					let options = {};
-					// Let user specify video or audio // {filter: 'audioonly'}
-					// Let user specify fileName, but default to info evt title
-					// Let user specify begin time
-					// Look at this: https://github.com/jpweeks/ytdl-audio/blob/master/index.js
+				const sendError = err => {
+					try {response.send({success: false, error: err})}
+					catch (err) {}
+				}
 
-					if (json.type != 'audio' && json.type != 'video') {sendError('Type not correct'); return;}
+				if (json.url && json.fileName && json.tags) {
+					const options = {};
+					const ffmpeg = require('fluent-ffmpeg');
+					const path = os.homedir() + '/Music/' + json.fileName + '.mp3';
+
 					if (json.url.indexOf('youtube.com') < 0 && json.url.indexOf('youtu.be') < 0) {sendError('Invalid url'); return;}
 					if (json.beginTime) options.begin = json.beginTime;
-					if (json.type == 'video') {options.filter = format => { return format.container === 'mp4'; }}
-					else if (json.type =='audio') options.filter = 'audioonly';
 
-					video = ytdl(json.url, { filter: format => { return format.container === 'mp4'; }});
-					video.pipe(fs.createWriteStream(os.homedir() + '/Videos/' + json.fileName));
-					video.on('info', info => {
-						info = info;
-					});
+					options.filter = 'audioonly';
+
+					const video = ytdl(json.url, options);
+					const writer = ffmpeg(video)
+					.format('mp3')
+					.audioBitrate(128);
+
+					const args = {
+						seek: 0,
+						duration: null
+					}
+
+					if (args.seek) writer.seekInput(formatTime(args.seek));
+					if (args.duration) writer.duration(args.duration);
 
 					video.on('progress', (chunkLength, downloaded, total) => {
 						process.stdout.cursorTo(0);
@@ -200,56 +211,21 @@ module.exports = {
 					});
 
 					video.on('end', () => {
-						let fileName;
 						process.stdout.write('\n');
-
-						if (json.fileName) fileName = json.fileName;
-						else fileName = info.title.replace('"', '\\"') + '.mp4';
-
-						if (json.type == 'audio') {
-							const writer = require('fluent-ffmpeg')(reader)
-							.format('mp3')
-							.audioBitrate(128);
-
-							// if (args.seek) writer.seekInput(formatTime(args.seek));
-							// if (args.duration) writer.duration(args.duration);
-
-							// writer.output(process.stdout).run();
-							writer.output(os.homedir() + '/Music/' + fileName).run();
-							writer.on('finish', done);
-						} else if (json.type == 'video') {
-							const stream = video.pipe(fs.createWriteStream(os.homedir() + '/Videos/' + fileName));
-							console.log(os.homedir() + '/Videos/' + fileName);
-							request.pipe(stream);
-							stream.on('finish', done);
-							stream.on('error', sendError);
-						}
-
-						function done() {
-							let path;
-
-							if (json.type == 'video') path = os.homedir() + '/Videos/' + fileName;
-							else if (json.type == 'audio') path = os.homedir() + '/Music/' + fileName;
-
-							fs.exists(path, exists => {
-								if (exists) {
-									console.log(fileName + ' downloaded');
-									fileHandler.searchSystem(fs, os, audioFileExtentions, videoFileExtentions, utils).then(json => {
-										response.send({success: true, fileName: fileName, jsonUpdated: true});
-									}).catch(err => response.send({success: true, fileName: fileName, jsonUpdated: false}));
-								} else sendError('File does not exist. This is a weird problem... You should investigate.');
-							});
-						}
+						fs.exists(path, exists => {
+							if (exists) {
+								console.log(`'${json.fileName}'` + ' downloaded');
+								fileHandler.searchSystem(fs, os, audioFileExtentions, videoFileExtentions, utils).then(json => {
+									response.send({success: true, fileName: json.fileName, jsonUpdated: true});
+								}).catch(err => response.send({success: true, fileName: json.fileName, jsonUpdated: false}));
+							} else sendError('File does not exist. This is a weird problem... You should investigate.');
+						});
 					});
 
-					video.on('error', sendError);
+					writer.output(path).run();
+					video.on('error', err => {console.log(err); sendError(err)});
 				}
 			});
-
-			const sendError = err => {
-				try {response.send({success: false, error: err}); }
-				catch (err) {}
-			}
 		});
 
 		app.post('/updateSettings', (request, response) => {
