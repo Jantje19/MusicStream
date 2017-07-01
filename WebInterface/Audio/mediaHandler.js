@@ -128,12 +128,10 @@ function updateInterface() {
 
 	if (queue.length > 0) {
 		elem.innerHTML = '';
-
+		document.getElementById('queueCount').innerText = queue.length;
 		queue.forEach((object, key) => {
 			if (key == queueIndex) elem.innerHTML += `<button title="${object}" onclick="queueClick(event, '${key}')" style="background-color: lightblue;"><span>${key + 1}</span><span>${object}</button></div><hr>`;
 			else elem.innerHTML += `<button title="${object}" onclick="queueClick(event, '${key}')"><span>${key + 1}</span><span>${object}</button></div><hr>`;
-
-			// elem.innerHTML += '<br>';
 		});
 	} else elem.innerHTML = '<i>Queue is empty</i>';
 
@@ -153,7 +151,7 @@ function updateInterface() {
 // Media Sessions
 function mediaSession() {
 	const songName = queue[queueIndex].replace(/(\.\w{3})$/, '');
-	const match = songName.split('-');
+	const match = songName.split(/(\-|\–)/);
 
 	let title = songName;
 	let artist = songName;
@@ -224,24 +222,26 @@ function mediaSession() {
 				dataDiv.innerHTML += `<p><b>Album:</b> ${json.album}</p>`;
 				dataDiv.innerHTML += `<p><b>Year:</b> ${json.year}</p>`;
 
-				if (window.innerWidth > 500) {
-					if (json.image.imageBuffer.data.length > 1e7) return;
-					const arrayBufferView = new Uint8Array(json.image.imageBuffer.data);
-					const blob = new Blob([arrayBufferView], {type: "image/jpeg"});
-					const urlCreator = window.URL || window.webkitURL;
+				try {
+					if (window.innerWidth > 500) {
+						if (json.image.imageBuffer.data.length > 1e7) return;
+						const arrayBufferView = new Uint8Array(json.image.imageBuffer.data);
+						const blob = new Blob([arrayBufferView], {type: "image/jpeg"});
+						const urlCreator = window.URL || window.webkitURL;
 
-					imageUrl = urlCreator.createObjectURL(blob);
-					img.id = 'thumbnail';
-					img.style.top = '40px';
-					img.style.right = '10px';
-					img.style.width = '100px';
-					img.style.height = 'auto';
-					img.style.position = 'absolute';
-					img.style.border = '2px white solid';
-					img.style.boxShadow = '0 0 10px rgba(0, 0, 0, 0.3)';
-					img.src = imageUrl;
-					dataDiv.appendChild(img);
-				}
+						imageUrl = urlCreator.createObjectURL(blob);
+						img.id = 'thumbnail';
+						img.style.top = '40px';
+						img.style.right = '10px';
+						img.style.width = '100px';
+						img.style.height = 'auto';
+						img.style.position = 'absolute';
+						img.style.border = '2px white solid';
+						img.style.boxShadow = '0 0 10px rgba(0, 0, 0, 0.3)';
+						img.src = imageUrl;
+						dataDiv.appendChild(img);
+					}
+				} catch (err) {};
 
 				document.getElementById('mainControls').appendChild(dataDiv);
 				document.getElementById('showData').setAttribute('activated', '');
