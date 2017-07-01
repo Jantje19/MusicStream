@@ -171,6 +171,10 @@ module.exports = {
 			});
 
 			request.on('end', () => {
+				/*
+				Image Support?
+				*/
+
 				const json = JSON.parse(body);
 
 				const url = request.url;
@@ -212,12 +216,17 @@ module.exports = {
 
 					video.on('end', () => {
 						process.stdout.write('\n');
+
 						fs.exists(path, exists => {
 							if (exists) {
 								console.log(`'${json.fileName}'` + ' downloaded');
-								fileHandler.searchSystem(fs, os, audioFileExtentions, videoFileExtentions, utils).then(json => {
-									response.send({success: true, fileName: json.fileName, jsonUpdated: true});
-								}).catch(err => response.send({success: true, fileName: json.fileName, jsonUpdated: false}));
+
+								// Tags
+								if (id3.write(json.tags, path)) {
+									fileHandler.searchSystem(fs, os, audioFileExtentions, videoFileExtentions, utils).then(json => {
+										response.send({success: true, fileName: json.fileName, jsonUpdated: true, addedTags: true});
+									}).catch(err => response.send({success: true, fileName: json.fileName, jsonUpdated: false, addedTags: true}));
+								} else response.send({success: true, fileName: json.fileName, jsonUpdated: false, addedTags: false});
 							} else sendError('File does not exist. This is a weird problem... You should investigate.');
 						});
 					});
