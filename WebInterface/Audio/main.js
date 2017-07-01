@@ -4,6 +4,18 @@ let clickTimer;
 const cssRules = [];
 const audio = new Audio();
 
+const keyShortcuts = {
+	"escape": stopSong,
+	"arrowright": next,
+	"arrowleft": previous,
+	"enter": () => {
+		if (audio.src != null) {
+			if (audio.paused) startSong();
+			else pauseSong();
+		} else playSong(null, true);
+	}
+}
+
 function getData() {
 	return new Promise((resolve, reject) => {
 		get('/data/').then(json => {
@@ -19,7 +31,7 @@ function handlePlaylist(evt, name) {
 			window.location = '/managePlaylist.html#' + name;
 	} else {
 		get('/playlist/' + name).then(json => {
-			if (document.getElementById('shuffle')) json.songs.shuffle();
+			if (document.getElementById('shuffle').getAttribute('activated')) json.songs.shuffle();
 			deleteQueue();
 			queueIndex = 0;
 			enqueue(...json.songs);
@@ -85,6 +97,12 @@ function addWholeSongsToQueue() {
 
 function moveQueueItem(oldIndex, newIndex) {
 	queue.move(oldIndex, newIndex);
+	if (newIndex < queueIndex) queueIndex++;
+	else if (newIndex > queueIndex) queueIndex--;
+	else if (newIndex == queueIndex) playSong(newIndex, true);
+	// else if (newIndex == queueIndex && oldIndex > queueIndex) queueIndex++;
+	// else if (newIndex == queueIndex && oldIndex < queueIndex) queueIndex--;
+	// else if (oldIndex == queueIndex);
 	updateInterface();
 }
 
@@ -261,6 +279,8 @@ function load() {
 			playlistsElem.innerHTML += `<button class="listElem ${key}" onclick="handlePlaylist(event, '${object}')">${object}</button><hr>`;
 		});
 
+		document.getElementById('songCount').innerText = songArr.length;
+
 		function searchArr(query, array) {
 			const outp = [];
 
@@ -305,10 +325,23 @@ function load() {
 		audio.volume = Number(evt.target.value) / 100;
 	});
 
+	// Shortcuts
+	window.addEventListener('keyup', evt => {
+		const key = evt.code.toLowerCase();
+		if (key in keyShortcuts) {
+			evt.preventDefault(evt);
+			keyShortcuts[key]();
+			return false;
+		}
+
+		return true;
+	});
+
 	getData().then(json => {
 		data = json;
 
 		if (json.songs.length > 0) {
+			document.getElementById('songCount').innerText = json.songs.length;
 			songsElem.innerHTML = '';
 			json.songs.forEach((object, key) => {
 				songsElem.innerHTML += `<button title="${object}" class="song ${key}" onclick="songClick(this)">${object}</button><hr>`;
