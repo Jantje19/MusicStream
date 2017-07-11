@@ -58,9 +58,15 @@
 		<div id="main">
 			<div id="songsContainer">
 				<h3>Songs</h3>
-				<span id="songCount"></span>
-				<button title="Add whole list to queue (only use when you're confident in your system)" style="float: right;" onclick="addWholeSongsToQueue()"><img src="Assets/ic_playlist_add_black.svg"></button>
 				<button title="Pick random" style="float: right;" onclick="pickRandomSong()"><img src="Assets/ic_random_black.svg"></button>
+				<button title="Add whole list to queue (only use when you're confident in your system)" style="float: right;" onclick="addWholeSongsToQueue()"><img src="Assets/ic_playlist_add_black.svg"></button>
+				<hr style="border-bottom-color: lightgray;">
+				<span id="songCount">Amount: 0</span>
+				<select id="sort">
+					<option value="none">Alphabet</option>
+					<option value="newest">Newest</option>
+					<option value="oldest">Oldest</option>
+				</select>
 				<hr>
 				<div id="songs">
 					<div class="ball-scale-multiple"><div></div><div></div><div></div></div>
@@ -69,14 +75,17 @@
 			<div id="playlistsContainer">
 				<h3>Playlists</h3>
 				<button title="Create playlist" style="float: right;" onclick="window.location = '/createPlaylist.html'"><img src="Assets/ic_add_black.svg"></button>
+				<hr style="border-bottom-color: lightgray;">
+				<span id="playlistCount">Amount: 0</span>
 				<hr>
 				<div id="playlists"></div>
 			</div>
 			<div id="queueContainer">
 				<h3>Queue</h3>
-				<span id="queueCount"></span>
 				<button title="Empty queue" style="float: right;" onclick="deleteQueue()"><img src="Assets/ic_clear_all_black.svg"/></button>
 				<button title="Save to playlist" style="float: right;" onclick="saveQueueToPlaylist()"><img src="Assets/ic_save_black.svg"/></button>
+				<hr style="border-bottom-color: lightgray;">
+				<span id="queueCount">Amount: 0</span>
 				<hr>
 				<div id="queue">
 					<i>Queue is empty</i>

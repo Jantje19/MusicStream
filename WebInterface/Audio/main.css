@@ -126,8 +126,11 @@ main #main div h3 {
 }
 
 main #main div > span {
-	font-size: 50%;
-	font-style: italic;
+	font-size: 80%;
+}
+
+main #main div > select {
+	float: right;
 }
 
 main #main button {

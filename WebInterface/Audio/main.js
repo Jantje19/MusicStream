@@ -279,7 +279,8 @@ function load() {
 			playlistsElem.innerHTML += `<button class="listElem ${key}" onclick="handlePlaylist(event, '${object}')">${object}</button><hr>`;
 		});
 
-		document.getElementById('songCount').innerText = songArr.length;
+		document.getElementById('songCount').innerText = "Amount: " + songArr.length;
+		document.getElementById('playlistCount').innerText = "Amount: " + playlistArr.length;
 
 		function searchArr(query, array) {
 			const outp = [];
@@ -306,6 +307,29 @@ function load() {
 				controlsElem.style.height = '230px';
 			}
 		}
+	});
+
+	document.getElementById('sort').addEventListener('change', evt => {
+		let after = '';
+		const val = evt.target.value;
+
+		if (val != "none") after = 'sort=' + val;
+
+		fetch('/data/' + after).then(response => {
+			response.json().then(json => {
+				const songs = json.audio.songs;
+				const songsElem = document.getElementById('songs');
+
+				songsElem.innerHTML = '';
+				songs.forEach((object, key) => {
+					songsElem.innerHTML += `<button class="song ${key}" onclick="songClick(this)">${object}</button><hr>`;
+				});
+
+				document.getElementById('songCount').innerText = "Amount: " + songs.length;
+			});
+		}).catch( err => {
+			console.error('An error occurred', err);
+		});
 	});
 
 	document.getElementById('volumeToggle').addEventListener('click', evt => {
@@ -341,7 +365,7 @@ function load() {
 		data = json;
 
 		if (json.songs.length > 0) {
-			document.getElementById('songCount').innerText = json.songs.length;
+			document.getElementById('songCount').innerText = "Amount: " + json.songs.length;
 			songsElem.innerHTML = '';
 			json.songs.forEach((object, key) => {
 				songsElem.innerHTML += `<button title="${object}" class="song ${key}" onclick="songClick(this)">${object}</button><hr>`;
@@ -349,6 +373,7 @@ function load() {
 		} else songsElem.innerHTML = '<i>No songs</i>';
 
 		if (json.playlists.length > 0) {
+			document.getElementById('playlistCount').innerText = "Amount: " + json.playlists.length;
 			json.playlists.forEach((object, key) => {
 				playlistsElem.innerHTML += `<button title="${object}" class="listElem ${key}" onclick="handlePlaylist(event, '${object}')">${object}</button><hr>`;
 			});

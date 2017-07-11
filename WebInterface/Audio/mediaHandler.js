@@ -128,7 +128,7 @@ function updateInterface() {
 
 	if (queue.length > 0) {
 		elem.innerHTML = '';
-		document.getElementById('queueCount').innerText = queue.length;
+		document.getElementById('queueCount').innerText = "Amount: " + queue.length;
 		queue.forEach((object, key) => {
 			if (key == queueIndex) elem.innerHTML += `<button title="${object}" onclick="queueClick(event, '${key}')" style="background-color: lightblue;"><span>${key + 1}</span><span>${object}</button></div><hr>`;
 			else elem.innerHTML += `<button title="${object}" onclick="queueClick(event, '${key}')"><span>${key + 1}</span><span>${object}</button></div><hr>`;
@@ -252,7 +252,6 @@ function mediaSession() {
 					navigator.mediaSession.metadata.artist = json.artist;
 
 					img.onload = evt => {
-						console.log(evt);
 						navigator.mediaSession.metadata.artwork.length = 0;
 						navigator.mediaSession.metadata.artwork = [
 						{ src: imageUrl, sizes: '512x512', type: 'image/jpeg' },
@@ -279,8 +278,13 @@ function mediaSession() {
 
 		navigator.mediaSession.setActionHandler('nexttrack', next);
 		navigator.mediaSession.setActionHandler('previoustrack', previous);
-		navigator.mediaSession.setActionHandler('play', evt => {playSong(null, true)});
-		navigator.mediaSession.setActionHandler('pause', evt => {pauseSong(null, true)});
+		navigator.mediaSession.setActionHandler('pause', evt => pauseSong(null, true));
+		navigator.mediaSession.setActionHandler('play', evt => {
+			if (audio.src != null) {
+				if (audio.paused) startSong();
+				else pauseSong();
+			} else playSong(null, true);
+		});
 		// navigator.mediaSession.setActionHandler('seekforward', function() {  Code excerpted.  });
 		// navigator.mediaSession.setActionHandler('seekbackward', evt => {playSong(null, true)});
 
