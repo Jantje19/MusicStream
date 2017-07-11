@@ -249,17 +249,24 @@ function load() {
 	});
 
 	document.getElementById('searchBtn').addEventListener('click', evt => {
-		const searchBar = document.getElementById('searchBar');
 		const searchInp = document.getElementById('searchInp');
 
-		if (searchBar.style.display == 'inline-block') {
+		if (searchInp.style.display == 'block') {
 			searchInp.blur();
 			searchInp.value = '';
-			searchBar.style.display = 'none';
+			searchInp.style.display = 'none';
 		} else {
-			searchBar.style.display = 'inline-block';
+			searchInp.style.display = 'block';
 			searchInp.focus();
 		}
+	});
+
+	document.getElementById('overflowMenuHolder').querySelector('button').addEventListener('click', evt => {
+		const menu = document.getElementById('overflowMenu');
+
+		if (menu.style.display == 'block')
+			menu.style.display = 'none';
+		else menu.style.display = 'block';
 	});
 
 	document.getElementById('searchInp').addEventListener('keyup', evt => {
@@ -343,6 +350,19 @@ function load() {
 		audio.volume = 0;
 		document.getElementById('volumeSlider').value = 0;
 		document.getElementById('volumePopUp').style.display = 'none';
+	});
+
+	document.getElementById('updateJSONBtn').addEventListener('click', evt => {
+		document.getElementById('overflowMenu').style.display = 'none';
+
+		fetch('/updateJSON/').then(response => {
+			response.json().then(json => {
+				if (json.success) alert('Updated JSON');
+				else alert(json.info);
+			});
+		}).catch( err => {
+			console.error('An error occurred', err);
+		});
 	});
 
 	document.getElementById('volumeSlider').addEventListener('change', evt => {

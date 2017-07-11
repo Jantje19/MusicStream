@@ -216,7 +216,7 @@ function mediaSession() {
 				const dataDiv = document.createElement('div');
 
 				dataDiv.id = 'artistInfo';
-				dataDiv.innerHTML += `<p style="font-size: 120%;"><i>Song info:</i></p><hr>`;
+				dataDiv.innerHTML += `<p style="font-size: 120%;">Song info:</p><hr>`;
 				dataDiv.innerHTML += `<p><b>Title:</b> ${json.title}</p>`;
 				dataDiv.innerHTML += `<p><b>Artist:</b> ${json.artist}</p>`;
 				dataDiv.innerHTML += `<p><b>Album:</b> ${json.album}</p>`;

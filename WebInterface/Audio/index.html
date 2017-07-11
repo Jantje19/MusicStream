@@ -35,6 +35,82 @@
 	<link href="main.css" rel="stylesheet" type="text/css" media="screen"/>
 	<link href="seekbarStyle.css" rel="stylesheet" type="text/css" media="screen"/>
 
+	<style type="text/css">
+		header h1 {
+			float: none;
+		}
+
+		header > div {
+			height: 100%;
+		}
+
+		header > div > div {
+			width: 40px;
+			height: 100%;
+			display: inline-block;
+		}
+
+		header > div > div > div {
+			display: none;
+		}
+
+		header > div > div > button {
+			margin-top: 3px;
+			float: none !important;
+			padding: 0px !important;
+			position: relative !important;
+		}
+
+		header > div:first-child {
+			float: left;
+		}
+
+		header #search #searchInp {
+			top: 0;
+			left: 10%;
+			width: 40%;
+			padding: 5px;
+			border: none;
+			display: none;
+			color: #16a085;
+			position: absolute;
+			text-align: center;
+			transform: translate(50%, 70%);
+		}
+
+		header #overflowMenuHolder #overflowMenu {
+			top: 50px;
+			right: 1%;
+			width: 150px;
+			display: none;
+			z-index: 100000;
+			position: absolute;
+			background-color: white;
+			box-shadow: 0 0 5px rgba(0, 0 , 0, 0.3);
+		}
+
+		header #overflowMenuHolder #overflowMenu button {
+			width: 100%;
+			padding: 10px;
+			height: initial;
+			position: initial;
+			transition: background-color .3s ease;
+		}
+
+		header #overflowMenuHolder #overflowMenu button:hover {
+			background-color: rgba(0, 0, 0, 0.05);
+		}
+
+		header #overflowMenuHolder #overflowMenu button:before {
+			content: '';
+			display: none;
+		}
+
+		header > div:last-child {
+			float: right;
+		}
+	</style>
+
 	<script type="text/javascript" src="mediaHandler.js"></script>
 	<script type="text/javascript" src="main.js"></script>
 
@@ -49,9 +125,27 @@
 <body>
 
 	<header>
-		<div><h1>Music</h1></div>
-		<div id="searchBar"><input type="text" id="searchInp"></div>
-		<div id="searchBtn"><img src="Assets/ic_search_white.svg"></div>
+		<div>
+			<h1>Music</h1>
+		</div>
+
+		<div>
+			<div id="search">
+				<button id="searchBtn"><img src="Assets/ic_search_white.svg"></button>
+				<input type="text" id="searchInp">
+			</div>
+
+			<div id="overflowMenuHolder">
+				<button><img src="Assets/ic_more_vert_white.svg"></button>
+
+				<div id="overflowMenu">
+					<a href="/videos/"><button>Video's</button></a>
+					<button id="updateJSONBtn">Update JSON</button>
+					<a href="/downloadYoutube"><button>Youtube Download</button></a>
+					<a href="/help/"><button>Help / Shortcuts</button></a>
+				</div>
+			</div>
+		</div>
 	</header>
 
 	<main>
