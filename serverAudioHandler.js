@@ -156,7 +156,9 @@ module.exports = {
 					return;
 				}
 
-				fileHandler.updatePlaylist(fs, body, mostListenedPlaylistName).then(data => response.send(data)).catch(err => response.send(err));
+				if (body.name == mostListenedPlaylistName)
+					response.send({success: false, error: `Cannot access '${playlistName}'`, info: "This file is not editable"});
+				else fileHandler.updatePlaylist(fs, body, mostListenedPlaylistName).then(data => response.send(data)).catch(err => response.send(err));
 			});
 		});
 
