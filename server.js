@@ -192,7 +192,7 @@ module.exports = {
 				}
 
 				if (json) {
-					if (json.url && json.fileName && json.tags) {
+					if (json.url && json.fileName) {
 						const options = {};
 						const ffmpeg = require('fluent-ffmpeg');
 						const path = os.homedir() + '/Music/' + json.fileName + '.mp3';
@@ -201,8 +201,6 @@ module.exports = {
 						if (json.beginTime) options.begin = json.beginTime;
 
 						options.filter = 'audioonly';
-
-						console.log(json);
 
 						const video = ytdl(json.url, options);
 						const writer = ffmpeg(video)
@@ -231,10 +229,16 @@ module.exports = {
 									console.log(`'${json.fileName}'` + ' downloaded');
 
 									// Tags
-									if (id3.write(json.tags, path)) {
-										fileHandler.searchSystem(fs, os, audioFileExtentions, videoFileExtentions, utils).then(json => {
-											response.send({success: true, fileName: json.fileName, jsonUpdated: true, addedTags: true});
-										}).catch(err => response.send({success: true, fileName: json.fileName, jsonUpdated: false, addedTags: true}));
+									if (json.tags) {
+										console.log(json.tags);
+										console.log("--------");
+										console.log(id3.write(json.tags, path));
+
+										if (id3.write(json.tags, path)) {
+											fileHandler.searchSystem(fs, os, audioFileExtentions, videoFileExtentions, utils).then(json => {
+												response.send({success: true, fileName: json.fileName, jsonUpdated: true, addedTags: true});
+											}).catch(err => response.send({success: true, fileName: json.fileName, jsonUpdated: false, addedTags: true}));
+										} else response.send({success: true, fileName: json.fileName, jsonUpdated: false, addedTags: false});
 									} else response.send({success: true, fileName: json.fileName, jsonUpdated: false, addedTags: false});
 								} else sendError('File does not exist. This is a weird problem... You should investigate.');
 							});
