@@ -50,12 +50,12 @@
 							else resolve(json);
 						});
 					}
-				}).catch(err => reject(err));
+				}).catch(err => reject);
 			});
 		}
 
 		function songClick(songName) {
-			playlist.push(songName);
+			playlist.push(unescape(songName));
 			updateInterface();
 		}
 
@@ -95,7 +95,7 @@
 
 						songsElem.innerHTML = '';
 						json.songs.forEach((object, key) => {
-							songsElem.innerHTML += `<button title="${object}" class="song ${key}" onclick="songClick('${object}')">${object}</button><hr>`;
+							songsElem.innerHTML += `<button title="${object}" class="song ${key}" onclick="songClick('${escape(object)}')">${object}</button><hr>`;
 						});
 					}).catch(err => alert(err));
 				} else alert('Playlist not found');

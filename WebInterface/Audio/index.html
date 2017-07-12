@@ -131,12 +131,12 @@
 
 		<div>
 			<div id="search">
-				<button id="searchBtn"><img src="Assets/ic_search_white.svg"></button>
+				<button id="searchBtn" title="Search"><img src="Assets/ic_search_white.svg"></button>
 				<input type="text" id="searchInp">
 			</div>
 
 			<div id="overflowMenuHolder">
-				<button><img src="Assets/ic_more_vert_white.svg"></button>
+				<button title="Overflow menu"><img src="Assets/ic_more_vert_white.svg"></button>
 
 				<div id="overflowMenu">
 					<a href="/videos/"><button>Video's</button></a>
@@ -191,13 +191,13 @@
 
 			<div id="mainControls">
 				<div id="left">
-					<button onclick="previous()"><img src="Assets/ic_skip_previous_white.svg"></button>
-					<button id="toggleBtn"><img src="Assets/ic_play_arrow_white.svg"></button> <!-- onclick="playSong(queue[queueIndex], true)" -->
-					<button onclick="next()"><img src="Assets/ic_skip_next_white.svg"></button>
+					<button title="Play previous song" onclick="previous()"><img src="Assets/ic_skip_previous_white.svg"></button>
+					<button title="Play/pause song" id="toggleBtn"><img src="Assets/ic_play_arrow_white.svg"></button> <!-- onclick="playSong(queue[queueIndex], true)" -->
+					<button title="Play next song" onclick="next()"><img src="Assets/ic_skip_next_white.svg"></button>
 					<div id="volume">
-						<button id="volumeToggle"><img src="Assets/ic_volume_up_white.svg"></button>
+						<button title="Change volume" id="volumeToggle"><img src="Assets/ic_volume_up_white.svg"></button>
 						<div id="volumePopUp">
-							<button id="muteBtn"><img src="Assets/ic_volume_off_black.svg"></button>
+							<button title="Mute" id="muteBtn"><img src="Assets/ic_volume_off_black.svg"></button>
 							<input id="volumeSlider" type="range" min="0" max="100" value="100">
 						</div>
 					</div>
@@ -206,9 +206,9 @@
 					<p id="songName" style="width: 100%; text-overflow: ellipsis; overflow: hidden; padding: 5px 0"></p>
 				</div>
 				<div id="right">
-					<button id="showData"><img src="Assets/ic_keyboard_arrow_up_white.svg"></button>
-					<button id="repeat"><img src="Assets/ic_repeat_white.svg"></button>
-					<button id="shuffle"><img src="Assets/ic_shuffle_white.svg"></button>
+					<button title="Show song data" id="showData"><img src="Assets/ic_keyboard_arrow_up_white.svg"></button>
+					<button title="Repeat song" id="repeat"><img src="Assets/ic_repeat_white.svg"></button>
+					<button title="Shuffle" id="shuffle"><img src="Assets/ic_shuffle_white.svg"></button>
 				</div>
 			</div>
 		</div>
