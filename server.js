@@ -1,5 +1,5 @@
 module.exports = {
-	start: function(dirname, fileHandler, fs, os, audioFileExtentions, videoFileExtentions, utils, querystring, id3, mostListenedPlaylistName, ytdl) {
+	start: function(dirname, fileHandler, fs, os, audioFileExtensions, videoFileExtensions, utils, querystring, id3, mostListenedPlaylistName, ytdl) {
 		const express = require('express');
 		const app = express();
 		const port = 8000;
@@ -19,7 +19,7 @@ module.exports = {
 			console.log('Got a request for ' + url);
 
 			if (url.toLowerCase().indexOf('sort=') > -1) sort = true;
-			fileHandler.getJSON(fs, os, audioFileExtentions, videoFileExtentions, utils).then(json => {
+			fileHandler.getJSON(fs, os, audioFileExtensions, videoFileExtensions, utils).then(json => {
 				const songs = [];
 				const videos = [];
 
@@ -95,16 +95,22 @@ module.exports = {
 		app.get('/updateJSON/', (request, response) => {
 			console.log('Got a request for ' + request.url);
 
-			fileHandler.searchSystem(fs, os, audioFileExtentions, videoFileExtentions, utils).then(json => {
+			fileHandler.searchSystem(fs, os, audioFileExtensions, videoFileExtensions, utils).then(json => {
 				// json.audio.playlists.forEach((object, key) => {
 				// 	console.log(fileHandler.readPlaylist(object.path + object.file));
 				// });
 
-				response.send('JSON updated successfully');
+				response.send({success: true});
 			}).catch(err => {
 				console.log(err);
-				response.send({error: "There was an error with updating the playlist", info: err});
+				response.send({success: false, error: "There was an error with updating the playlist", info: err});
 			});
+		});
+
+		app.get('/help/', (request, response) => {
+			const url = querystring.unescape(request.url);
+			console.log('Got a request for ' + url);
+			response.sendFile(dirname + 'help.html');
 		});
 
 		app.get('/getSettings', (request, response) => {
@@ -180,7 +186,7 @@ module.exports = {
 				let json;
 
 				const sendError = err => {
-					try {response.send({success: false, error: err, jsonUpdated: false, addedTags: false})}
+					try {response.send({success: false, error: err, jsonUpdated: false})}
 					catch (err) {}
 				}
 
@@ -229,17 +235,11 @@ module.exports = {
 									console.log(`'${json.fileName}'` + ' downloaded');
 
 									// Tags
-									if (json.tags) {
-										console.log(json.tags);
-										console.log("--------");
-										console.log(id3.write(json.tags, path));
+									if (json.tags) id3.write(json.tags, path);
 
-										if (id3.write(json.tags, path)) {
-											fileHandler.searchSystem(fs, os, audioFileExtentions, videoFileExtentions, utils).then(json => {
-												response.send({success: true, fileName: json.fileName, jsonUpdated: true, addedTags: true});
-											}).catch(err => response.send({success: true, fileName: json.fileName, jsonUpdated: false, addedTags: true}));
-										} else response.send({success: true, fileName: json.fileName, jsonUpdated: false, addedTags: false});
-									} else response.send({success: true, fileName: json.fileName, jsonUpdated: false, addedTags: false});
+									fileHandler.searchSystem(fs, os, audioFileExtensions, videoFileExtensions, utils).then(json => {
+										response.send({success: true, fileName: json.fileName, jsonUpdated: true});
+									}).catch(err => response.send({success: true, fileName: json.fileName, jsonUpdated: false}));
 								} else sendError('File does not exist. This is a weird problem... You should investigate.');
 							});
 						});
@@ -276,8 +276,8 @@ module.exports = {
 			});
 		});
 
-		require('./serverVideoHandler.js').start(app, dirname, fileHandler, fs, os, audioFileExtentions, videoFileExtentions, utils, querystring);
-		require('./serverAudioHandler.js').start(app, dirname, fileHandler, fs, os, audioFileExtentions, videoFileExtentions, utils, querystring, id3, mostListenedPlaylistName);
+		require('./serverVideoHandler.js').start(app, dirname, fileHandler, fs, os, audioFileExtensions, videoFileExtensions, utils, querystring);
+		require('./serverAudioHandler.js').start(app, dirname, fileHandler, fs, os, audioFileExtensions, videoFileExtensions, utils, querystring, id3, mostListenedPlaylistName);
 
 		app.get('/*', (request, response) => {
 			let url = request.url;

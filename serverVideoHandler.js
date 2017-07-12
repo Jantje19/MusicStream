@@ -1,11 +1,11 @@
 module.exports = {
-	start: (app, dirname, fileHandler, fs, os, audioFileExtentions, videoFileExtentions, utils, querystring) => {
+	start: (app, dirname, fileHandler, fs, os, audioFileExtensions, videoFileExtensions, utils, querystring) => {
 		app.get('/video/*', (request, response) => {
 			const url = querystring.unescape(request.url);
 			console.log('Got a request for ' + url);
 
 			if (!url.endsWith('/')) {
-				fileHandler.getJSON(fs, os, audioFileExtentions, videoFileExtentions, utils).then(json => {
+				fileHandler.getJSON(fs, os, audioFileExtensions, videoFileExtensions, utils).then(json => {
 					const fileName = url.match(/(.+)\/(.+)$/)[2].trim();
 					const inArray = findSong(json.video.videos, fileName);
 

@@ -1,5 +1,5 @@
 module.exports = {
-	start: (app, dirname, fileHandler, fs, os, audioFileExtentions, videoFileExtentions, utils, querystring, id3, mostListenedPlaylistName) => {
+	start: (app, dirname, fileHandler, fs, os, audioFileExtensions, videoFileExtensions, utils, querystring, id3, mostListenedPlaylistName) => {
 		app.get('/playlist/*', (request, response) => {
 			const url = querystring.unescape(request.url);
 
@@ -7,7 +7,7 @@ module.exports = {
 
 			if (!url.endsWith('/')) {
 				if (url.match(/(.+)\.(\w{2,5})/)) {
-					fileHandler.getJSON(fs, os, audioFileExtentions, videoFileExtentions, utils).then(json => {
+					fileHandler.getJSON(fs, os, audioFileExtensions, videoFileExtensions, utils).then(json => {
 						const playlistName = url.match(/(.+)\/(.+)$/)[2].trim();
 						const inArray = findPlaylist(json.audio.playlists, playlistName);
 
@@ -62,7 +62,7 @@ module.exports = {
 			console.log('Got a request for ' + url);
 
 			if (!url.endsWith('/')) {
-				fileHandler.getJSON(fs, os, audioFileExtentions, videoFileExtentions, utils).then(json => {
+				fileHandler.getJSON(fs, os, audioFileExtensions, videoFileExtensions, utils).then(json => {
 					const songName = url.match(/(.+)\/(.+)$/)[2].trim();
 					const inArray = findSong(json.audio.songs, songName);
 
@@ -89,7 +89,7 @@ module.exports = {
 			console.log('Got a request for ' + url);
 
 			if (!url.endsWith('/')) {
-				fileHandler.getJSON(fs, os, audioFileExtentions, videoFileExtentions, utils).then(json => {
+				fileHandler.getJSON(fs, os, audioFileExtensions, videoFileExtensions, utils).then(json => {
 					const songName = url.match(/(.+)\/(.+)$/)[2].trim();
 					const inArray = findSong(json.audio.songs, songName);
 
@@ -122,7 +122,7 @@ module.exports = {
 
 			console.log('Got a request for ' + url + '. HAHA Your browser sucks');
 
-			fileHandler.getJSON(fs, os, audioFileExtentions, videoFileExtentions, utils).then(json => {
+			fileHandler.getJSON(fs, os, audioFileExtensions, videoFileExtensions, utils).then(json => {
 				let html = '<script>function playSong(songName) {var elem = document.getElementById("audio"); elem.src = "/song/" + songName; elem.play()}</script><audio id="audio">YOUR BROWSER DOESN\'T SUPPORT THE AUDIO ELEMENT</audio>';
 
 				json.audio.songs.forEach((object, key) => {

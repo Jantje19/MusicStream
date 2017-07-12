@@ -1,5 +1,5 @@
 module.exports = {
-	searchSystem: function(fs, os, audioFileExtentions, videoFileExtentions, utils) {
+	searchSystem: function(fs, os, audioFileExtensions, videoFileExtensions, utils) {
 		const songsArr = [];
 		const videosArr = [];
 		const playlistsArr = [];
@@ -41,8 +41,8 @@ module.exports = {
 									fs.stat(path + object, (err, stats) => {
 										const ctime = new Date(stats.ctime.toString());
 
-										if (audioFileExtentions.includes(fileExtention)) songsArr.push({path: path, fileName: object, lastChanged: ctime});
-										else if (videoFileExtentions.includes(fileExtention)) videosArr.push({path: path, fileName: object, lastChanged: ctime});
+										if (audioFileExtensions.includes(fileExtention)) songsArr.push({path: path, fileName: object, lastChanged: ctime});
+										else if (videoFileExtensions.includes(fileExtention)) videosArr.push({path: path, fileName: object, lastChanged: ctime});
 										else if (fileExtention == '.m3u') playlistsArr.push({path: path, fileName: object, lastChanged: ctime});
 										else if (fileExtention) console.log('File extention not supported', object);
 										else if (!fileExtention && fs.lstatSync(path + object).isDirectory()) handleFolders(path + object + '/', utils);
@@ -107,8 +107,6 @@ module.exports = {
 		const jsonPath = 'playlists.json';
 
 		return new Promise((resolve, reject) => {
-			// if (body.name == mostListenedPlaylistName) reject({success: false, error: `Cannot access '${playlistName}'`, info: "This file is not editable"});
-
 			fs.exists(__dirname + '/' + jsonPath, exists => {
 				if (exists) {
 					fs.readFile(__dirname + '/' + jsonPath, 'utf-8', (err, data) => {
@@ -149,7 +147,7 @@ module.exports = {
 		});
 	},
 
-	getJSON: function(fs, os, audioFileExtentions, videoFileExtentions, utils) {
+	getJSON: function(fs, os, audioFileExtensions, videoFileExtensions, utils) {
 		return new Promise((resolve, reject) => {
 			const JSONPath = './JSON.json';
 
@@ -161,7 +159,7 @@ module.exports = {
 					});
 				} else {
 					console.log('Nope');
-					resolve(this.searchSystem(fs, os, audioFileExtentions, videoFileExtentions, utils));
+					resolve(this.searchSystem(fs, os, audioFileExtensions, videoFileExtensions, utils));
 				}
 			});
 		});

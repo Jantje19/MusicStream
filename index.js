@@ -6,8 +6,8 @@ const server = require('./server.js');
 const querystring = require('querystring');
 const fileHandler = require('./fileHandler.js');
 
-const videoFileExtentions = ['.mp4'];
-const audioFileExtentions = ['.mp3', '.m3a', '.wav'];
+const videoFileExtensions = ['.mp4'];
+const audioFileExtensions = ['.mp3', '.m3a', '.wav'];
 const mostListenedPlaylistName = 'MostListened';
 
 const utils = {
@@ -30,4 +30,4 @@ const utils = {
 	}
 }
 
-server.start(__dirname + '/WebInterface/', fileHandler, fs, os, audioFileExtentions, videoFileExtentions, utils, querystring, id3, mostListenedPlaylistName, ytdl);
+server.start(__dirname + '/WebInterface/', fileHandler, fs, os, audioFileExtensions, videoFileExtensions, utils, querystring, id3, mostListenedPlaylistName, ytdl);
