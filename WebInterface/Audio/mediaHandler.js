@@ -3,7 +3,7 @@ let queueIndex = 0;
 
 function enqueue(...vals) {
 	if (vals.length > 1) {
-		if (document.getElementById('shuffle').getAttribute('activated') != null) vals.shuffle();
+		if (document.getElementById('shuffle').getAttribute('activated') == 'true') vals.shuffle();
 		vals.forEach((object, key) => {
 			queue[queue.length] = object;
 		});
@@ -28,13 +28,13 @@ function end() {
 }
 
 function next() {
-	if (!(document.getElementById('repeat').getAttribute('activated') != null && document.getElementById('repeat').getAttribute('repeatOne') != null)) {
+	if (!(document.getElementById('repeat').getAttribute('activated') == 'true' && document.getElementById('repeat').getAttribute('repeatOne') == 'true')) {
 		const newIndex = Number(queueIndex) + 1;
 
 		if (queue.length > newIndex) {
 			queueIndex = newIndex;
 		} else {
-			if (document.getElementById('repeat').getAttribute('activated') != null) queueIndex = 0;
+			if (document.getElementById('repeat').getAttribute('activated') == 'true') queueIndex = 0;
 			else return;
 		}
 
@@ -50,7 +50,7 @@ function previous() {
 	if (queueIndex > 0) {
 		queueIndex = newIndex;
 	} else {
-		if (document.getElementById('repeat').getAttribute('activated') != null) queueIndex = queue.length - 1;
+		if (document.getElementById('repeat').getAttribute('activated') == 'true') queueIndex = queue.length - 1;
 		else return;
 	}
 
@@ -91,7 +91,7 @@ function playSong(songName, notAddToQueue) {
 function startSong() {
 	document.getElementById('toggleBtn').querySelector('img').src = 'Assets/ic_play_arrow_white.svg';
 	try {document.getElementById('songName').innerText = queue[queueIndex].replace(/(\.\w{2,5})$/, '');} catch (err) {}
-	document.getElementById('showData').removeAttribute('activated');
+	document.getElementById('showData').setAttribute('activated', false);
 	audio.play().then(mediaSession).catch(err => {
 		console.log(err);
 	});
@@ -185,7 +185,7 @@ function mediaSession() {
 			}
 
 			document.getElementById('mainControls').appendChild(dataDiv);
-			document.getElementById('showData').setAttribute('activated', '');
+			document.getElementById('showData').setAttribute('activated', true);
 
 			// Edit thumbnail
 			if (json.image && 'mediaSession' in navigator) {
@@ -244,7 +244,7 @@ function mediaSession() {
 				} catch (err) {};
 
 				document.getElementById('mainControls').appendChild(dataDiv);
-				document.getElementById('showData').setAttribute('activated', '');
+				document.getElementById('showData').setAttribute('activated', true);
 
 				if ('mediaSession' in navigator) {
 					navigator.mediaSession.metadata.title = json.title;

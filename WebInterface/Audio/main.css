@@ -302,7 +302,7 @@ main #controls #mainControls div#right button {
 	opacity: 0.3;
 }
 
-main #controls #mainControls div#right button[activated] {
+main #controls #mainControls div#right button[activated='true'] {
 	opacity: 1;
 }
 

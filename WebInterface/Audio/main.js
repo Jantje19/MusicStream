@@ -31,7 +31,7 @@ function handlePlaylist(evt, name) {
 			window.location = '/managePlaylist.html#' + name;
 	} else {
 		get('/playlist/' + name).then(json => {
-			if (document.getElementById('shuffle').getAttribute('activated')) json.songs.shuffle();
+			if (document.getElementById('shuffle').getAttribute('activated') == 'true') json.songs.shuffle();
 			deleteQueue();
 			queueIndex = 0;
 			enqueue(...json.songs);
@@ -88,7 +88,7 @@ function songClick(elem) {
 function addWholeSongsToQueue() {
 	const buttons = document.getElementById('songs').querySelectorAll('button');
 
-	if (document.getElementById('shuffle').getAttribute('activated') != null) Array.from(buttons).shuffle();
+	if (document.getElementById('shuffle').getAttribute('activated') == 'true') Array.from(buttons).shuffle();
 
 	buttons.forEach((object, key) => {
 		enqueue(object.innerText);
@@ -219,32 +219,32 @@ function load() {
 	document.getElementById('repeat').addEventListener('click', evt => {
 		const val = evt.target.getAttribute('activated');
 
-		if (val != null) {
+		if (val == 'true') {
 			const img = evt.target.querySelector('img');
 			const repeatOne = evt.target.getAttribute('repeatOne');
 
 			if (repeatOne != null) {
 				img.src = 'Assets/ic_repeat_white.svg';
 				evt.target.removeAttribute('repeatOne');
-				evt.target.removeAttribute('activated');
+				evt.target.setAttribute('activated', false);
 			} else {
 				evt.target.setAttribute('repeatOne', '');
 				img.src = 'Assets/ic_repeat_one_white.svg';
 			}
 		} else {
-			evt.target.setAttribute('activated', '');
+			evt.target.setAttribute('activated', true);
 		}
 	});
 
 	document.getElementById('shuffle').addEventListener('click', evt => {
 		const val = evt.target.getAttribute('activated');
 
-		if (val != null) {
-			evt.target.removeAttribute('activated');
+		if (val == 'true') {
+			evt.target.setAttribute('activated', false);
 		} else {
 			queue.shuffle();
 			playSong(null, true);
-			evt.target.setAttribute('activated', '');
+			evt.target.setAttribute('activated', true);
 		}
 	});
 
@@ -305,7 +305,7 @@ function load() {
 		const controlsElem = document.getElementById('controls');
 		const elem = evt.currentTarget;
 
-		if (elem.getAttribute('activated') != null) {
+		if (elem.getAttribute('activated') == 'true') {
 			if (elem.className.indexOf('active') > -1) {
 				elem.className = elem.className.replace('active', '');
 				controlsElem.style.height = '';
