@@ -112,6 +112,12 @@ module.exports = {
 			response.sendFile(dirname + 'help.html');
 		});
 
+		app.get('/settings/', (request, response) => {
+			const url = querystring.unescape(request.url);
+			console.log('Got a request for ' + url);
+			utils.sendFile(fs, dirname + 'settings.html', response);
+		});
+
 		app.get('/getSettings', (request, response) => {
 			const url = querystring.unescape(request.url);
 
