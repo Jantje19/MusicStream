@@ -2,10 +2,10 @@
 A NodeJS web client for streaming music to the network
 
 ## Install
-- Clone the git repo
-- run `npm install`
-- run `npm start`
-- Go to `http://localhost:8000`
+1. Install [Node.js](https://nodejs.org/en/download/package-manager/)
+2. Clone or download the Github repo
+3. Within the directory run: `npm install && npm start` in a command line
+4. Go to: http://localhost:8000
 
 ## NOTE
 The web-interface only works with browsers that have ES6 support.
