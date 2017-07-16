@@ -1,10 +1,9 @@
 module.exports = {
-	start: function(dirname, fileHandler, fs, os, audioFileExtensions, videoFileExtensions, utils, querystring, id3, mostListenedPlaylistName, ytdl) {
+	start: function(dirname, fileHandler, fs, os, settings, utils, querystring, id3, ytdl) {
 		const express = require('express');
 		const app = express();
-		const port = 8000;
+		const port = settings.port.val;
 
-		// Data request
 		app.get('*/all.css', (request, response) => {
 			response.sendFile(dirname + 'all.css');
 		});
@@ -19,7 +18,7 @@ module.exports = {
 			console.log('Got a request for ' + url);
 
 			if (url.toLowerCase().indexOf('sort=') > -1) sort = true;
-			fileHandler.getJSON(fs, os, audioFileExtensions, videoFileExtensions, utils).then(json => {
+			fileHandler.getJSON(fs, os, settings.audioFileExtensions.val, settings.videoFileExtensions.val, utils).then(json => {
 				const songs = [];
 				const videos = [];
 
@@ -72,11 +71,15 @@ module.exports = {
 					}
 
 					playlists = flatten(playlists);
+					// If oldest just reverse :P
 					if (url.toLowerCase().indexOf('sort=oldest') > -1) {
 						songs.reverse();
 						videos.reverse();
 						playlists.reverse();
 					}
+
+					songs.filter(val => {return !(settings.ignoredAudioFiles.val.includes(val))});
+					videos.filter(val => {return !(settings.ignoredVideoFiles.val.includes(val))});
 
 					response.send({audio: {songs: songs, playlists: playlists}, video: {videos: videos}});
 				}).catch(err => response.send({error: "Something went wrong", info: "Either getting the songs or getting the playlists or both went wrong"}));
@@ -95,15 +98,11 @@ module.exports = {
 		app.get('/updateJSON/', (request, response) => {
 			console.log('Got a request for ' + request.url);
 
-			fileHandler.searchSystem(fs, os, audioFileExtensions, videoFileExtensions, utils).then(json => {
-				// json.audio.playlists.forEach((object, key) => {
-				// 	console.log(fileHandler.readPlaylist(object.path + object.file));
-				// });
-
+			fileHandler.searchSystem(fs, os, settings.audioFileExtensions.val, settings.videoFileExtensions.val, utils).then(json => {
 				response.send({success: true});
 			}).catch(err => {
 				console.log(err);
-				response.send({success: false, error: "There was an error with updating the playlist", info: err});
+				response.send({success: false, error: "There was an error with updating the JSON", info: err});
 			});
 		});
 
@@ -139,17 +138,16 @@ module.exports = {
 			const id = arr[arr.length - 1];
 			console.log('Got a request for ' + url);
 
-			// response.send({"success":true, "info": {"keywords":["techno","chicken","10","hours","loop","kiptokren","funny","dance","disco","music","laser","lights","red","bluepoultry","bok","song","yt:crop=16:9"], "view_count":"1297674", "author": {"id":"UCZDLYzePJ7YFda3b_KjpWoQ", "name":"Kipper", "avatar":"https://yt3.ggpht.com/-oQaJt0ET6zs/AAAAAAAAAAI/AAAAAAAAAAA/vUf0tpkdj20/s88-c-k-no-mo-rj-c0xffffff/photo.jpg", "user":"kiptokren", "channel_url":"https://www.youtube.com/channel/UCZDLYzePJ7YFda3b_KjpWoQ","user_url":"https://www.youtube.com/user/kiptokren"}, "thumbnail_url":"https://i.ytimg.com/vi/gLmcGkvJ-e0/default.jpg", "title":"Techno Chicken [10 hours]", "description":"Song made by Oli Chang.\n\nOriginal: http://www.youtube.com/watch?v=p_2_EJ..."} });
-			// return;
-
 			if (id.length == 11) {
 				try {
 					ytdl.getInfo(id, (err, info) => {
 						// For some weird JS reason the type of the parsed info is an object, but the prototype does not work...
 						info = JSON.parse(JSON.stringify(info));
+						// You can edit this
 						const allowed = ['keywords', 'view_count', 'author', 'title', 'thubnail_url', 'description', 'thumbnail_url'];
 
 						Object.prototype.filter = function(arr) {
+							// Check if it is a JSON Object
 							if (this.constructor === {}.constructor) {
 								const newObj = {};
 								for (key in this) {
@@ -237,7 +235,7 @@ module.exports = {
 									// Tags
 									if (json.tags) id3.write(json.tags, path);
 
-									fileHandler.searchSystem(fs, os, audioFileExtensions, videoFileExtensions, utils).then(json => {
+									fileHandler.searchSystem(fs, os, settings.audioFileExtensions.val, settings.videoFileExtensions.val, utils).then(json => {
 										response.send({success: true, fileName: json.fileName, jsonUpdated: true});
 									}).catch(err => response.send({success: true, fileName: json.fileName, jsonUpdated: false}));
 								} else sendError('File does not exist. This is a weird problem... You should investigate.');
@@ -276,9 +274,10 @@ module.exports = {
 			});
 		});
 
-		require('./serverVideoHandler.js').start(app, dirname, fileHandler, fs, os, audioFileExtensions, videoFileExtensions, utils, querystring);
-		require('./serverAudioHandler.js').start(app, dirname, fileHandler, fs, os, audioFileExtensions, videoFileExtensions, utils, querystring, id3, mostListenedPlaylistName);
+		require('./serverVideoHandler.js').start(app, dirname, fileHandler, fs, os, settings.audioFileExtensions.val, settings.videoFileExtensions.val, utils, querystring);
+		require('./serverAudioHandler.js').start(app, dirname, fileHandler, fs, os, settings.audioFileExtensions.val, settings.videoFileExtensions.val, utils, querystring, id3, settings.mostListenedPlaylistName.val);
 
+		// Just handle the rest
 		app.get('/*', (request, response) => {
 			let url = request.url;
 			if (url.length > 1) console.log('Got a request for ' + url);
