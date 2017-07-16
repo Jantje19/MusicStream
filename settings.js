@@ -51,12 +51,5 @@ module.exports = {
 		val: 100,
 		type: 'range',
 		desc: 'The volume that defaults on page load.'
-	},
-
-	defaultSongSort: {
-		val: 'Alphabet',
-		type: 'selection',
-		selection: ['Alphabet', 'Newest', 'Oldest'],
-		desc: 'You can sort songs by these. What should be the default?'
 	}
 }
