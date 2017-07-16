@@ -3,11 +3,13 @@ module.exports = {
 		const songsArr = [];
 		const videosArr = [];
 		const playlistsArr = [];
+		// Folders that have to be searched
 		const audioFolderPath = os.homedir() + '/Music/';
 		const videoFolderPath = os.homedir() + '/Videos/';
 
 		console.log('Starting checking files');
 		return new Promise((resolve, reject) => {
+			// Wait untill the functions both finish
 			Promise.all([handleFolders(audioFolderPath, utils), handleFolders(videoFolderPath, utils)]).then(() => {
 				setTimeout(() => {
 					jsonFileArr = {audio: {songs: songsArr, playlists: playlistsArr}, video: {videos: videosArr}};
@@ -34,6 +36,7 @@ module.exports = {
 								return this.indexOf(str) >= 0 ? true : false;
 							}
 
+							// Loop through all the files
 							files.forEach((object, key) => {
 								if (object.toLowerCase() != 'desktop.ini') {
 									const fileExtention = utils.getFileExtention(object.toLowerCase());
@@ -41,6 +44,8 @@ module.exports = {
 									fs.stat(path + object, (err, stats) => {
 										const ctime = new Date(stats.ctime.toString());
 
+										// Check if the file has a file extension that is in the arrays in index.js or that it is a playlist
+										// If it is a file just execute this function again
 										if (audioFileExtensions.includes(fileExtention)) songsArr.push({path: path, fileName: object, lastChanged: ctime});
 										else if (videoFileExtensions.includes(fileExtention)) videosArr.push({path: path, fileName: object, lastChanged: ctime});
 										else if (fileExtention == '.m3u') playlistsArr.push({path: path, fileName: object, lastChanged: ctime});
@@ -55,7 +60,7 @@ module.exports = {
 						}
 					});
 				} else {
-					resolve();
+					reject();
 				}
 			});
 		}
@@ -75,6 +80,7 @@ module.exports = {
 						else {
 							data = data.replace('#EXTM3U', '');
 
+							// Split by every song
 							data.split(/#EXTINF:[0-9]+,.+/).forEach((object, key) => {
 								object = object.trim();
 
@@ -161,21 +167,6 @@ module.exports = {
 					console.log('Nope');
 					resolve(this.searchSystem(fs, os, audioFileExtensions, videoFileExtensions, utils));
 				}
-			});
-		});
-	},
-
-	getSettings: function(fs) {
-		return new Promise((response, reject) => {
-			const path = './settings.json';
-
-			fs.exists(path, exists => {
-				if (exists) {
-					fs.readFile(path, 'utf-8', (err, data) => {
-						if (err) reject(err);
-						else resolve(data);
-					});
-				} else reject('File doesn\'t exist');
 			});
 		});
 	},

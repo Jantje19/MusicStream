@@ -120,15 +120,8 @@ module.exports = {
 
 		app.get('/getSettings', (request, response) => {
 			const url = querystring.unescape(request.url);
-
 			console.log('Got a request for ' + url);
-
-			fileHandler.getSettings(fs).then(json => {
-				response.send(json);
-			}).catch(err => {
-				console.log('There was an error with getting the JSON file', err);
-				response.send({error: 'There was an error with getting the JSON file', info: err});
-			});
+			response.send(settings);
 		});
 
 		app.get('/downloadYoutube*', (request, response) => {
