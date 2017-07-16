@@ -115,7 +115,7 @@ module.exports = {
 		app.get('/settings/', (request, response) => {
 			const url = querystring.unescape(request.url);
 			console.log('Got a request for ' + url);
-			utils.sendFile(fs, dirname + 'settings.html', response);
+			response.sendFile(dirname + 'settings.html');
 		});
 
 		app.get('/getSettings', (request, response) => {
