@@ -258,15 +258,26 @@ module.exports = {
 			});
 
 			request.on('end', () => {
-				const jsonPath = 'settings.json';
+				const jsonPath = './settings.js';
 				const url = querystring.unescape(request.url);
 
 				console.log('Got a POST request for ' + url);
 
-				fs.writeFile(__dirname + '/' + jsonPath, body, (err) => {
-					if (err) response.send({success: false, error: 'There was an error with creating the settings file', info: err});
-					else response.send({success: true});
-				});
+				try {
+					body = JSON.parse(body);
+
+					// Copy the settings
+					data = JSON.parse(JSON.stringify(settings));
+
+					for (key in body) {
+						data[key].val = body[key];
+					}
+
+					fs.writeFile(jsonPath, 'module.exports = ' + JSON.stringify(data), err => {
+						if (err) response.send({success: false, info: err});
+						else response.send({success: true});
+					});
+				} catch (err) {response.send({success: false, info: err})}
 			});
 		});
 
