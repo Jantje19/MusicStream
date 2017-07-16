@@ -281,8 +281,8 @@ module.exports = {
 		app.get('/*', (request, response) => {
 			let url = request.url;
 			if (url.length > 1) console.log('Got a request for ' + url);
-			if (url.indexOf('/videos') > -1) response.sendFile(dirname + 'Video/' + url.replace('/videos/', ''));
-			else if (url.indexOf('/') > -1) response.sendFile(dirname + 'Audio/' + url);
+			if (url.indexOf('/videos') > -1) utils.sendFile(fs, dirname + 'Video/' + url.replace('/videos/', ''), response);
+			else if (url.indexOf('/') > -1) utils.sendFile(fs, dirname + 'Audio/' + url, response);
 		});
 
 		app.use(express.static(dirname));

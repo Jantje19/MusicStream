@@ -27,6 +27,27 @@ const utils = {
 		newArr.sort((a, b) => {return a[1] - b[1]});
 		newArr.reverse();
 		return newArr;
+	},
+
+	sendFile: function(fs, path, response) {
+		if (path.endsWith('/')) path = path + 'index.html';
+
+		fs.exists(path, exists => {
+			if (exists) {
+				if (utils.getFileExtention(path) == '.html') {
+					fs.readFile(path, 'utf-8', (err, data) => {
+						if (err) response.status(500).send('Error: 500. An error occured: ' + err);
+						else {
+							for (key in settings) {
+								data = data.replace(`\{\{${key}\}\}`, settings[key].val);
+							}
+
+							response.status(200).send(data);
+						}
+					});
+				} else response.sendFile(path);
+			} else response.status(404).send('Error: 404. File not found');
+		});
 	}
 }
 
