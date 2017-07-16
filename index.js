@@ -39,7 +39,7 @@ const utils = {
 						if (err) response.status(500).send('Error: 500. An error occured: ' + err);
 						else {
 							for (key in settings) {
-								data = data.replace(`\{\{${key}\}\}`, settings[key].val);
+								data = data.replace(new RegExp(`\{\{${key}\}\}`, 'g'), settings[key].val);
 							}
 
 							response.status(200).send(data);
