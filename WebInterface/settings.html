@@ -13,14 +13,118 @@
 		}
 
 		body {
+			top: 0;
+			left: 0;
 			margin: 0;
+			width: 100%;
+			height: 100%;
+			position: absolute;
+			overflow-x: hidden;
 		}
 
-		header {
-			margin: 0 10px;
-			text-align: center;
+		header h1 {
+			margin: 0;
+			margin-left: 10px;
+		}
+
+		main div#settings {
+			width: 80%;
+			margin: auto;
+		}
+
+		main button#save {
+			color: white;
+			border: none;
+			display: block;
+			cursor: pointer;
+			margin: 50px 10%;
+			padding: 10px 20px;
+			background-color: #16a085;
 		}
 	</style>
+
+	<link href="all.css" rel="stylesheet" type="text/css" media="screen"/>
+
+	<script type="text/javascript">
+		function typeToHTML(type, title, desc, val) {
+			let html = `<h3>${title}</h3><p>${desc}</p>`;
+
+			switch (type) {
+				case 'mult':
+				html += `<input caseVal="${type}" id="${title}" type="text" value="${val.toString().replace(/\,/g, '; ').replace(/\./g, '')}">`;
+				break;
+				case 'bool':
+				html += `<input caseVal="${type}" id="${title}" type="checkbox" ${(val == true) ? 'checked' : ''}>`;
+				break;
+				case 'range':
+				html += `<input caseVal="${type}" id="${title}" onchange="change(this)" type="range" value="${val}"><label for="${title}">${val}%</label>`;
+				break;
+				case 'string':
+				html += `<input caseVal="${type}" id="${title}" type="text" value="${val}">`;
+				break;
+				case 'number':
+				html += `<input caseVal="${type}" id="${title}" type="number" value="${val}" min="0" max="100">`;
+				break;
+			}
+
+			return html;
+		}
+
+		function valToJSON(elem, type) {
+			switch (type) {
+				case 'mult':
+				if (elem.value.trim().length > 0) return (elem.value.trim().replace(/(\s+)?\;(\s+)?/g, ',')).split(',').map(val => {return '.' + val});
+				else return [];
+				case 'bool':
+				return Boolean(elem.checked);
+				case 'range':
+				return Number(elem.value);
+				case 'string':
+				return elem.value.toString();
+				case 'number':
+				return Number(elem.value);
+			}
+		}
+
+		function save() {
+			const json = {};
+
+			Array.from(document.getElementById('settings').querySelectorAll('input')).forEach((object, key) => {
+				json[object.id.substr(0, 1).toLowerCase() + object.id.substr(1)] = valToJSON(object, object.getAttribute('caseVal'));
+			});
+
+			fetch(/updateSettings/, {method: 'POST', body: JSON.stringify(json)}).then(response => {
+				response.json().then(json => {
+					if (json.success) {
+						if (confirm('Everything went according to plan. You have to restart the server to see the changes. Do you want to go back?')) window.location = location.host;
+					} else alert('An error occured: ', json.info);
+				});
+			}).catch( err => {
+				console.error('An error occurred', err);
+			});
+		}
+
+		function load() {
+			fetch('/getSettings/').then(response => {
+				response.json().then(json => {
+					let newHTML = '';
+
+					for (key in json) {
+						const data = json[key];
+						newHTML += typeToHTML(data.type, key.substr(0, 1).toUpperCase() + key.substr(1), data.desc, data.val);
+					}
+
+					document.getElementById('settings').innerHTML = newHTML;
+				});
+			}).catch( err => {
+				console.error('An error occurred', err);
+			});
+		}
+
+		function change(elem) {document.querySelector(`label[for="${elem.id}"]`).innerText = elem.value + '%';}
+
+		window.onload = load;
+	</script>
 
 </head>
 <body>
@@ -30,6 +134,8 @@
 	</header>
 
 	<main>
+		<div id="settings"><div class="ball-scale-multiple"><div></div><div></div><div></div></div></div>
+		<button id="save" onclick="save()">Save</button>
 	</main>
 
 </body>
