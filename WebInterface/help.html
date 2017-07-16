@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html>
-<head>
+<head lang="en">
 
 	<title>Help / Shortcuts</title>
 
@@ -200,7 +200,7 @@
 				<h3>Supported extensions</h3>
 
 				<p>
-					By default the supported file extensions are: <i>'mp3'</i>, <i>'m3a'</i> and <i>'wav'</i>. But you can add or remove extensions in <i>index.js</i>. Take into a count that not every browser supports the same file extensions.
+					By default the supported file extensions are: <i>'mp3'</i>, <i>'m3a'</i> and <i>'wav'</i>. But you can add or remove extensions on the <a href="/settings/">settings page</a>. Take into a count that not every browser supports the same file extensions.
 				</p>
 
 				<hr>
@@ -208,7 +208,7 @@
 				<h3>Most Listened Playlist</h3>
 
 				<p>
-					This playlist will be updated when a song ends. The name is editable in <i>index.js</i>. Take into a count that after initialization of the playlist name you have to update the <i>playlists.json</i> too.
+					This playlist will be updated when a song ends. The name is editable on the <a href="/settings/">settings page</a>. Take into a count that after initialization of the playlist name you have to update the <i>playlists.json</i> too.
 				</p>
 
 				<hr>
@@ -285,7 +285,7 @@
 
 			<div maxHeight="870">
 				<p>
-					I am working on a settings file, so it is easier to configure the server.
+					There is a <a href="/settings/">settings page</a> where you can edit basic settings. You will have to restart the server after you save!
 				</p>
 
 				<hr>
@@ -334,6 +334,18 @@
 
 				<p>
 					It returns the video file. Requires a video file name after the last slash.
+				</p>
+
+				<h4 style="font-size: 0.8em;"><a href="/getSettings/">Get Settings</a></h4>
+
+				<p>
+					Returns all settings in JSON form.
+				</p>
+
+				<h4 style="font-size: 0.8em;"><a href="/updateSettings/">Update Settings</a></h4>
+
+				<p>
+					A post request that accepts a JSON string as the new settings file.
 				</p>
 			</div>
 		</div>
