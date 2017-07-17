@@ -229,10 +229,10 @@ module.exports = {
 									console.log(`'${json.fileName}'` + ' downloaded');
 
 									// Tags
-									if (json.tags) id3.write(json.tags, path);
+									// if (json.tags) id3.write(json.tags, path);
 
 									fileHandler.searchSystem(fs, os, settings.audioFileExtensions.val, settings.videoFileExtensions.val, utils).then(json => {
-										response.send({success: true, fileName: json.fileName, jsonUpdated: true});
+										response.send({success: true, fileName: json.fileName + '.mp3', jsonUpdated: true});
 									}).catch(err => response.send({success: true, fileName: json.fileName, jsonUpdated: false}));
 								} else sendError('File does not exist. This is a weird problem... You should investigate.');
 							});
@@ -242,6 +242,80 @@ module.exports = {
 						video.on('error', err => {console.log(err); sendError(err)});
 					} else sendError('Tags not found. Expected url, fileName and tags.');
 				} else sendError('No JSON found');
+			});
+		});
+
+		app.post('/tags*', (request, response) => {
+			let body = '';
+
+			const url = querystring.unescape(request.url);
+			console.log('Got a POST request for ' + url);
+
+			request.on('data', data => {
+				body += data;
+
+				if (body.length > 1e6) {
+					request.send({success: false, err: 'The amount of data is to much', info: 'The connection was destroyed because the amount of data passed is to much'});
+					request.connection.destroy();
+					return;
+				}
+			});
+
+			request.on('end', () => {
+				let json;
+
+				try {
+					json = JSON.parse(body);
+				} catch (err) {
+					response.send({success: false, info: err});
+					return;
+				}
+
+				if (json.tags && json.songName) {
+					fileHandler.getJSON(fs, os, settings.audioFileExtensions.val, settings.videoFileExtensions.val, utils).then(songs => {
+						function findSong(array, songName) {
+							for (let i = 0; i < array.length; i++) {
+								if (array[i].fileName == songName) return array[i];
+							}
+						}
+
+						function getImage(url) {
+							return new Promise((resolve, reject) => {
+								const http = require('http');
+								Stream = require('stream').Transform;
+
+								url = url.replace('https', 'http');
+
+								http.request(url, function(response) {
+									const data = new Stream();
+
+									response.on('data', function(chunk) {
+										data.push(chunk);
+									});
+
+									response.on('error', reject);
+
+									response.on('end', function() {
+										const buffer = data.read();
+
+										if (buffer instanceof Buffer) resolve(buffer);
+										else reject('Not a buffer');
+									});
+								}).end();
+							});
+						}
+
+						getImage(json.tags.image).then(imageBuffer => {
+							json.tags.image = {
+								mime: "png",
+								imageBuffer: imageBuffer
+							};
+
+							if (id3.write(json.tags, findSong(songs.audio.songs, json.songName).path + json.songName)) response.send({success: true});
+							else response.send({success: false, info: 'Something went wrong with writing the tags'});
+						}).catch(err => {console.log(err); response.send({success: false, info: err})});
+					}).catch(err => {console.log(err); response.send({success: false, info: err})});
+				} else response.send({success: false, info: 'The required tags (tags, songName) are not found.'});
 			});
 		});
 
