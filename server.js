@@ -355,8 +355,8 @@ module.exports = {
 			});
 		});
 
-		require('./serverVideoHandler.js').start(app, dirname, fileHandler, fs, os, settings.audioFileExtensions.val, settings.videoFileExtensions.val, utils, querystring);
-		require('./serverAudioHandler.js').start(app, dirname, fileHandler, fs, os, settings.audioFileExtensions.val, settings.videoFileExtensions.val, utils, querystring, id3, settings.mostListenedPlaylistName.val);
+		require('./serverVideoHandler.js').start(app, dirname, fileHandler, fs, os, settings, utils, querystring);
+		require('./serverAudioHandler.js').start(app, dirname, fileHandler, fs, os, settings, utils, querystring, id3);
 
 		// Just handle the rest
 		app.get('/*', (request, response) => {

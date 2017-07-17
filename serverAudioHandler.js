@@ -1,19 +1,22 @@
 module.exports = {
-	start: (app, dirname, fileHandler, fs, os, audioFileExtensions, videoFileExtensions, utils, querystring, id3, mostListenedPlaylistName) => {
+	start: (app, dirname, fileHandler, fs, os, settings, utils, querystring, id3) => {
 		app.get('/playlist/*', (request, response) => {
 			const url = querystring.unescape(request.url);
 
 			console.log('Got a request for ' + url);
 
 			if (!url.endsWith('/')) {
+				// Check if it has a file extention, otherwise read the playlists.json file
 				if (url.match(/(.+)\.(\w{2,5})/)) {
-					fileHandler.getJSON(fs, os, audioFileExtensions, videoFileExtensions, utils).then(json => {
+					fileHandler.getJSON(fs, os, settings.audioFileExtensions.val, settings.videoFileExtensions.val, utils).then(json => {
 						const playlistName = url.match(/(.+)\/(.+)$/)[2].trim();
 						const inArray = findPlaylist(json.audio.playlists, playlistName);
 
+						// Check if the playlist actually exists
 						if (inArray.val == true) {
 							const playlist = json.audio.playlists[inArray.index];
 
+							// Let fileHandler.js handle this
 							fileHandler.readPlayList(fs, playlist.path + playlist.fileName, json.audio.songs).then(songsArr => {
 								response.send({songs: songsArr});
 							}).catch(err => {
@@ -35,8 +38,8 @@ module.exports = {
 								else {
 									data = JSON.parse(data);
 
-									if (name == mostListenedPlaylistName)
-										response.send({songs: utils.sortJSON(data[mostListenedPlaylistName]).map(val => {return val[0]})});
+									if (name == settings.mostListenedPlaylistName.val)
+										response.send({songs: utils.sortJSON(data[settings.mostListenedPlaylistName.val]).map(val => {return val[0]})});
 									else response.send({songs: data[name]});
 								}
 							});
@@ -62,7 +65,7 @@ module.exports = {
 			console.log('Got a request for ' + url);
 
 			if (!url.endsWith('/')) {
-				fileHandler.getJSON(fs, os, audioFileExtensions, videoFileExtensions, utils).then(json => {
+				fileHandler.getJSON(fs, os, settings.audioFileExtensions.val, settings.videoFileExtensions.val, utils).then(json => {
 					const songName = url.match(/(.+)\/(.+)$/)[2].trim();
 					const inArray = findSong(json.audio.songs, songName);
 
@@ -122,11 +125,15 @@ module.exports = {
 
 			console.log('Got a request for ' + url + '. HAHA Your browser sucks');
 
-			fileHandler.getJSON(fs, os, audioFileExtensions, videoFileExtensions, utils).then(json => {
-				let html = '<script>function playSong(songName) {var elem = document.getElementById("audio"); elem.src = "/song/" + songName; elem.play()}</script><audio id="audio">YOUR BROWSER DOESN\'T SUPPORT THE AUDIO ELEMENT</audio>';
+			fileHandler.getJSON(fs, os, settings.audioFileExtensions.val, settings.videoFileExtensions.val, utils).then(json => {
+				let html = '';
+				const settings = require('./settings.js');
+				// let html = '<script>function playSong(songName) {var elem = document.getElementById("audio"); elem.src = "/song/" + songName; elem.play()}</script><audio id="audio">YOUR BROWSER DOESN\'T SUPPORT THE AUDIO ELEMENT</audio>';
 
 				json.audio.songs.forEach((object, key) => {
-					html += `<a onclick="playSong('${object.fileName}')" href="#">${object.fileName}</a><hr>`; // href="/song/${object.fileName}" target="_blank"
+					// html += `<a onclick="playSong('${object.fileName}')" href="#">${object.fileName}</a><hr>`; // href="/song/${object.fileName}" target="_blank"
+
+					if (!settings.ignoredAudioFiles.val.includes(object.fileName)) html += `<a href="/song/${object.fileName}" target="_blank">${object.fileName}</a><hr>`;
 				});
 
 				response.send(html);
@@ -156,9 +163,9 @@ module.exports = {
 					return;
 				}
 
-				if (body.name == mostListenedPlaylistName)
+				if (body.name == settings.mostListenedPlaylistName.val)
 					response.send({success: false, error: `Cannot access '${playlistName}'`, info: "This file is not editable"});
-				else fileHandler.updatePlaylist(fs, body, mostListenedPlaylistName).then(data => response.send(data)).catch(err => response.send(err));
+				else fileHandler.updatePlaylist(fs, body, settings.mostListenedPlaylistName.val).then(data => response.send(data)).catch(err => response.send(err));
 			});
 		});
 
@@ -185,8 +192,8 @@ module.exports = {
 						fs.readFile('./playlists.json', 'utf-8', (err, data) => {
 
 							try {data = JSON.parse(data)} catch (err) {return}
-							if (data[mostListenedPlaylistName]) {
-								songs = data[mostListenedPlaylistName];
+							if (data[settings.mostListenedPlaylistName.val]) {
+								songs = data[settings.mostListenedPlaylistName.val];
 
 								if (body in songs) songs[body]++;
 								else songs[body] = 1;
@@ -199,7 +206,7 @@ module.exports = {
 						send();
 					}
 
-					function send() {fileHandler.updatePlaylist(fs, {name: mostListenedPlaylistName, songs: songs}, mostListenedPlaylistName).then(data => response.send({success: true, data: body + ' successfully added to ' + mostListenedPlaylistName})).catch(err => response.send({success: false, data: 'Something happened when tried to add ' + body + ' to ' + mostListenedPlaylistName}));}
+					function send() {fileHandler.updatePlaylist(fs, {name: settings.mostListenedPlaylistName.val, songs: songs}, settings.mostListenedPlaylistName.val).then(data => response.send({success: true, data: body + ' successfully added to ' + settings.mostListenedPlaylistName.val})).catch(err => response.send({success: false, data: 'Something happened when tried to add ' + body + ' to ' + settings.mostListenedPlaylistName.val}));}
 				});
 			});
 		});
