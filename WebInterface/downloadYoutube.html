@@ -177,6 +177,8 @@
 	</style>
 
 	<script type="text/javascript">
+		let useTags = true;
+
 		function load() {
 			document.getElementById('searchBtn').addEventListener('click', evt => {
 				const url = document.getElementById('link').value;
@@ -247,30 +249,45 @@
 			}
 
 			document.getElementById('save').addEventListener('click', evt => {
+				useTags = Boolean(document.getElementById('use_tags').checked);
+
 				evt.target.style.opacity = '0.3';
 				evt.target.style.pointerEvents = 'none';
 
 				const data = {
 					url: document.getElementById('link').value,
 					fileName: document.getElementById('artist').value + ' - ' + document.getElementById('title').value,
-				}
-
-				if (document.getElementById('use_tags').checked) {
-					data.tags = {
+					tags: {
 						title: document.getElementById('title').value,
 						album: document.getElementById('album').value,
 						artist: document.getElementById('artist').value
 					}
-
-					if (document.getElementById('uiac').checked) data.tags.image = document.querySelector('img').src;
 				}
+
+				if (document.getElementById('uiac').checked) data.tags.image = document.querySelector('img').src;
 
 				document.getElementById('videoInput').innerHTML = '<b>Downloading... This may take a while.</b>';
 				fetch('/ytdl', {method: "POST", body: JSON.stringify(data)}).then(response => {
 					response.json().then(json => {
-						console.log(json);
 						if (json.success) {
-							if (confirm('Everything went according to plan. Do you want to go to the home page?')) window.location = window.location.origin;
+							if (useTags) {
+								const body = {
+									songName: json.fileName,
+									tags: data.tags
+								}
+
+								document.getElementById('videoInput').innerHTML = '<b>Setting tags...</b>';
+								fetch('/tags', {method: 'POST', body: JSON.stringify(body)}).then(response => {
+									response.json().then(json => {
+										document.getElementById('videoInput').innerHTML = '<b>Done!</b>';
+										if (json.success) {
+											if (confirm('Everything went according to plan. Do you want to go to the home page?')) window.location = window.location.origin;
+										} else alert('Error: ' + json.info);
+									});
+								}).catch( err => {
+									console.error('An error occurred', err);
+								});
+							} else if (confirm('Everything went according to plan. Do you want to go to the home page?')) window.location = window.location.origin;
 						} else alert('Error: ' + json.error)/*Display toast or something..*/;
 					});
 				}).catch( err => {
