@@ -15,7 +15,7 @@ module.exports = {
 		app.get('*/data/*', (request, response) => {
 			let sort = false;
 			const url = request.url;
-			console.log('Got a request for ' + url);
+			console.log(utils.logDate() + ' Got a request for ' + url);
 
 			if (url.toLowerCase().indexOf('sort=') > -1) sort = true;
 			fileHandler.getJSON(fs, os, settings.audioFileExtensions.val, settings.videoFileExtensions.val, utils).then(json => {
@@ -105,26 +105,26 @@ module.exports = {
 
 		app.get('/help/', (request, response) => {
 			const url = querystring.unescape(request.url);
-			console.log('Got a request for ' + url);
+			console.log(utils.logDate() + ' Got a request for ' + url);
 			response.sendFile(dirname + 'help.html');
 		});
 
 		app.get('/settings/', (request, response) => {
 			const url = querystring.unescape(request.url);
-			console.log('Got a request for ' + url);
+			console.log(utils.logDate() + ' Got a request for ' + url);
 			response.sendFile(dirname + 'settings.html');
 		});
 
 		app.get('/getSettings', (request, response) => {
 			const url = querystring.unescape(request.url);
-			console.log('Got a request for ' + url);
+			console.log(utils.logDate() + ' Got a request for ' + url);
 			response.send(settings);
 		});
 
 		app.get('/downloadYoutube*', (request, response) => {
 			const url = querystring.unescape(request.url);
 
-			console.log('Got a request for ' + url);
+			console.log(utils.logDate() + ' Got a request for ' + url);
 			response.sendFile(dirname + 'downloadYoutube.html');
 		});
 
@@ -132,7 +132,7 @@ module.exports = {
 			const url = querystring.unescape(request.url);
 			const arr = url.split('/');
 			const id = arr[arr.length - 1];
-			console.log('Got a request for ' + url);
+			console.log(utils.logDate() + ' Got a request for ' + url);
 
 			if (id.length == 11) {
 				try {
@@ -165,7 +165,7 @@ module.exports = {
 			let body = '';
 
 			const url = querystring.unescape(request.url);
-			console.log('Got a POST request for ' + url);
+			console.log(utils.logDate() + ' Got a POST request for ' + url);
 
 			request.on('data', data => {
 				body += data;
@@ -249,7 +249,7 @@ module.exports = {
 			let body = '';
 
 			const url = querystring.unescape(request.url);
-			console.log('Got a POST request for ' + url);
+			console.log(utils.logDate() + ' Got a POST request for ' + url);
 
 			request.on('data', data => {
 				body += data;
@@ -306,10 +306,7 @@ module.exports = {
 						}
 
 						getImage(json.tags.image).then(imageBuffer => {
-							json.tags.image = {
-								mime: "png",
-								imageBuffer: imageBuffer
-							};
+							json.tags.image = imageBuffer;
 
 							if (id3.write(json.tags, findSong(songs.audio.songs, json.songName).path + json.songName)) response.send({success: true});
 							else response.send({success: false, info: 'Something went wrong with writing the tags'});
@@ -335,7 +332,7 @@ module.exports = {
 				const jsonPath = './settings.js';
 				const url = querystring.unescape(request.url);
 
-				console.log('Got a POST request for ' + url);
+				console.log(utils.logDate() + ' Got a POST request for ' + url);
 
 				try {
 					body = JSON.parse(body);
@@ -361,13 +358,13 @@ module.exports = {
 		// Just handle the rest
 		app.get('/*', (request, response) => {
 			let url = request.url;
-			if (url.length > 1) console.log('Got a request for ' + url);
+			if (url.length > 1) console.log(utils.logDate() + ' Got a request for ' + url);
 			if (url.indexOf('/videos') > -1) utils.sendFile(fs, dirname + 'Video/' + url.replace('/videos/', ''), response);
 			else if (url.indexOf('/') > -1) utils.sendFile(fs, dirname + 'Audio/' + url, response);
 		});
 
 		app.use(express.static(dirname));
 		app.listen(port.toString());
-		console.log('Server is running on port ' + port);
+		console.log(new Date() + ' Server is running on port ' + port);
 	}
 }

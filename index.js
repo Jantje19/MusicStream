@@ -11,6 +11,17 @@ const settings = require('./settings.js');
 
 // Usefull functions
 const utils = {
+	logDate: function() {
+		const date = new Date();
+
+		function convertToDoubleDigit(num) {
+			if (num.toString().length < 2) return "0" + num;
+			else return num;
+		}
+
+		return `${convertToDoubleDigit(date.getHours())}:${convertToDoubleDigit(date.getMinutes())}:${convertToDoubleDigit(date.getSeconds())}`;
+	},
+
 	getFileExtention: function(fileName) {
 		const match = fileName.match(/.+(\.\w+)$/i);
 

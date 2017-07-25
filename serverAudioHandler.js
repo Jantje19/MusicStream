@@ -3,7 +3,7 @@ module.exports = {
 		app.get('/playlist/*', (request, response) => {
 			const url = querystring.unescape(request.url);
 
-			console.log('Got a request for ' + url);
+			console.log(utils.logDate() + ' Got a request for ' + url);
 
 			if (!url.endsWith('/')) {
 				// Check if it has a file extention, otherwise read the playlists.json file
@@ -62,7 +62,7 @@ module.exports = {
 		app.get('/song/*', (request, response) => {
 			const url = querystring.unescape(request.url);
 
-			console.log('Got a request for ' + url);
+			console.log(utils.logDate() + ' Got a request for ' + url);
 
 			if (!url.endsWith('/')) {
 				fileHandler.getJSON(fs, os, settings.audioFileExtensions.val, settings.videoFileExtensions.val, utils).then(json => {
@@ -89,7 +89,7 @@ module.exports = {
 
 		app.get('/songInfo/*', (request, response) => {
 			const url = querystring.unescape(request.url);
-			console.log('Got a request for ' + url);
+			console.log(utils.logDate() + ' Got a request for ' + url);
 
 			if (!url.endsWith('/')) {
 				fileHandler.getJSON(fs, os, settings.audioFileExtensions.val, settings.videoFileExtensions.val, utils).then(json => {
@@ -155,7 +155,7 @@ module.exports = {
 			request.on('end', () => {
 				const url = querystring.unescape(request.url);
 
-				console.log('Got a POST request for ' + url);
+				console.log(utils.logDate() + ' Got a POST request for ' + url);
 
 				try {body = JSON.parse(body);}
 				catch (err) {
@@ -186,7 +186,7 @@ module.exports = {
 				const jsonPath = './playlists.json';
 				const url = querystring.unescape(request.url);
 
-				console.log('Got a POST request for ' + url);
+				console.log(utils.logDate() + ' Got a POST request for ' + url);
 				fs.exists(jsonPath, exists => {
 					if (exists) {
 						fs.readFile('./playlists.json', 'utf-8', (err, data) => {

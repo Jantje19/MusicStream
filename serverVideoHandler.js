@@ -2,7 +2,7 @@ module.exports = {
 	start: (app, dirname, fileHandler, fs, os, settings, utils, querystring) => {
 		app.get('/video/*', (request, response) => {
 			const url = querystring.unescape(request.url);
-			console.log('Got a request for ' + url);
+			console.log(utils.logDate() + ' Got a request for ' + url);
 
 			if (!url.endsWith('/')) {
 				fileHandler.getJSON(fs, os, settings.audioFileExtensions.val, settings.videoFileExtensions.val, utils).then(json => {
