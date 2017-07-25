@@ -92,7 +92,7 @@ module.exports = {
 			console.log('Got a request for ' + url);
 
 			if (!url.endsWith('/')) {
-				fileHandler.getJSON(fs, os, audioFileExtensions, videoFileExtensions, utils).then(json => {
+				fileHandler.getJSON(fs, os, settings.audioFileExtensions.val, settings.videoFileExtensions.val, utils).then(json => {
 					const songName = url.match(/(.+)\/(.+)$/)[2].trim();
 					const inArray = findSong(json.audio.songs, songName);
 
