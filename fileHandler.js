@@ -7,7 +7,7 @@ module.exports = {
 		const audioFolderPath = os.homedir() + '/Music/';
 		const videoFolderPath = os.homedir() + '/Videos/';
 
-		console.log(utils.logDate() + ' SEARCHSYSTEM: Starting checking files');
+		utils.colorLog(utils.logDate() + ' [[fgBlue, SEARCHSYSTEM:]] Starting checking files');
 		return new Promise((resolve, reject) => {
 			// Wait untill the functions both finish
 			Promise.all([handleFolders(audioFolderPath, utils), handleFolders(videoFolderPath, utils)]).then(() => {
@@ -17,7 +17,7 @@ module.exports = {
 					fs.writeFile(__dirname + '/JSON.json', JSON.stringify(jsonFileArr), (err) => {
 						if (err) reject(err);
 						else {
-							console.log(utils.logDate() + ' SEARCHSYSTEM: Updated the Json file');
+							utils.colorLog(utils.logDate() + ' [[fgBlue, SEARCHSYSTEM:]] Updated the Json file');
 							resolve(jsonFileArr);
 						}
 					});

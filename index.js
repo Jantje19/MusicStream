@@ -9,6 +9,8 @@ const fileHandler = require('./fileHandler.js');
 // Settings
 const settings = require('./settings.js');
 
+
+const startServer = () => server.start(__dirname + '/WebInterface/', fileHandler, fs, os, settings, utils, querystring, id3, ytdl);
 // Usefull functions
 const utils = {
 	logDate: function() {
@@ -59,14 +61,50 @@ const utils = {
 				} else response.sendFile(path);
 			} else response.status(404).send('Error: 404. File not found');
 		});
+	},
+
+	// Í don't want to import modules I can write myself
+	colorLog: function(text, color) {
+		const regEx = /\[\[(.+)\,(\s+)?(.+)\]\]/i;
+		const colors = {
+			reset: "\x1b[0m",
+			fgBlack: "\x1b[30m",
+			fgRed: "\x1b[31m",
+			fgGreen: "\x1b[32m",
+			fgYellow: "\x1b[33m",
+			fgBlue: "\x1b[34m",
+			fgMagenta: "\x1b[35m",
+			fgCyan: "\x1b[36m",
+			fgWhite: "\x1b[37m",
+			bgBlack: "\x1b[40m",
+			bgRed: "\x1b[41m",
+			bgGreen: "\x1b[42m",
+			bgYellow: "\x1b[43m",
+			bgBlue: "\x1b[44m",
+			bgMagenta: "\x1b[45m",
+			bgCyan: "\x1b[46m",
+			bgWhite: "\x1b[47m"
+		}
+
+		try {
+			text.match(new RegExp(regEx, 'gi')).forEach((object, key) => {
+				object = object.match(regEx);
+				text = text.replace(object[0], colors[object[1]] + object[3] + colors.reset);
+			});
+		} catch(err) {}
+
+		if (color) {
+			if (colors[color]) console.log(colors[color], text, colors.reset);
+			else console.log(text);
+		} else console.log(text);
 	}
 }
 
-console.log(new Date() + ' Starting MusicStream');
+// Console.err is a console.error log in red:
+console.err = (...args) => console.error("\x1b[31m", ...args, "\x1b[0m");
 
-const startServer = () => server.start(__dirname + '/WebInterface/', fileHandler, fs, os, settings, utils, querystring, id3, ytdl);
-
+utils.colorLog(new Date() + ' [[fgGreen, Starting MusicStream]]')
 fileHandler.searchSystem(fs, os, settings.audioFileExtensions.val, settings.videoFileExtensions.val, utils).then(startServer).catch(err => {
-	console.log('Couln\'t update the JSON file.', err);
+	console.err('Couln\'t update the JSON file.', err);
 	startServer();
 });
