@@ -98,7 +98,7 @@ module.exports = {
 			fileHandler.searchSystem(fs, os, settings.audioFileExtensions.val, settings.videoFileExtensions.val, utils).then(json => {
 				response.send({success: true});
 			}).catch(err => {
-				console.log(err);
+				console.err(err);
 				response.send({success: false, error: "There was an error with updating the JSON", info: err});
 			});
 		});
@@ -239,7 +239,7 @@ module.exports = {
 						});
 
 						writer.output(path).run();
-						video.on('error', err => {console.log(err); sendError(err)});
+						video.on('error', err => {console.err(err); sendError(err)});
 					} else sendError('Tags not found. Expected url, fileName and tags.');
 				} else sendError('No JSON found');
 			});
@@ -310,8 +310,8 @@ module.exports = {
 
 							if (id3.write(json.tags, findSong(songs.audio.songs, json.songName).path + json.songName)) response.send({success: true});
 							else response.send({success: false, info: 'Something went wrong with writing the tags'});
-						}).catch(err => {console.log(err); response.send({success: false, info: err})});
-					}).catch(err => {console.log(err); response.send({success: false, info: err})});
+						}).catch(err => {console.err(err); response.send({success: false, info: err})});
+					}).catch(err => {console.err(err); response.send({success: false, info: err})});
 				} else response.send({success: false, info: 'The required tags (tags, songName) are not found.'});
 			});
 		});

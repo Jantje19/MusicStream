@@ -165,7 +165,7 @@ module.exports = {
 						else resolve(JSON.parse(data));
 					});
 				} else {
-					console.log('Nope');
+					console.wrn('The JSON file does not exist, so I am creating one...');
 					resolve(this.searchSystem(fs, os, audioFileExtensions, videoFileExtensions, utils));
 				}
 			});

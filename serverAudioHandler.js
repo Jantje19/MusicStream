@@ -20,7 +20,7 @@ module.exports = {
 							fileHandler.readPlayList(fs, playlist.path + playlist.fileName, json.audio.songs).then(songsArr => {
 								response.send({songs: songsArr});
 							}).catch(err => {
-								console.log('There was an error with reading the playlist', err);
+								console.err('There was an error with reading the playlist', err);
 								response.send({error: 'There was an error with reading the playlist', info: err});
 							});
 						} else response.send({error: `The playlist '${playlistName}' was not found`, info: "The cached JSON file had no reference to this file"});

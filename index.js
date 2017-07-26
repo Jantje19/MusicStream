@@ -71,15 +71,16 @@ const utils = {
 			fgBlack: "\x1b[30m",
 			fgRed: "\x1b[31m",
 			fgGreen: "\x1b[32m",
-			fgYellow: "\x1b[33m",
+			fgOrange: "\x1b[33m",
 			fgBlue: "\x1b[34m",
 			fgMagenta: "\x1b[35m",
 			fgCyan: "\x1b[36m",
+			fgYellow: "\x1b[93m",
 			fgWhite: "\x1b[37m",
 			bgBlack: "\x1b[40m",
 			bgRed: "\x1b[41m",
 			bgGreen: "\x1b[42m",
-			bgYellow: "\x1b[43m",
+			bgOrange: "\x1b[43m",
 			bgBlue: "\x1b[44m",
 			bgMagenta: "\x1b[45m",
 			bgCyan: "\x1b[46m",
@@ -102,6 +103,8 @@ const utils = {
 
 // Console.err is a console.error log in red:
 console.err = (...args) => console.error("\x1b[31m", ...args, "\x1b[0m");
+// Console.wrn is a console.warn log in orange:
+console.wrn = (...args) => console.warn("\x1b[33m", ...args, "\x1b[0m");
 
 utils.colorLog(new Date() + ' [[fgGreen, Starting MusicStream]]')
 fileHandler.searchSystem(fs, os, settings.audioFileExtensions.val, settings.videoFileExtensions.val, utils).then(startServer).catch(err => {
