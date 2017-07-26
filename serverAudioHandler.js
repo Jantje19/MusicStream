@@ -25,7 +25,7 @@ module.exports = {
 							});
 						} else response.send({error: `The playlist '${playlistName}' was not found`, info: "The cached JSON file had no reference to this file"});
 					}).catch(err => {
-						console.error('There was an error with getting the JSON file', err);
+						console.err('There was an error with getting the JSON file', err);
 						response.send({error: "There was an error with getting the JSON file", info: err});
 					});
 				} else {

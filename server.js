@@ -81,7 +81,7 @@ module.exports = {
 					response.send({audio: {songs: songs.filter(val => {return !(settings.ignoredAudioFiles.val.includes(val))}), playlists: playlists}, video: {videos: videos.filter(val => {return !(settings.ignoredVideoFiles.val.includes(val))})}});
 				}).catch(err => response.send({error: "Something went wrong", info: "Either getting the songs or getting the playlists or both went wrong"}));
 			}).catch(err => {
-				console.error('There was an error with getting the info', err);
+				console.err('There was an error with getting the info', err);
 				response.send({error: "There was an error with getting the info", info: err});
 			});
 
