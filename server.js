@@ -365,6 +365,6 @@ module.exports = {
 
 		app.use(express.static(dirname));
 		app.listen(port.toString());
-		console.log(new Date() + ' Server is running on port ' + port);
+		console.log(utils.logDate() + ' Server is running on port ' + port);
 	}
 }

@@ -62,4 +62,11 @@ const utils = {
 	}
 }
 
-server.start(__dirname + '/WebInterface/', fileHandler, fs, os, settings, utils, querystring, id3, ytdl);
+console.log(new Date() + ' Starting MusicStream');
+
+const startServer = () => server.start(__dirname + '/WebInterface/', fileHandler, fs, os, settings, utils, querystring, id3, ytdl);
+
+fileHandler.searchSystem(fs, os, settings.audioFileExtensions.val, settings.videoFileExtensions.val, utils).then(startServer).catch(err => {
+	console.log('Couln\'t update the JSON file.', err);
+	startServer();
+});

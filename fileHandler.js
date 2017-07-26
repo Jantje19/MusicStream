@@ -7,7 +7,7 @@ module.exports = {
 		const audioFolderPath = os.homedir() + '/Music/';
 		const videoFolderPath = os.homedir() + '/Videos/';
 
-		console.log('Starting checking files');
+		console.log(utils.logDate() + ' SEARCHSYSTEM: Starting checking files');
 		return new Promise((resolve, reject) => {
 			// Wait untill the functions both finish
 			Promise.all([handleFolders(audioFolderPath, utils), handleFolders(videoFolderPath, utils)]).then(() => {
@@ -15,11 +15,12 @@ module.exports = {
 					jsonFileArr = {audio: {songs: songsArr, playlists: playlistsArr}, video: {videos: videosArr}};
 
 					fs.writeFile(__dirname + '/JSON.json', JSON.stringify(jsonFileArr), (err) => {
-						if (err) throw err;
-						else console.log('Updated the Json file');
+						if (err) reject(err);
+						else {
+							console.log(utils.logDate() + ' SEARCHSYSTEM: Updated the Json file');
+							resolve(jsonFileArr);
+						}
 					});
-
-					resolve(jsonFileArr);
 				}, 1000);
 			}).catch(err => {
 				reject(err);
