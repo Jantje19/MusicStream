@@ -180,7 +180,7 @@ module.exports = {
 				let json;
 
 				const sendError = err => {
-					try {response.send({success: false, error: err, jsonUpdated: false})}
+					try {response.send({success: false, error: JSON.stringify(err), jsonUpdated: false})}
 					catch (err) {}
 				}
 
@@ -231,7 +231,7 @@ module.exports = {
 									// Tags
 									// if (json.tags) id3.write(json.tags, path);
 
-									fileHandler.searchSystem(fs, os, settings.audioFileExtensions.val, settings.videoFileExtensions.val, utils).then(json => {
+									fileHandler.searchSystem(fs, os, settings.audioFileExtensions.val, settings.videoFileExtensions.val, utils).then(() => {
 										response.send({success: true, fileName: json.fileName + '.mp3', jsonUpdated: true});
 									}).catch(err => response.send({success: true, fileName: json.fileName, jsonUpdated: false}));
 								} else sendError('File does not exist. This is a weird problem... You should investigate.');
