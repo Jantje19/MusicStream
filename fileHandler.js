@@ -50,9 +50,9 @@ module.exports = {
 										if (audioFileExtensions.includes(fileExtention)) songsArr.push({path: path, fileName: object, lastChanged: ctime});
 										else if (videoFileExtensions.includes(fileExtention)) videosArr.push({path: path, fileName: object, lastChanged: ctime});
 										else if (fileExtention == '.m3u') playlistsArr.push({path: path, fileName: object, lastChanged: ctime});
-										else if (fileExtention) console.log('File extention not supported', object);
+										else if (fileExtention) console.wrn('File extention not supported', object);
 										else if (!fileExtention && fs.lstatSync(path + object).isDirectory()) handleFolders(path + object + '/', utils);
-										else console.warn('Something is weird...', 'FILENAME:' + object, 'EXTENSION:' + fileExtention);
+										else console.wrn('Something is weird...', 'FILENAME:' + object, 'EXTENSION:' + fileExtention);
 									});
 								}
 							});
