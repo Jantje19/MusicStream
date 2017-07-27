@@ -9,7 +9,6 @@ const fileHandler = require('./fileHandler.js');
 // Settings
 const settings = require('./settings.js');
 
-
 const startServer = () => server.start(__dirname + '/WebInterface/', fileHandler, fs, os, settings, utils, querystring, id3, ytdl);
 // Usefull functions
 const utils = {
@@ -106,8 +105,11 @@ console.err = (...args) => console.error("\x1b[31m", ...args, "\x1b[0m");
 // Console.wrn is a console.warn log in orange:
 console.wrn = (...args) => console.warn("\x1b[33m", ...args, "\x1b[0m");
 
-utils.colorLog(new Date() + ' [[fgGreen, Starting MusicStream]]')
-fileHandler.searchSystem(fs, os, settings.audioFileExtensions.val, settings.videoFileExtensions.val, utils).then(startServer).catch(err => {
-	console.err('Couln\'t update the JSON file.', err);
-	startServer();
-});
+utils.colorLog(new Date() + ' [[fgGreen, Starting MusicStream]]');
+
+if (settings.updateJsonOnStart == true) {
+	fileHandler.searchSystem(fs, os, settings.audioFileExtensions.val, settings.videoFileExtensions.val, utils).then(startServer).catch(err => {
+		console.err('Couln\'t update the JSON file.', err);
+		startServer();
+	});
+} else startServer();
