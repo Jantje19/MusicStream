@@ -34,6 +34,12 @@ module.exports = {
 		type: 'mult',
 		desc: 'Filter out video files that appear in the /data/ request. The videos are still accessible through /video/.'
 	},
+	
+	updateJsonOnStart: {
+		"val": true,
+		"type": "bool",
+		"desc": "If true it will first check the filesystem for songs and video's, then it will start the server."
+	},
 
 	repeatDefaultOnAudio: {
 		val: false,
