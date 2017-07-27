@@ -4,8 +4,16 @@ module.exports = {
 		const app = express();
 		const port = settings.port.val;
 
+		app.get('*/all.js', (request, response) => {
+			response.sendFile(dirname + 'all.js');
+		});
+
 		app.get('*/all.css', (request, response) => {
 			response.sendFile(dirname + 'all.css');
+		});
+
+		app.get('*/seekbarStyle.css', (request, response) => {
+			response.sendFile(dirname + 'seekbarStyle.css');
 		});
 
 		app.get('*/Assets/*', (request, response) => {
