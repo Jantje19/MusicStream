@@ -68,20 +68,27 @@ function queueClick(evt, index) {
 	}
 }
 
-function songClick(elem) {
-	const object = elem.innerText;
+function songClick(evt) {
+	const elem = evt.target;
 
-	if (clickTimer) {
-		clearTimeout(clickTimer);
-		clickTimer = null;
-		queueIndex = queue.length;
-		enqueue(object);
-		playSong(object, true);
+	if (evt.altKey) {
+		enqueue(elem.innerText);
+		moveQueueItem(queue.length - 1, queueIndex + 1);
 	} else {
-		clickTimer = setTimeout(() => {
+		const object = elem.innerText;
+
+		if (clickTimer) {
+			clearTimeout(clickTimer);
 			clickTimer = null;
+			queueIndex = queue.length;
 			enqueue(object);
-		}, 200);
+			playSong(object, true);
+		} else {
+			clickTimer = setTimeout(() => {
+				clickTimer = null;
+				enqueue(object);
+			}, 200);
+		}
 	}
 }
 
@@ -279,7 +286,7 @@ function load() {
 		playlistsElem.innerHTML = '';
 
 		songArr.forEach((object, key) => {
-			songsElem.innerHTML += `<button class="song ${key}" onclick="songClick(this)">${object}</button><hr>`;
+			songsElem.innerHTML += `<button class="song ${key}" onclick="songClick(event)">${object}</button><hr>`;
 		});
 
 		playlistArr.forEach((object, key) => {
@@ -329,7 +336,7 @@ function load() {
 
 				songsElem.innerHTML = '';
 				songs.forEach((object, key) => {
-					songsElem.innerHTML += `<button class="song ${key}" onclick="songClick(this)">${object}</button><hr>`;
+					songsElem.innerHTML += `<button class="song ${key}" onclick="songClick(event)">${object}</button><hr>`;
 				});
 
 				document.getElementById('songCount').innerText = "Amount: " + songs.length;
@@ -388,7 +395,7 @@ function load() {
 			document.getElementById('songCount').innerText = "Amount: " + json.songs.length;
 			songsElem.innerHTML = '';
 			json.songs.forEach((object, key) => {
-				songsElem.innerHTML += `<button title="${object}" class="song ${key}" onclick="songClick(this)">${object}</button><hr>`;
+				songsElem.innerHTML += `<button title="${object}" class="song ${key}" onclick="songClick(event)">${object}</button><hr>`;
 			});
 		} else songsElem.innerHTML = '<i>No songs</i>';
 
@@ -426,6 +433,7 @@ Array.prototype.move = function (old_index, new_index) {
 			this.push(undefined);
 		}
 	}
+
 	this.splice(new_index, 0, this.splice(old_index, 1)[0]);
 	return this;
 };
