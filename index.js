@@ -8,8 +8,20 @@ const fileHandler = require('./fileHandler.js');
 
 // Settings
 const settings = require('./settings.js');
+// For version checking
+const {version} = require('./package.json');
 
-const startServer = () => server.start(__dirname + '/WebInterface/', fileHandler, fs, os, settings, utils, querystring, id3, ytdl);
+const startServer = () => {
+	const startServerModule = () => server.start(__dirname + '/WebInterface/', fileHandler, fs, os, settings, utils, querystring, id3, ytdl);
+
+	if (settings.updateJsonOnStart.val == true) {
+		fileHandler.searchSystem(fs, os, settings.audioFileExtensions.val, settings.videoFileExtensions.val, utils).then(startServerModule).catch(err => {
+			console.err('Couln\'t update the JSON file.', err);
+			startServerModule();
+		});
+	} else startServerModule();
+}
+
 // Usefull functions
 const utils = {
 	logDate: function() {
@@ -62,7 +74,55 @@ const utils = {
 		});
 	},
 
-	// Í don't want to import modules I can write myself
+	fetch: function(url, https, URLModule) {
+		return new Promise((resolve, reject) => {
+			const options = URLModule.parse(url);
+
+			// Github needs a header to be sent
+			options.headers = {'User-Agent':'Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0)'};
+			https.get(options, res => {
+				let rawData = '';
+
+				const {statusCode} = res;
+				const contentType = res.headers['content-type'];
+
+				if (statusCode !== 200) {
+					reject('Request Failed.\n' + `Status Code: ${statusCode}`);
+					res.resume();
+					return;
+				}
+
+				res.setEncoding('utf8');
+
+				res.on('data', chunk => {rawData += chunk;});
+				res.on('end', () => {
+					if (/^application\/json/.test(contentType)) {
+						try {
+							resolve(JSON.parse(rawData));
+						} catch(err) {
+							reject(e);
+						}
+					} else resolve(rawData);
+				});
+			}).on('error', err => reject);
+		});
+	},
+
+	newVersionAvailable: function(version) {
+		return new Promise((resolve, reject) => {
+			console.log(utils.logDate() + ' Checking for updates. Connecting to Github...');
+			utils.fetch('https://api.github.com/repos/Jantje19/MusicStream/releases/latest', require('https'), require('url')).then(response => {
+				// Check if the returned value is JSON
+				if (response.constructor == {}.constructor) {
+					if (response.tag_name != version)
+						resolve({isAvailable: true, version: response.tag_name});
+					else resolve({isAvailable: false, version: version});
+				} else reject('The response is not json, so it is useless');
+			}).catch(err => reject);
+		});
+	},
+
+	// I don't want to import modules I can write myself
 	colorLog: function(text, color) {
 		const regEx = /\[\[(.+)\,(\s+)?(.+)\]\]/i;
 		const colors = {
@@ -106,10 +166,16 @@ console.err = (...args) => console.error("\x1b[31m", ...args, "\x1b[0m");
 console.wrn = (...args) => console.warn("\x1b[33m", ...args, "\x1b[0m");
 
 utils.colorLog(new Date() + ' [[fgGreen, Starting MusicStream]]');
-
-if (settings.updateJsonOnStart.val == true) {
-	fileHandler.searchSystem(fs, os, settings.audioFileExtensions.val, settings.videoFileExtensions.val, utils).then(startServer).catch(err => {
-		console.err('Couln\'t update the JSON file.', err);
+if (settings.checkForUpdateOnStart.val == true) {
+	utils.newVersionAvailable(version).then(newVersion => {
+		if (newVersion.isAvailable == true) {
+			utils.colorLog(`A new update is available: ${newVersion.version}`, 'fgGreen');
+		} else {
+			utils.colorLog(`No update available, running version: ${newVersion.version}`, 'fgCyan');
+			startServer();
+		}
+	}).catch(err => {
+		console.wrn('An error occurred when checking for updates', err);
 		startServer();
 	});
 } else startServer();
