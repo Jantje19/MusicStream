@@ -32,7 +32,7 @@
 			margin: auto;
 		}
 
-		main button#save {
+		main button {
 			color: white;
 			border: none;
 			display: block;
@@ -40,6 +40,10 @@
 			margin: 50px 10%;
 			padding: 10px 20px;
 			background-color: #16a085;
+		}
+
+		main button#checkUpdate {
+			background-color: lightgray;
 		}
 	</style>
 
@@ -104,6 +108,21 @@
 			});
 		}
 
+		function checkUpdate() {
+			fetch('/checkForUpdates/').then(response => {
+				response.json().then(json => {
+					if (json.success) {
+						if (json.data.isAvailable) {
+							if (confirm(`There is a new version available: ${json.data.version}, download?`))
+								window.location = json.data.url;
+						} else alert(`You are already on the latest version: ${json.data.version}`);
+					} else alert('Could not get the required data...');
+				});
+			}).catch( err => {
+				console.error('An error occurred', err);
+			});
+		}
+
 		function load() {
 			fetch('/getSettings/').then(response => {
 				response.json().then(json => {
@@ -136,6 +155,7 @@
 	<main>
 		<div id="settings"><div class="ball-scale-multiple"><div></div><div></div><div></div></div></div>
 		<button id="save" onclick="save()">Save</button>
+		<button id="checkUpdate" onclick="checkUpdate()">Check for updates</button>
 	</main>
 
 </body>
