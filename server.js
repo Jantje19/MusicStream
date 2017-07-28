@@ -1,5 +1,5 @@
 module.exports = {
-	start: function(dirname, fileHandler, fs, os, settings, utils, querystring, id3, ytdl) {
+	start: function(dirname, fileHandler, fs, os, settings, utils, querystring, id3, ytdl, version) {
 		const express = require('express');
 		const app = express();
 		const port = settings.port.val;
@@ -100,8 +100,16 @@ module.exports = {
 			}
 		});
 
+		app.get('/checkForUpdates/', (request, response) => {
+			console.log(utils.logDate() + ' Got a request for ' + request.url);
+
+			utils.newVersionAvailable(version).then(newVersion => {
+				response.send({success: true, data: newVersion});
+			}).catch(err => response.send({success: false, error: err}));
+		});
+
 		app.get('/updateJSON/', (request, response) => {
-			console.log('Got a request for ' + request.url);
+			console.log(utils.logDate() + ' Got a request for ' + request.url);
 
 			fileHandler.searchSystem(fs, os, settings.audioFileExtensions.val, settings.videoFileExtensions.val, utils).then(json => {
 				response.send({success: true});

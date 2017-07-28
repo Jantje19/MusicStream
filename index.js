@@ -12,7 +12,7 @@ const settings = require('./settings.js');
 const {version} = require('./package.json');
 
 const startServer = () => {
-	const startServerModule = () => server.start(__dirname + '/WebInterface/', fileHandler, fs, os, settings, utils, querystring, id3, ytdl);
+	const startServerModule = () => server.start(__dirname + '/WebInterface/', fileHandler, fs, os, settings, utils, querystring, id3, ytdl, version);
 
 	if (settings.updateJsonOnStart.val == true) {
 		fileHandler.searchSystem(fs, os, settings.audioFileExtensions.val, settings.videoFileExtensions.val, utils).then(startServerModule).catch(err => {
@@ -115,7 +115,7 @@ const utils = {
 				// Check if the returned value is JSON
 				if (response.constructor == {}.constructor) {
 					if (response.tag_name != version)
-						resolve({isAvailable: true, version: response.tag_name});
+						resolve({isAvailable: true, version: response.tag_name, url: response.html_url});
 					else resolve({isAvailable: false, version: version});
 				} else reject('The response is not json, so it is useless');
 			}).catch(err => reject);
