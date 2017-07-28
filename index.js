@@ -107,7 +107,7 @@ console.wrn = (...args) => console.warn("\x1b[33m", ...args, "\x1b[0m");
 
 utils.colorLog(new Date() + ' [[fgGreen, Starting MusicStream]]');
 
-if (settings.updateJsonOnStart == true) {
+if (settings.updateJsonOnStart.val == true) {
 	fileHandler.searchSystem(fs, os, settings.audioFileExtensions.val, settings.videoFileExtensions.val, utils).then(startServer).catch(err => {
 		console.err('Couln\'t update the JSON file.', err);
 		startServer();
