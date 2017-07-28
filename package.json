@@ -1,6 +1,6 @@
 {
   "name": "music_stream",
-  "version": "1.0.0",
+  "version": "v0.1.0",
   "description": "Stream music",
   "main": "index.js",
   "scripts": {
@@ -15,6 +15,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "express": "^4.14.0",
+    "fluent-ffmpeg": "^2.1.2",
     "node-id3": "0.0.9",
     "ytdl-core": "^0.14.4"
   },
