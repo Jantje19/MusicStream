@@ -36,9 +36,15 @@ module.exports = {
 	},
 	
 	updateJsonOnStart: {
-		"val": true,
-		"type": "bool",
-		"desc": "If true it will first check the filesystem for songs and video's, then it will start the server."
+		val: true,
+		type: "bool",
+		desc: "If true it will first check the filesystem for songs and video's, then it will start the server."
+	},
+	
+	checkForUpdateOnStart: {
+		val: true,
+		type: "bool",
+		desc: "If true it will first check the local version number against Githubs, if it finds a new version it will say, otherwise it will just start the server."
 	},
 
 	repeatDefaultOnAudio: {
