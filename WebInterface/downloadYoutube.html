@@ -197,7 +197,7 @@
 
 								videoInfo.innerHTML += `<img alt="thumbnail" src="${json.thumbnail_url}" />`;
 								videoInfo.innerHTML += `<h3>${json.title}</h3>`;
-								videoInfo.innerHTML += `<div><img alt="author" src="${json.author.avatar}"><span>${json.author.user}</span></div>`;
+								videoInfo.innerHTML += `<div><img alt="author" src="${json.author.avatar}"><span>${json.author.name}</span></div>`;
 								videoInfo.innerHTML += `<p><b>View Count:</b> ${json.view_count}</p>`;
 								videoInfo.innerHTML += '<hr>';
 								videoInfo.innerHTML += `<p id="description">${json.description.replace(/\n/g, '<br>')}</p>`;
