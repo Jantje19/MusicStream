@@ -209,6 +209,9 @@ module.exports = {
 
 				if (json) {
 					if (json.url && json.fileName) {
+						// Slashes don't work in paths
+						json.fileName = json.fileName.replace('\/', '\\');
+
 						const options = {};
 						const ffmpeg = require('fluent-ffmpeg');
 						const path = os.homedir() + '/Music/' + json.fileName + '.mp3';
