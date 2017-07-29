@@ -71,7 +71,7 @@ function queueClick(evt, index) {
 function songClick(evt) {
 	const elem = evt.target;
 
-	if (evt.altKey) {
+	if (evt.ctrlKey) {
 		enqueue(elem.innerText);
 		moveQueueItem(queue.length - 1, queueIndex + 1);
 	} else {
