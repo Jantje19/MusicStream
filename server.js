@@ -5,19 +5,23 @@ module.exports = {
 		const port = settings.port.val;
 
 		app.get('*/all.js', (request, response) => {
-			response.sendFile(dirname + 'all.js');
+			utils.sendFile(fs, dirname + 'all.js', response);
 		});
 
 		app.get('*/all.css', (request, response) => {
-			response.sendFile(dirname + 'all.css');
+			utils.sendFile(fs, dirname + 'all.css', response);
 		});
 
 		app.get('*/seekbarStyle.css', (request, response) => {
-			response.sendFile(dirname + 'seekbarStyle.css');
+			utils.sendFile(fs, dirname + 'seekbarStyle.css', response);
 		});
 
 		app.get('*/Assets/*', (request, response) => {
-			response.sendFile(dirname + request.url.replace('videos/', ''));
+			utils.sendFile(fs, dirname + request.url.replace('videos/', ''), response);
+		});
+
+		app.get('*/favicon.ico', (request, response) => {
+			utils.sendFile(fs, dirname + 'Assets/Icons/favicon.ico', response);
 		});
 
 		app.get('*/data/*', (request, response) => {
@@ -122,13 +126,14 @@ module.exports = {
 		app.get('/help/', (request, response) => {
 			const url = querystring.unescape(request.url);
 			console.log(utils.logDate() + ' Got a request for ' + url);
-			response.sendFile(dirname + 'help.html');
+			utils.sendFile(fs, dirname + 'help.html', response);
 		});
 
 		app.get('/settings/', (request, response) => {
 			const url = querystring.unescape(request.url);
 			console.log(utils.logDate() + ' Got a request for ' + url);
 			response.sendFile(dirname + 'settings.html');
+			utils.sendFile(fs, dirname + 'settings.html', response);
 		});
 
 		app.get('/getSettings', (request, response) => {
@@ -141,7 +146,7 @@ module.exports = {
 			const url = querystring.unescape(request.url);
 
 			console.log(utils.logDate() + ' Got a request for ' + url);
-			response.sendFile(dirname + 'downloadYoutube.html');
+			utils.sendFile(fs, dirname + 'downloadYoutube.html', response);
 		});
 
 		app.get('/ytdl/*', (request, response) => {
@@ -324,12 +329,23 @@ module.exports = {
 							});
 						}
 
-						getImage(json.tags.image).then(imageBuffer => {
-							json.tags.image = imageBuffer;
-
+						function done() {
 							if (id3.write(json.tags, findSong(songs.audio.songs, json.songName).path + json.songName)) response.send({success: true});
 							else response.send({success: false, info: 'Something went wrong with writing the tags'});
-						}).catch(err => {console.err(err); response.send({success: false, info: err})});
+						}
+
+						if (json.tags.delete) {
+							if (id3.removeTags(findSong(songs.audio.songs, json.songName).path + json.songName))
+								response.send({success: true});
+							else response.send({success: false, info: "Tags not deleted"});
+						} else {
+							if (json.tags.image) {
+								getImage(json.tags.image).then(imageBuffer => {
+									json.tags.image = imageBuffer;
+									done();
+								}).catch(err => {console.err(err); response.send({success: false, info: err})});
+							} else done();
+						}
 					}).catch(err => {console.err(err); response.send({success: false, info: err})});
 				} else response.send({success: false, info: 'The required tags (tags, songName) are not found.'});
 			});
