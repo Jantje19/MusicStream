@@ -113,13 +113,7 @@
 				}).catch( err => {
 					console.error('An error occurred', err);
 				});
-			} else {
-				fetch('/data/').then(response => {
-					response.json().then(json => selectSong(json));
-				}).catch( err => {
-					console.error('An error occurred', err);
-				});
-			}
+			} else showSongSelect();
 
 			document.getElementById('fab').addEventListener('click', evt => {
 				const tags = {};
@@ -146,9 +140,13 @@
 					console.error('An error occurred', err);
 				});
 			});
+		}
 
-			document.getElementById('back').addEventListener('click', evt => {
-				window.location = window.location.origin;
+		function showSongSelect() {
+			fetch('/data/').then(response => {
+				response.json().then(json => selectSong(json));
+			}).catch( err => {
+				console.error('An error occurred', err);
 			});
 		}
 
@@ -177,6 +175,7 @@
 
 					document.getElementById('fab').style.transform = 'translateY(0)';
 					document.querySelector('header').innerHTML += '<button title="Delete all the tags" onclick="deleteTags()" style="left: unset; right: 30px"><img src="Assets/ic_delete_white.svg"></button>';
+					document.querySelector('header').innerHTML += '<button title="Fetch tags from Last.FM" onclick="handleLastFmBtn()" style="left: unset; right: 70px"><img src="Assets/ic_cached_white.svg"></button>';
 
 					div.id = 'tagEditor';
 					mainElem.innerHTML = '<h3>Tag editor</h3>';
@@ -216,10 +215,43 @@
 								window.location = window.location.origin;
 						} else alert("ERROR: " + json.info);
 					});
-				}).catch( err => {
+				}).catch(err => {
 					console.error('An error occurred', err);
 				});
 			}
+		}
+
+		function handleLastFmBtn() {
+			const title = document.getElementById('title').value.trim();
+			const artist = document.getElementById('artist').value.trim();
+
+			if (title != "" && artist != "") {
+				getTagsFromLastFm(title, artist).then(tags => {
+					document.getElementById('title').value = tags.name;
+					document.getElementById('artist').value = tags.artist.name;
+					document.getElementById('length').value = tags.duration;
+				}).catch(err => alert("Error with finding tags: " + err));
+			} else alert("Title and artist are required for the Last.FM API.");
+		}
+
+		function getTagsFromLastFm(title, artist) {
+			if (title && artist) {
+				return new Promise((resolve, reject) => {
+					fetch(`https://ws.audioscrobbler.com/2.0/?method=track.getInfo&api_key=f02456f630621a02581b2143a67372f0&artist=${artist}&track=${title}&format=json`).then(response => {
+						response.json().then(json => {
+							if (json.error) reject(json.message);
+							else resolve(json.track);
+						}).catch(err => reject(err));
+					}).catch(err => reject(err));
+				});
+			} else return Promise.reject('Title or artist not supplied');
+		}
+
+		function back() {
+			if (location.hash) {
+				location.hash = '';
+				showSongSelect();
+			} else location = location.origin;
 		}
 
 		window.onload = load;
@@ -229,7 +261,7 @@
 <body>
 
 	<header>
-		<button id="back"><img src="Assets/ic_arrow_back_white.svg"></button>
+		<button onclick="back()" id="back"><img src="Assets/ic_arrow_back_white.svg"></button>
 		<div style="padding-top: 5px"><h1>Edit Tags</h1></div>
 	</header>
 
