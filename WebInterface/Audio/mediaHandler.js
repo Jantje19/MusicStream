@@ -60,6 +60,7 @@ function previous() {
 
 function deleteQueue() {
 	stopSong();
+	queueIndex = 0;
 	queue.length = 0;
 	updateInterface();
 }
