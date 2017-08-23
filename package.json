@@ -1,7 +1,7 @@
 {
   "name": "music_stream",
   "version": "v0.1.0",
-  "description": "Stream music",
+  "description": "Stream media",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -16,7 +16,7 @@
   "dependencies": {
     "express": "^4.14.0",
     "fluent-ffmpeg": "^2.1.2",
-    "node-id3": "0.0.9",
+    "node-id3": "0.0.10",
     "ytdl-core": "^0.14.4"
   },
   "devDependencies": {},
