@@ -7,8 +7,10 @@ A NodeJS web client for streaming music to the network
 3. Within the directory run: `npm install && npm start` in a command line
 4. Go to: http://localhost:8000
 
-## NOTE
+## Notes
 The web-interface only works with browsers that have ES6 support.
+
+This program needs Node-ID3 version 0.0.10 or higher to work with images properly.
 
 Supported browsers with build numbers:
 - Edge: 14
@@ -20,7 +22,7 @@ Supported browsers with build numbers:
 - Android (Chrome): 57
 - Android browser (WebView): 56
 
-**Internet Explorer won't work.** *but why would you use it anyway.*
+Internet Explorer won't work. (*but why would you use it anyway.*)
 
 **You can still use it on old browsers. On the frontpage it will ask you to move to the old browsers page. The features are very limited tho.**
 
