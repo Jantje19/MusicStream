@@ -1,5 +1,5 @@
 module.exports = {
-	start: function(dirname, fileHandler, fs, os, settings, utils, querystring, id3, ytdl, version, ffmpeg) {
+	start: function(dirname, fileHandler, fs, os, settings, utils, querystring, id3, ytdl, version) {
 		const express = require('express');
 		const app = express();
 		const port = settings.port.val;
