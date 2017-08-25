@@ -105,7 +105,6 @@ a:hover {
 /* Identifiers */
 main {
 	display: flex;
-	margin-top: 20px;
 }
 
 main > div {
@@ -113,11 +112,7 @@ main > div {
 }
 
 main > div:first-child {
-	flex-grow: 2;
-}
-
-main > div:last-child {
-	background-color: rgba(22, 160, 133, 0.2);
+	flex-grow: 1.5;
 }
 
 main > div:last-child button {
@@ -126,9 +121,7 @@ main > div:last-child button {
 	border: none;
 	cursor: pointer;
 	text-align: left;
-	overflow: hidden;
 	padding: 10px 5px;
-	text-overflow: ellipsis;
 	background-color: transparent;
 	transition: background-color .3s ease;
 
@@ -141,18 +134,57 @@ main > div:last-child button:hover {
 	background-color: rgba(0, 0, 0, 0.15);
 }
 
+main #videos {
+	width: 40%;
+	height: 90vh;
+	overflow-y: scroll;
+}
+
 main #player {
 	width: 100%;
-	height: 100%;
 	overflow: hidden;
 	position: relative;
-	background-color: darkgray;
+	background-color: black;
+}
+
+main #videoInfo {
+	padding: 50px 0;
+}
+
+main #videoInfo h2 {
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+main #loader {
+	top: 0;
+	left: 0;
+	opacity: 0;
+	width: 100%;
+	height: 100%;
+	display: flex;
+	position: absolute;
+	align-items: center;
+	pointer-events: none;
+	justify-content: center;
+	transition: opacity 1s ease;
+}
+
+main #loader .ball-scale-multiple {
+	background-color: white;
+	transform: translate(0, -5vh);
+}
+
+main #loader .ball-scale-multiple div:first-child {
+	opacity: .8;
+	animation: none;
+	background-color: white;
 }
 
 main #player #videoElem {
 	width: 100%;
 	height: 40vw;
-	background-color: gray;
+	background-color: black;
 }
 
 main #player #videoElem video {
@@ -162,8 +194,8 @@ main #player #videoElem video {
 
 main #player #controls {
 	left: 0px;
-	bottom: 0px;
 	width: 100%;
+	bottom: 0px;
 	height: 40px;
 	position: absolute;
 	background-color: #16a085;
@@ -176,8 +208,16 @@ main #player:hover #controls {
 	transform: translateY(0px);
 }
 
-main #player #controls button {
+main #player #controls span {
+	width: auto;
+	color: white;
 	height: 100%;
+	display: inline-block;
+	transform: translateY(-3px);
+}
+
+main #player #controls button {
+	height: 110%;
 	border: none;
 	cursor: pointer;
 	position: relative;
@@ -203,4 +243,62 @@ main #player #controls button:hover:before {
 
 main #player #controls > div {
 	height: 100%;
+}
+
+
+
+
+video:full-screen {
+	box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+}
+
+video:-ms-full-screen {
+	box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+}
+
+video:-moz-full-screen {
+	box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+}
+
+video:-webkit-full-screen {
+	box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+}
+
+
+
+#player:full-screen, #player:full-screen #videoElem {
+	height: 100%;
+}
+
+#player:-ms-full-screen, #player:-ms-full-screen #videoElem {
+	height: 100%;
+}
+
+#player:-moz-full-screen, #player:-moz-full-screen #videoElem {
+	height: 100%;
+}
+
+#player:-webkit-full-screen, #player:-webkit-full-screen #videoElem {
+	height: 100%;
+}
+
+
+
+main #controls #seekBar[type=range] {
+	width: 65%;
+	margin: 10px 0;
+	position: relative;
+	border-radius: 20px;
+}
+
+main #controls #seekBar[type=range]::-webkit-slider-runnable-track {
+	border-radius: 10px;
+}
+
+main #controls #seekBar[type=range]::-moz-range-track {
+	border-radius: 10px;
+}
+
+main #controls #seekBar[type=range]::-ms-track {
+	border-radius: 10px;
 }

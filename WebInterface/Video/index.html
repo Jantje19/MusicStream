@@ -33,6 +33,7 @@
 
 	<link href="all.css" rel="stylesheet" type="text/css" media="screen"/>
 	<link href="main.css" rel="stylesheet" type="text/css" media="screen"/>
+	<link href="seekbarStyle.css" rel="stylesheet" type="text/css" media="screen"/>
 
 	<script type="text/javascript" src="main.js"></script>
 
@@ -57,13 +58,29 @@
 						<button id="playPause"><img src="Assets/ic_play_arrow_white.svg"></button>
 					</div>
 
+					<div style="width: 79%; display: inline-block;">
+						<span id="time-start">00:00</span>
+						<input type="range" value="0" min="0" max="100" id="seekBar"/>
+						<span id="time-end">00:00</span>
+					</div>
+
 					<div style="float: right">
 						<button id="fullScreen"><img src="Assets/ic_fullscreen_white.svg"></button>
 					</div>
 				</div>
+
+				<div id="loader">
+					<div class="ball-scale-multiple"><div></div><div></div><div></div><div></div></div>
+				</div>
 			</div>
 
-			<div id="videoInfo"></div>
+			<div id="videoInfo">
+				<h2 id="title"></h2>
+				<div>
+					<span id="length"></span>
+					<span id="fileSize"></span>
+				</div>
+			</div>
 		</div>
 
 		<div id="videos"></div>
