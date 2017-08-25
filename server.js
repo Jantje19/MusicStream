@@ -1,5 +1,5 @@
 module.exports = {
-	start: function(dirname, fileHandler, fs, os, settings, utils, querystring, id3, ytdl, version) {
+	start: function(dirname, fileHandler, fs, os, settings, utils, querystring, id3, ytdl, version, ffmpeg) {
 		const express = require('express');
 		const app = express();
 		const port = settings.port.val;
@@ -132,7 +132,6 @@ module.exports = {
 		app.get('/settings/', (request, response) => {
 			const url = querystring.unescape(request.url);
 			console.log(utils.logDate() + ' Got a request for ' + url);
-			response.sendFile(dirname + 'settings.html');
 			utils.sendFile(fs, dirname + 'settings.html', response);
 		});
 
