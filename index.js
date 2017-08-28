@@ -1,10 +1,13 @@
 const fs = require('fs');
 const os = require('os');
+const https = require('https');
 const id3 = require('node-id3');
+const URLModule = require('url');
 const ytdl = require('ytdl-core');
 const server = require('./server.js');
 const querystring = require('querystring');
 const fileHandler = require('./fileHandler.js');
+
 
 // Settings
 const settings = require('./settings.js');
@@ -12,7 +15,7 @@ const settings = require('./settings.js');
 const {version} = require('./package.json');
 
 const startServer = () => {
-	const startServerModule = () => server.start(__dirname + '/WebInterface/', fileHandler, fs, os, settings, utils, querystring, id3, ytdl, version);
+	const startServerModule = () => server.start(__dirname + '/WebInterface/', fileHandler, fs, os, settings, utils, querystring, id3, ytdl, version, https, URLModule);
 
 	if (settings.updateJsonOnStart.val == true) {
 		fileHandler.searchSystem(fs, os, settings.audioFileExtensions.val, settings.videoFileExtensions.val, utils).then(startServerModule).catch(err => {
@@ -74,12 +77,11 @@ const utils = {
 		});
 	},
 
-	fetch: function(url, https, URLModule) {
+	fetch: function(url, https, URLModule, headers) {
 		return new Promise((resolve, reject) => {
 			const options = URLModule.parse(url);
 
-			// Github needs a header to be sent
-			options.headers = {'User-Agent':'Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0)'};
+			options.headers = headers;
 			https.get(options, res => {
 				let rawData = '';
 
@@ -100,18 +102,21 @@ const utils = {
 						try {
 							resolve(JSON.parse(rawData));
 						} catch(err) {
-							reject(e);
+							reject(err);
 						}
 					} else resolve(rawData);
 				});
-			}).on('error', err => reject);
+			}).on('error', err => reject(err));
 		});
 	},
 
 	newVersionAvailable: function(version) {
 		return new Promise((resolve, reject) => {
+			// Github needs a header to be sent
+			const header = {'User-Agent':'Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0)'};
+
 			console.log(utils.logDate() + ' Checking for updates. Connecting to Github...');
-			utils.fetch('https://api.github.com/repos/Jantje19/MusicStream/releases/latest', require('https'), require('url')).then(response => {
+			utils.fetch('https://api.github.com/repos/Jantje19/MusicStream/releases/latest', https, url, header).then(response => {
 				// Check if the returned value is JSON
 				if (response.constructor == {}.constructor) {
 					if (response.tag_name != version)
