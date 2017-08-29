@@ -102,6 +102,25 @@ a:hover {
 }
 
 /* Identifiers */
+body #lyricsElem {
+	right: 55px;
+	z-index: 100;
+	width: 150px;
+	height: 150px;
+	bottom: 127px;
+	position: absolute;
+	overflow-y: scroll;
+	background-color: white;
+	border: 10px solid white;
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.5)
+}
+
+body #lyricsElem .ball-scale-multiple {
+	width: 60px;
+	height: 60px;
+	transform: translateX(110%);
+}
+
 main #main {
 	display: flex;
 	margin-top: 20px;
@@ -337,6 +356,12 @@ main #controls #mainControls #artistInfo p {
 	text-align: left;
 	overflow: hidden;
 	text-overflow: ellipsis;
+}
+
+main #controls #mainControls #artistInfo #infoBtn {
+	float: right;
+	cursor: pointer;
+	transform: translate(-95%, -95%);
 }
 
 main #controls #mainControls #artistInfo #thumbnail {
