@@ -108,7 +108,7 @@ body #lyricsElem {
 	width: 150px;
 	height: 150px;
 	bottom: 127px;
-	position: absolute;
+	position: fixed;
 	overflow-y: scroll;
 	background-color: white;
 	border: 10px solid white;
