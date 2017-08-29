@@ -111,6 +111,30 @@ const utils = {
 	},
 
 	newVersionAvailable: function(version) {
+		function compareVersions(version1, version2) {
+			version1 = version1.split('.');
+			version2 = version2.split('.');
+
+			if (version1.length == version2.length) {
+				for (let i = 0; i < version1.length; i++) {
+					const num1 = Number(version1[i]);
+					const num2 = Number(version2[i]);
+
+					if (num1 && num2) {
+						if (num1 < num2)
+							return 1;
+						else if (num1 != num2)
+							return 0;
+					} else {
+						if (version1[i] != version2[i])
+							return 0;
+					}
+				}
+
+				return -1;
+			} else return 0;
+		}
+
 		return new Promise((resolve, reject) => {
 			// Github needs a header to be sent
 			const header = {'User-Agent':'Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0)'};
@@ -119,9 +143,16 @@ const utils = {
 			utils.fetch('https://api.github.com/repos/Jantje19/MusicStream/releases/latest', https, URLModule, header).then(response => {
 				// Check if the returned value is JSON
 				if (response.constructor == {}.constructor) {
-					if (response.tag_name != version)
+					const versionSame = compareVersions(response.tag_name, version);
+
+					if (versionSame == 0)
+						resolve({isAvailable: false, version: version});
+					else if (versionSame > 0)
+						resolve({isAvailable: false, version: version, greater: true, url: response.html_url});
+					else if (versionSame < 0)
 						resolve({isAvailable: true, version: response.tag_name, url: response.html_url});
-					else resolve({isAvailable: false, version: version});
+					else
+						reject('Version check went wrong.');
 				} else reject('The response is not json, so it is useless');
 			}).catch(err => reject);
 		});
@@ -189,17 +220,36 @@ console.err = (...args) => console.error("\x1b[31m", ...args, "\x1b[0m");
 // Console.wrn is a console.warn log in orange:
 console.wrn = (...args) => console.warn("\x1b[33m", ...args, "\x1b[0m");
 
+// Check args
+if (process.argv.includes('check-updates')) {
+	utils.newVersionAvailable(version).then(newVersion => {
+		if (newVersion.greater)
+			utils.colorLog(`No update available, running version: ${newVersion.version}. But this version if greater than that on GitHub (${newVersion.version}), Maybe you want to get the newest code from GitHub: [[fgMagenta, ${newVersion.url}]]`, 'fgOrange');
+		else if (newVersion.isAvailable == true)
+			utils.colorLog(`A new update is available: ${newVersion.version}. You can download it at: [[fgMagenta, ${newVersion.url}]]`, 'fgGreen');
+		else
+			utils.colorLog(`No update available, running version: ${newVersion.version}`, 'fgCyan');
+	}).catch(err => {
+		console.wrn('An error occurred when checking for updates:', err);
+		startServer();
+	});
+
+	return;
+}
+
 utils.colorLog(new Date() + ' [[fgGreen, Starting MusicStream]]');
 if (settings.checkForUpdateOnStart.val == true) {
 	utils.newVersionAvailable(version).then(newVersion => {
-		if (newVersion.isAvailable == true) {
+		if (newVersion.greater) {
+			utils.colorLog(`No update available, running version: ${newVersion.version}. But this version if greater than that on GitHub (${newVersion.version}), Maybe you want to get the newest code from GitHub: [[fgMagenta, ${newVersion.url}]]`, 'fgOrange');
+		} else if (newVersion.isAvailable == true) {
 			utils.colorLog(`A new update is available: ${newVersion.version}`, 'fgGreen');
 		} else {
 			utils.colorLog(`No update available, running version: ${newVersion.version}`, 'fgCyan');
 			startServer();
 		}
 	}).catch(err => {
-		console.wrn('An error occurred when checking for updates', err);
+		console.wrn('An error occurred when checking for updates: ' + err + '. Starting server...');
 		startServer();
 	});
 } else startServer();
