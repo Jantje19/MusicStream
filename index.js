@@ -116,7 +116,7 @@ const utils = {
 			const header = {'User-Agent':'Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0)'};
 
 			console.log(utils.logDate() + ' Checking for updates. Connecting to Github...');
-			utils.fetch('https://api.github.com/repos/Jantje19/MusicStream/releases/latest', https, url, header).then(response => {
+			utils.fetch('https://api.github.com/repos/Jantje19/MusicStream/releases/latest', https, URLModule, header).then(response => {
 				// Check if the returned value is JSON
 				if (response.constructor == {}.constructor) {
 					if (response.tag_name != version)
