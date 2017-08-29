@@ -42,9 +42,9 @@ function handlePlaylist(evt, name) {
 	}
 }
 
-function get(url) {
+function get(url, headers) {
 	return new Promise((resolve, reject) => {
-		fetch(url).then(response => {
+		fetch(url, headers).then(response => {
 			if (response.type === 'opaque') reject('Received a response, but it\'s opaque so can\'t examine it');
 			else if (response.status !== 200) reject('Looks like there was a problem. Status Code: ' + response.status);
 			else {

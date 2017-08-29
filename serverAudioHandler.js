@@ -1,5 +1,5 @@
 module.exports = {
-	start: (app, dirname, fileHandler, fs, os, settings, utils, querystring, id3) => {
+	start: (app, dirname, fileHandler, fs, os, settings, utils, querystring, id3, https, URLModule) => {
 		app.get('/playlist/*', (request, response) => {
 			const url = querystring.unescape(request.url);
 
@@ -120,6 +120,23 @@ module.exports = {
 			}
 		});
 
+		app.get('/getLyrics/*', (request, response) => {
+			const url = querystring.unescape(request.url);
+			console.log('Got a request for ' + url);
+
+			const urlArr = url.split('/').filter(val => {return val != ''});
+			urlArr.shift();
+
+			const artist = urlArr[0];
+			const songName = urlArr[1];
+
+			utils.fetch(`https://makeitpersonal.co/lyrics?artist=${artist}&title=${songName}`, https, URLModule).then(text => {
+				response.send({success: true, lyrics: text});
+			}).catch(err => {
+				response.send({success: false, error: err})
+			});
+		});
+
 		app.get('/OldBrowsers/*', (request, response) => {
 			const url = request.url;
 
@@ -133,7 +150,8 @@ module.exports = {
 				json.audio.songs.forEach((object, key) => {
 					// html += `<a onclick="playSong('${object.fileName}')" href="#">${object.fileName}</a><hr>`; // href="/song/${object.fileName}" target="_blank"
 
-					if (!settings.ignoredAudioFiles.val.includes(object.fileName)) html += `<a href="/song/${object.fileName}" target="_blank">${object.fileName}</a><hr>`;
+					if (!settings.ignoredAudioFiles.val.includes(object.fileName))
+						html += `<a href="/song/${object.fileName}" target="_blank">${object.fileName}</a><hr>`;
 				});
 
 				response.send(html);

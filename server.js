@@ -1,5 +1,5 @@
 module.exports = {
-	start: function(dirname, fileHandler, fs, os, settings, utils, querystring, id3, ytdl, version) {
+	start: function(dirname, fileHandler, fs, os, settings, utils, querystring, id3, ytdl, version, https, URLModule) {
 		const express = require('express');
 		const app = express();
 		const port = settings.port.val;
@@ -387,7 +387,7 @@ module.exports = {
 		});
 
 		require('./serverVideoHandler.js').start(app, dirname, fileHandler, fs, os, settings, utils, querystring);
-		require('./serverAudioHandler.js').start(app, dirname, fileHandler, fs, os, settings, utils, querystring, id3);
+		require('./serverAudioHandler.js').start(app, dirname, fileHandler, fs, os, settings, utils, querystring, id3, https, URLModule);
 
 		// Just handle the rest
 		app.get('/*', (request, response) => {
