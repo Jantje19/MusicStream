@@ -229,7 +229,10 @@
 				getTagsFromLastFm(title, artist).then(tags => {
 					document.getElementById('title').value = tags.name;
 					document.getElementById('artist').value = tags.artist.name;
+					document.getElementById('album').value = tags.album.title;
+					document.getElementById('comment').value = tags.wiki.summary;
 					document.getElementById('length').value = tags.duration;
+					document.getElementById('image').value = tags.album.image[2]['#text'];
 				}).catch(err => alert("Error with finding tags: " + err));
 			} else alert("Title and artist are required for the Last.FM API.");
 		}
