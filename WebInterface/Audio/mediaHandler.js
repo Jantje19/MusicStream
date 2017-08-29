@@ -149,16 +149,24 @@ function updateInterface() {
 }
 
 function displayLyrics(artist, songName) {
+	let lyricsElem = document.getElementById('lyricsElem');
+
+	if (!lyricsElem) {
+		lyricsElem = document.createElement('div');
+		lyricsElem.id = 'lyricsElem';
+		lyricsElem.innerHTML = `<h3>Loading</h3><br><div class="ball-scale-multiple"><div></div><div></div><div></div></div>`;
+
+		document.body.appendChild(lyricsElem);
+	} else lyricsElem.style.display = 'block';
+
+	setTimeout(() => {
+		document.body.addEventListener('click', evt => {
+			if (evt.target != lyricsElem)
+				lyricsElem.style.display = 'none';
+		});
+	}, 100);
+
 	get(`/getLyrics/${artist}/${songName}`).then(json => {
-		let lyricsElem = document.getElementById('lyricsElem');
-
-		if (!lyricsElem) {
-			lyricsElem = document.createElement('div');
-			lyricsElem.id = 'lyricsElem';
-
-			document.body.appendChild(lyricsElem);
-		}
-
 		if (json.success)
 			lyricsElem.innerHTML = `<h3>Lyrics</h3><br><p>${json.lyrics}</p>`;
 		else

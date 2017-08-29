@@ -115,6 +115,12 @@ body #lyricsElem {
 	box-shadow: 0 0 10px rgba(0, 0, 0, 0.5)
 }
 
+body #lyricsElem .ball-scale-multiple {
+	width: 60px;
+	height: 60px;
+	transform: translateX(110%);
+}
+
 main #main {
 	display: flex;
 	margin-top: 20px;
