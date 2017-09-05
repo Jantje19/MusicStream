@@ -1,5 +1,5 @@
 # MusicStream
-A NodeJS web client for streaming music to the network
+A NodeJS server and web client for streaming music (and videos) to your network
 
 ## Install
 1. Install [Node.js](https://nodejs.org/en/download/package-manager/)
