@@ -72,8 +72,12 @@ function songClick(evt) {
 	const elem = evt.target;
 
 	if (evt.ctrlKey) {
-		enqueue(elem.innerText);
-		moveQueueItem(queue.length - 1, queueIndex + 1);
+		if (queue.length < 1) {
+			enqueue(elem.innerText);
+		} else {
+			enqueue(elem.innerText);
+			moveQueueItem(queue.length - 1, queueIndex + 1);
+		}
 	} else {
 		const object = elem.innerText;
 
@@ -392,11 +396,14 @@ function load() {
 		data = json;
 
 		if (json.songs.length > 0) {
+			checkUrlAttributes(json.songs);
 			document.getElementById('songCount').innerText = "Amount: " + json.songs.length;
 			songsElem.innerHTML = '';
 			json.songs.forEach((object, key) => {
 				songsElem.innerHTML += `<button title="${object}" class="song ${key}" onclick="songClick(event)">${object}</button><hr>`;
 			});
+
+			updateInterface();
 		} else songsElem.innerHTML = '<i>No songs</i>';
 
 		if (json.playlists.length > 0) {
@@ -437,6 +444,39 @@ Array.prototype.move = function (old_index, new_index) {
 	this.splice(new_index, 0, this.splice(old_index, 1)[0]);
 	return this;
 };
+
+// Location attributes
+function checkUrlAttributes(songsArr) {
+	function getLocationAtts(toLowerCase) {
+		if (window.location.search != '') {
+			const obj = {};
+
+			unescape(window.location.search).substr(1).split('&').map(val => {
+				const splitArr = val.split('=');
+
+				if (toLowerCase) {
+					splitArr[0] = splitArr[0].toLowerCase();
+					splitArr[1] = splitArr[1].toLowerCase();
+				}
+
+				obj[splitArr[0]] = splitArr[1];
+			});
+
+			return obj;
+		} else return;
+	}
+
+	const locationAtts =  getLocationAtts(false);
+
+	if (locationAtts) {
+		if ('queue' in locationAtts) {
+			locationAtts['queue'].split(/(\s+)?\,(\s+)?/).forEach((object, key) => {
+				if (songsArr.includes(object))
+					queue.push(object);
+			});
+		}
+	}
+}
 
 window.onload = load;
 

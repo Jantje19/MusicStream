@@ -167,10 +167,12 @@ function displayLyrics(artist, songName) {
 	}, 100);
 
 	get(`/getLyrics/${artist}/${songName}`).then(json => {
-		if (json.success)
-			lyricsElem.innerHTML = `<h3>Lyrics</h3><br><p>${json.lyrics}</p>`;
-		else
-			lyricsElem.innerHTML = `<h3>Error</h3><br><p>${json.error}</p>`;
+		if (json.success) {
+			// Split by upper and lower case difference, then adding a break tag
+			const lyrics = json.lyrics.split(/(?=[A-Z])/).map(val => {return val.trim();}).join('<br>');
+
+			lyricsElem.innerHTML = `<h3>Lyrics</h3><p style="line-height: 1.5;">${lyrics}</p>`;
+		} else lyricsElem.innerHTML = `<h3>Error</h3><br><p>${json.error}</p>`;
 	}).catch(err => console.err);
 }
 
