@@ -160,10 +160,14 @@ function displayLyrics(artist, songName) {
 	} else lyricsElem.style.display = 'block';
 
 	setTimeout(() => {
-		document.body.addEventListener('click', evt => {
-			if (evt.target != lyricsElem)
+		function clickEvt(evt) {
+			if (evt.target != lyricsElem) {
 				lyricsElem.style.display = 'none';
-		});
+				document.body.removeEventListener('click', clickEvt);
+			}
+		}
+
+		document.body.addEventListener('click', clickEvt);
 	}, 100);
 
 	get(`/getLyrics/${artist}/${songName}`).then(json => {
