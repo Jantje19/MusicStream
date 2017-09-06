@@ -130,11 +130,23 @@ module.exports = {
 			const artist = urlArr[0];
 			const songName = urlArr[1];
 
-			utils.fetch(`https://makeitpersonal.co/lyrics?artist=${artist}&title=${songName}`, https, URLModule).then(text => {
-				response.send({success: true, lyrics: text});
-			}).catch(err => {
-				response.send({success: false, error: err})
-			});
+			response.send({success: true, lyrics: 'Yay'});
+			return;
+
+			if (artist == undefined || artist.trim() == '') {
+				response.send({success: false, error: 'No artist supplied'});
+			} else if (songName == undefined || songName.trim() == '') {
+				response.send({success: false, error: 'No title supplied'});
+			} else {
+				utils.fetch(`https://makeitpersonal.co/lyrics?artist=${artist}&title=${songName}`, https, URLModule).then(text => {
+					if (text == "Sorry, We don't have lyrics for this song yet.")
+						response.send({success: false, error: text});
+					else
+						response.send({success: true, lyrics: text});
+				}).catch(err => {
+					response.send({success: false, error: err});
+				});
+			}
 		});
 
 		app.get('/OldBrowsers/*', (request, response) => {
