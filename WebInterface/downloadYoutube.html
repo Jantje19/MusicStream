@@ -224,6 +224,7 @@
 								document.getElementById('title').value = title;
 								document.getElementById('album').value = album;
 								document.getElementById('artist').value = artist;
+								document.getElementById('endTime').value = json.length_seconds;
 
 								setTimeout(() => {
 									nodes[3].style.transform = 'translate(-50%, -50%)';
@@ -254,9 +255,16 @@
 				evt.target.style.opacity = '0.3';
 				evt.target.style.pointerEvents = 'none';
 
+				let endTime = document.getElementById('startTime').value;
+
+				if (Number(endTime) <= 0)
+					endTime = null;
+
 				const data = {
 					url: document.getElementById('link').value,
 					fileName: document.getElementById('artist').value + ' - ' + document.getElementById('title').value,
+					startTime: document.getElementById('startTime').value,
+					endTime: endTime,
 					tags: {
 						title: document.getElementById('title').value,
 						album: document.getElementById('album').value,
@@ -328,7 +336,11 @@
 				<input type="text" id="artist"><br>
 				<label for="album">Album</label>
 				<input type="text" id="album"><br>
-				<input type="checkbox" id="uiac"> <!-- Checked? -->
+				<label for="startTime">Start:</label>
+				<input type="number" id="startTime" style="width: 8%" value="0">
+				<label for="endTime">End:</label>
+				<input type="number" id="endTime" style="width: 8%" value="0"><br>
+				<input type="checkbox" id="uiac" checked>
 				<label for="uiac">Use image as cover</label>
 
 				<button id="save">Save</button>
