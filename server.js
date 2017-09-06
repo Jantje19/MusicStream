@@ -160,7 +160,7 @@ module.exports = {
 						// For some weird JS reason the type of the parsed info is an object, but the prototype does not work...
 						info = JSON.parse(JSON.stringify(info));
 						// You can edit this
-						const allowed = ['keywords', 'view_count', 'author', 'title', 'thubnail_url', 'description', 'thumbnail_url'];
+						const allowed = ['keywords', 'view_count', 'author', 'title', 'thubnail_url', 'description', 'thumbnail_url', 'length_seconds'];
 
 						Object.prototype.filter = function(arr) {
 							// Check if it is a JSON Object
@@ -191,7 +191,7 @@ module.exports = {
 				body += data;
 
 				if (body.length > 1e6) {
-					request.send({success: false, err: 'The amount of data is to much', info: 'The connection was destroyed because the amount of data passed is to much'});
+					request.send({success: false, err: 'The amount of data is too much', info: 'The connection was destroyed because the amount of data passed is too much'});
 					request.connection.destroy();
 				}
 			});
@@ -222,6 +222,7 @@ module.exports = {
 
 						if (json.url.indexOf('youtube.com') < 0 && json.url.indexOf('youtu.be') < 0) {sendError('Invalid url'); return;}
 						if (json.beginTime) options.begin = json.beginTime;
+						if (json.endTime) options.end = json.endTime;
 
 						options.filter = 'audioonly';
 
@@ -231,11 +232,11 @@ module.exports = {
 						.audioBitrate(128);
 
 						const args = {
-							seek: 0,
-							duration: null
+							seek: json.startTime,
+							duration: json.endTime
 						}
 
-						if (args.seek) writer.seekInput(formatTime(args.seek));
+						if (args.seek) writer.seekInput(/*formatTime(*/args.seek/*)*/);
 						if (args.duration) writer.duration(args.duration);
 
 						video.on('progress', (chunkLength, downloaded, total) => {
@@ -391,7 +392,7 @@ module.exports = {
 
 		// Just handle the rest
 		app.get('/*', (request, response) => {
-			let url = request.url;
+			let url = request.url.replace(/\?(\w+)=(.+)/, '');
 			if (url.length > 1) console.log(utils.logDate() + ' Got a request for ' + url);
 			if (url.indexOf('/videos') > -1) utils.sendFile(fs, dirname + 'Video/' + url.replace('/videos/', ''), response);
 			else if (url.indexOf('/') > -1) utils.sendFile(fs, dirname + 'Audio/' + url, response);
