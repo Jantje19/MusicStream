@@ -130,9 +130,6 @@ module.exports = {
 			const artist = urlArr[0];
 			const songName = urlArr[1];
 
-			response.send({success: true, lyrics: 'Yay'});
-			return;
-
 			if (artist == undefined || artist.trim() == '') {
 				response.send({success: false, error: 'No artist supplied'});
 			} else if (songName == undefined || songName.trim() == '') {
