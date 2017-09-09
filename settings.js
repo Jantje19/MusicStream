@@ -8,7 +8,7 @@ module.exports = {
 	mostListenedPlaylistName: {
 		val: 'MostListened',
 		type: 'string',
-		desc: 'The name of the playlist that stores the songs you listened and how much.'
+		desc: 'The name of the playlist that stores the songs you listened and how many times.'
 	},
 
 	audioFileExtensions: {
@@ -38,13 +38,13 @@ module.exports = {
 	updateJsonOnStart: {
 		val: true,
 		type: "bool",
-		desc: "If true it will first check the filesystem for songs and video's, then it will start the server."
+		desc: "If true, it will first check the filesystem for songs and video's, then it will start the server."
 	},
 	
 	checkForUpdateOnStart: {
 		val: true,
 		type: "bool",
-		desc: "If true it will first check the local version number against Githubs, if it finds a new version it will say, otherwise it will just start the server."
+		desc: "If true, it will first check the local version number against Githubs, if it finds a new version it will notify you, otherwise it will just start the server. This makes startup times slower."
 	},
 
 	repeatDefaultOnAudio: {
