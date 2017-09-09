@@ -108,9 +108,9 @@ function addWholeSongsToQueue() {
 
 function moveQueueItem(oldIndex, newIndex) {
 	queue.move(oldIndex, newIndex);
-	if (newIndex < queueIndex) queueIndex++;
-	else if (newIndex > queueIndex) queueIndex--;
-	else if (newIndex == queueIndex) playSong(newIndex, true);
+	// if (newIndex < queueIndex) queueIndex++;
+	// else if (newIndex > queueIndex) queueIndex--;
+	// else if (newIndex == queueIndex) playSong(newIndex, true);
 	// else if (newIndex == queueIndex && oldIndex > queueIndex) queueIndex++;
 	// else if (newIndex == queueIndex && oldIndex < queueIndex) queueIndex--;
 	// else if (oldIndex == queueIndex);
