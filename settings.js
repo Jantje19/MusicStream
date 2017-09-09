@@ -8,7 +8,7 @@ module.exports = {
 	mostListenedPlaylistName: {
 		val: 'MostListened',
 		type: 'string',
-		desc: 'The name of the playlist that stores the songs you listened and how much'
+		desc: 'The name of the playlist that stores the songs you listened and how much.'
 	},
 
 	audioFileExtensions: {
