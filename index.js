@@ -235,6 +235,14 @@ if (process.argv.includes('check-updates')) {
 	});
 
 	return;
+} else if (process.argv.includes('update-json')) {
+	fileHandler.searchSystem(fs, os, settings.audioFileExtensions.val, settings.videoFileExtensions.val, utils).then(json => {
+		console.log('Successfully updated the JSON file.');
+	}).catch(err => {
+		console.log('There was an error with updating the JSON:', err);
+	});
+
+	return;
 }
 
 utils.colorLog(new Date() + ' [[fgGreen, Starting MusicStream]]');
