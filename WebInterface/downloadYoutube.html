@@ -65,7 +65,7 @@
 			background: none;
 			max-width: 500px;
 			max-height: 50px;
-			margin: 30px auto;
+			margin: 20px auto;
 			text-align: center;
 			border-radius: 30px;
 			border: 2px solid #16a085;
@@ -74,6 +74,10 @@
 			font-size: 150%;
 			color: rgba(0, 0, 0, 0.5);
 			box-shadow: 0 0 20px rgba(0, 0, 0, 0.3)
+		}
+
+		main div input[type=radio] {
+			margin-bottom: 20px;
 		}
 
 		main div #searchBtn {
@@ -255,12 +259,22 @@
 				evt.target.style.opacity = '0.3';
 				evt.target.style.pointerEvents = 'none';
 
+				let type;
+
+				if (document.getElementById('typeAudio').checked)
+					type = 'audio';
+				else if (document.document.getElementById('typeVideo').checked)
+					type = 'video';
+				else
+					alert('No type selected somehow...\nYou should refresh the page.');
+
 				let endTime = document.getElementById('startTime').value;
 
 				if (Number(endTime) <= 0)
 					endTime = null;
 
 				const data = {
+					type: type,
 					url: document.getElementById('link').value,
 					fileName: document.getElementById('artist').value + ' - ' + document.getElementById('title').value,
 					startTime: document.getElementById('startTime').value,
@@ -317,6 +331,10 @@
 	<main>
 		<div>
 			<input type="url" id="link" placeholder="https://www.youtube.com/watch?v=gLmcGkvJ-e0">
+			<input type="radio" name="type" id="typeAudio" value="Audio" checked>
+			<label for="typeAudio">Audio</label>
+			<input type="radio" name="type" id="typeVideo" value="Video">
+			<label for="typeVideo">Video</label>
 			<input type="submit" id="searchBtn" value="Search">
 		</div>
 
