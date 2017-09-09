@@ -5,7 +5,6 @@
 	"lang": "en",
 
 	"display": "standalone",
-	"orientation": "landscape",
 	"theme_color": "#16a085",
 	"background_color": "#16a085",
 	"icons": [
