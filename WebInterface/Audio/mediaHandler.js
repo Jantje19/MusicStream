@@ -1,14 +1,19 @@
 const queue = [];
 let queueIndex = 0;
+let previousTrack;
 let previousArtist;
 
 function enqueue(...vals) {
 	if (vals.length > 1) {
-		if (document.getElementById('shuffle').getAttribute('activated') == 'true') vals.shuffle();
+		if (document.getElementById('shuffle').getAttribute('activated') == 'true')
+			vals.shuffle();
+
 		vals.forEach((object, key) => {
 			queue[queue.length] = object;
 		});
 	} else queue[queue.length] = vals[0];
+
+	window.history.pushState(document.body.innerHTML, document.title, "?queue=" + queue.join(','));
 
 	updateInterface();
 }
@@ -63,6 +68,7 @@ function deleteQueue() {
 	stopSong();
 	queueIndex = 0;
 	queue.length = 0;
+	window.history.pushState(document.body.innerHTML, document.title, "/");
 	updateInterface();
 }
 
@@ -159,9 +165,24 @@ function displayLyrics(artist, songName) {
 		document.body.appendChild(lyricsElem);
 	} else lyricsElem.style.display = 'block';
 
+	function isDescendant(parent, child) {
+		let looped = 0;
+		let node = child.parentNode;
+
+		while (node != null && looped < 5) {
+			if (node == parent)
+				return true;
+
+			looped++;
+			node = node.parentNode;
+		}
+
+		return false;
+	}
+
 	setTimeout(() => {
 		function clickEvt(evt) {
-			if (evt.target != lyricsElem) {
+			if (!isDescendant(lyricsElem, evt.target)) {
 				lyricsElem.style.display = 'none';
 				document.body.removeEventListener('click', clickEvt);
 			}
@@ -170,14 +191,18 @@ function displayLyrics(artist, songName) {
 		document.body.addEventListener('click', clickEvt);
 	}, 100);
 
-	get(`/getLyrics/${artist}/${songName}`).then(json => {
-		if (json.success) {
-			// Split by upper and lower case difference, then adding a break tag
-			const lyrics = json.lyrics.split(/(?=[A-Z])/).map(val => {return val.trim();}).join('<br>');
+	if (previousTrack != songName) {
+		get(`/getLyrics/${artist}/${songName}`).then(json => {
+			if (json.success) {
+				// Split by upper and lower case difference, then adding a break tag
+				const lyrics = json.lyrics.split(/(?=[A-Z])/).map(val => {return val.trim();}).join('<br>');
 
-			lyricsElem.innerHTML = `<h3>Lyrics</h3><p style="line-height: 1.5;">${lyrics}</p>`;
-		} else lyricsElem.innerHTML = `<h3>Error</h3><br><p>${json.error}</p>`;
-	}).catch(err => console.err);
+				lyricsElem.innerHTML = `<h3>Lyrics</h3><p style="line-height: 1.5;">${lyrics}</p>`;
+			} else lyricsElem.innerHTML = `<h3>Error</h3><br><p>${json.error}</p>`;
+		}).catch(err => console.err);
+	}
+
+	previousTrack = songName;
 }
 
 function escapeString(string) {
