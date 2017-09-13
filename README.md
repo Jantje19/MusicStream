@@ -1,17 +1,17 @@
 # MusicStream
 A NodeJS server and web client for streaming music (and videos) to your network
 
-## Install
-Try the universal_python_executer.py if you have python installed.
-Otherwise move into the folder of your platform and execute one of the files within that folder.
-If both of these methods fail, use the manual method.
-
-#### Manual installation
+## Installation
 1. Install [Node.js](https://nodejs.org/en/download/package-manager/)
 2. [Download](https://github.com/jantje19/MusicStream/releases/) the latest release from Github
 3. Extract the files into a folder
-4. Within the directory run: `npm install && npm start` in a command line
+4. Within the directory run: `npm install && npm start` in a CLI
 5. Go to: http://localhost:8000
+
+### Running
+Try the universal_python_executer.py if you have python installed.
+Otherwise move into the folder of your platform and execute one of the files within that folder.
+If both of these methods fail, run `npm start` in a CLI
 
 ## Notes
 The web-interface only works with browsers that have ES6 support.
