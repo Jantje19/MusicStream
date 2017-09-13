@@ -2,6 +2,11 @@
 A NodeJS server and web client for streaming music (and videos) to your network
 
 ## Installation
+### Windows install video
+
+[![Install video](http://img.youtube.com/vi/UOG_lOcmQlo/0.jpg)](http://www.youtube.com/watch?v=UOG_lOcmQlo)
+
+### Steps
 1. Install [Node.js](https://nodejs.org/en/download/package-manager/)
 2. [Download](https://github.com/jantje19/MusicStream/releases/latest/) the latest release from Github
 3. Extract the files into a folder
