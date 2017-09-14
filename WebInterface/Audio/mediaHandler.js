@@ -192,17 +192,18 @@ function displayLyrics(artist, songName) {
 	}, 100);
 
 	if (previousTrack != songName) {
-		get(`/getLyrics/${artist}/${songName}`).then(json => {
-			if (json.success) {
-				// Split by upper and lower case difference, then adding a break tag
-				const lyrics = json.lyrics.split(/(?=[A-Z])/).map(val => {return val.trim();}).join('<br>');
+		fetch(`/getLyrics/${artist}/${songName}`).then(response => {
+			response.json().then(json => {
+				if (json.success) {
+					const lyrics = json.lyrics.split(/(?=[A-Z])/).map(val => {return val.trim();}).join('<br>');
+					// Split by upper and lower case difference, then adding a break tag
 
-				lyricsElem.innerHTML = `<h3>Lyrics</h3><p style="line-height: 1.5;">${lyrics}</p>`;
-			} else lyricsElem.innerHTML = `<h3>Error</h3><br><p>${json.error}</p>`;
-		}).catch(err => console.err);
+					previousTrack = songName;
+					lyricsElem.innerHTML = `<h3>Lyrics</h3><p style="line-height: 1.5;">${lyrics}</p>`;
+				} else lyricsElem.innerHTML = `<h3>Error</h3><br><p>${json.error}</p>`;
+			}).catch(err => {lyricsElem.innerHTML = `<h3>Error</h3><br><p>Nope</p>`;});
+		}).catch(err => {lyricsElem.innerHTML = `<h3>Error</h3><br><p>Nope</p>`;});
 	}
-
-	previousTrack = songName;
 }
 
 function escapeString(string) {
