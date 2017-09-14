@@ -122,7 +122,7 @@ module.exports = {
 
 		app.get('/getLyrics/*', (request, response) => {
 			const url = querystring.unescape(request.url);
-			console.log('Got a request for ' + url);
+			console.log(utils.logDate() + ' Got a request for ' + url);
 
 			const urlArr = url.split('/').filter(val => {return val != ''});
 			urlArr.shift();
