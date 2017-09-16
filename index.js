@@ -18,7 +18,7 @@ const startServer = () => {
 	const startServerModule = () => server.start(__dirname + '/WebInterface/', fileHandler, fs, os, settings, utils, querystring, id3, ytdl, version, https, URLModule);
 
 	if (settings.updateJsonOnStart.val == true) {
-		fileHandler.searchSystem(fs, os, settings.audioFileExtensions.val, settings.videoFileExtensions.val, utils).then(startServerModule).catch(err => {
+		fileHandler.searchSystem(fs, os, utils, settings).then(startServerModule).catch(err => {
 			console.err('Couln\'t update the JSON file.', err);
 			startServerModule();
 		});
@@ -236,7 +236,7 @@ if (process.argv.includes('check-updates')) {
 
 	return;
 } else if (process.argv.includes('update-json')) {
-	fileHandler.searchSystem(fs, os, settings.audioFileExtensions.val, settings.videoFileExtensions.val, utils).then(json => {
+	fileHandler.searchSystem(fs, os, utils, settings).then(json => {
 		console.log('Successfully updated the JSON file.');
 	}).catch(err => {
 		console.log('There was an error with updating the JSON:', err);

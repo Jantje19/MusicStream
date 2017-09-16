@@ -116,7 +116,7 @@ module.exports = {
 		app.get('/updateJSON/', (request, response) => {
 			console.log(utils.logDate() + ' Got a request for ' + request.url);
 
-			fileHandler.searchSystem(fs, os, settings.audioFileExtensions.val, settings.videoFileExtensions.val, utils).then(json => {
+			fileHandler.searchSystem(fs, os, utils, settings).then(json => {
 				response.send({success: true});
 			}).catch(err => {
 				console.err(err);

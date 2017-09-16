@@ -1,20 +1,37 @@
 module.exports = {
-	searchSystem: function(fs, os, audioFileExtensions, videoFileExtensions, utils) {
+	searchSystem: function(fs, os, utils, settings) {
+		let paths = [];
 		const songsArr = [];
 		const videosArr = [];
 		const playlistsArr = [];
-		// Folders that have to be searched
-		const audioFolderPath = os.homedir() + '/Music/';
-		const videoFolderPath = os.homedir() + '/Videos/';
 
+		const audioFileExtensions = settings.audioFileExtensions.val;
+		const videoFileExtensions = settings.videoFileExtensions.val;
+
+		if (settings.checkOsHomedirs.val) {
+			// Folders that have to be searched
+			paths.push(os.homedir() + '/Music/');
+			paths.push(os.homedir() + '/Videos/');
+		}
+
+		paths = paths.concat(settings.mediaPaths.val);
 		utils.colorLog(utils.logDate() + ' [[fgBlue, SEARCHSYSTEM:]] Starting checking files');
+
 		return new Promise((resolve, reject) => {
+			if (paths.length < 1)
+				reject('No paths specified for checking.');
+
+			const homedir = os.homedir();
+			const checkDirs = paths.map(val => {
+				handleFolders(val.replace('{homedir}', homedir), utils).then(data => resolve(data)).catch(err => reject(err));
+			});
+
 			// Wait untill the functions both finish
-			Promise.all([handleFolders(audioFolderPath, utils), handleFolders(videoFolderPath, utils)]).then(() => {
+			Promise.all(checkDirs).then(() => {
 				setTimeout(() => {
 					jsonFileArr = {audio: {songs: songsArr, playlists: playlistsArr}, video: {videos: videosArr}};
 
-					fs.writeFile(__dirname + '/JSON.json', JSON.stringify(jsonFileArr), (err) => {
+					fs.writeFile(__dirname + '/JSON.json', JSON.stringify(jsonFileArr), err => {
 						if (err) reject(err);
 						else {
 							utils.colorLog(utils.logDate() + ' [[fgBlue, SEARCHSYSTEM:]] Updated the Json file');
@@ -23,42 +40,43 @@ module.exports = {
 					});
 				}, 1000);
 			}).catch(err => {
-				reject(err);
+				reject('Err' + err);
 			});
 		});
 
 		function handleFolders(path, utils) {
 			return new Promise((resolve, reject) => {
-				if (path.indexOf('node_modules') < 0) {
-					fs.readdir(path, (err, files) => {
-						if (err) reject(err);
-						else {
-							// Loop through all the files
-							files.forEach((object, key) => {
-								if (object.toLowerCase() != 'desktop.ini') {
-									const fileExtention = utils.getFileExtention(object.toLowerCase());
+				fs.exists(path, exists => {
+					if (exists) {
+						fs.readdir(path, (err, files) => {
+							if (err) reject(err);
+							else {
+								// Loop through all the files
+								files.forEach((object, key) => {
+									if (object.toLowerCase() != 'desktop.ini') {
+										console.log(object);
+										const fileExtention = utils.getFileExtention(object.toLowerCase());
 
-									fs.stat(path + object, (err, stats) => {
-										const ctime = new Date(stats.ctime.toString());
+										fs.stat(path + object, (err, stats) => {
+											const ctime = new Date(stats.ctime.toString());
 
-										// Check if the file has a file extension that is in the arrays in index.js or that it is a playlist
-										// If it is a file just execute this function again
-										if (audioFileExtensions.includes(fileExtention)) songsArr.push({path: path, fileName: object, lastChanged: ctime});
-										else if (videoFileExtensions.includes(fileExtention)) videosArr.push({path: path, fileName: object, lastChanged: ctime});
-										else if (fileExtention == '.m3u') playlistsArr.push({path: path, fileName: object, lastChanged: ctime});
-										else if (fileExtention) console.wrn('File extention not supported', object);
-										else if (!fileExtention && fs.lstatSync(path + object).isDirectory()) handleFolders(path + object + '/', utils);
-										else console.wrn('Something is weird...', 'FILENAME:' + object, 'EXTENSION:' + fileExtention);
-									});
-								}
-							});
+											// Check if the file has a file extension that is in the arrays in index.js or that it is a playlist
+											// If it is a file just execute this function again
+											if (audioFileExtensions.includes(fileExtention)) songsArr.push({path: path, fileName: object, lastChanged: ctime});
+											else if (videoFileExtensions.includes(fileExtention)) videosArr.push({path: path, fileName: object, lastChanged: ctime});
+											else if (fileExtention == '.m3u') playlistsArr.push({path: path, fileName: object, lastChanged: ctime});
+											else if (fileExtention) console.wrn('File extention not supported', object);
+											else if (!fileExtention && fs.lstatSync(path + object).isDirectory()) handleFolders(path + object + '/', utils);
+											else console.wrn('Something is weird...', 'FILENAME:' + object, 'EXTENSION:' + fileExtention);
+										});
+									}
+								});
 
-							resolve();
-						}
-					});
-				} else {
-					reject();
-				}
+								resolve();
+							}
+						});
+					} else reject('Directory not found: ' + path);
+				});
 			});
 		}
 	},
