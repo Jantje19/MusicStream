@@ -30,15 +30,27 @@ module.exports = {
 	},
 
 	ignoredAudioFiles: {
-		val: ['Darude - Sand Storm.mp3'],
+		val: [''],
 		type: 'mult',
 		desc: 'Filter out audio files that appear in the /data/ request. The songs are still accessible through /song/ and via a playlist.'
 	},
 
 	ignoredVideoFiles: {
-		val: ['My embarrassing video that nobody should see.mp4'],
+		val: [''],
 		type: 'mult',
 		desc: 'Filter out video files that appear in the /data/ request. The videos are still accessible through /video/.'
+	},
+
+	checkOsHomedirs: {
+		val: true,
+		type: 'bool',
+		desc: "Check the OS home directorys /Music/ and /Videos/ for media files."
+	},
+
+	mediaPaths: {
+		val: [''],
+		type: 'mult',
+		desc: 'The paths the server should check for media files. {homedir} is replaced by the os.homedir.'
 	},
 
 	updateJsonOnStart: {
