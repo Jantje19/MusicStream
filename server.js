@@ -34,64 +34,65 @@ module.exports = {
 				const songs = [];
 				const videos = [];
 
-				if (sort) {
-					json.audio.songs.sort(sortFunc);
-					json.video.videos.sort(sortFunc);
-					json.audio.songs.forEach((object, key) => songs.push(object.fileName));
-					json.video.videos.forEach((object, key) => videos.push(object.fileName));
-				} else {
-					json.audio.songs.forEach((object, key) => songs.push(object.fileName));
-					json.video.videos.forEach((object, key) => videos.push(object.fileName));
-				}
-
-				getPlaylists = (json, fs) => {
-					return Promise.all([new Promise((resolve, reject) => {
-						const playlists = [];
-
-						if (sort) playlists.sort(sortFunc);
-						json.audio.playlists.forEach((object, key) => {
-							fileHandler.readPlayList(fs, object.path + object.fileName, json.audio.songs).then(songsArr => {
-								if (songsArr.length > 0) playlists.push(object.fileName);
-								if (key == json.audio.playlists.length - 1) resolve(playlists);
-							}).catch(err => reject(err));
-						});
-					}), new Promise((resolve, reject) => {
-						fs.exists('./playlists.json', exists => {
-							if (exists) {
-								fs.readFile('./playlists.json', 'utf-8', (err, data) => {
-									if (err) resolve(JSON.parse(data));
-									else {
-										const arr = [];
-										data = JSON.parse(data);
-
-										for (key in data)
-											arr.push(key);
-
-										resolve(arr);
-									}
-								});
-							} else resolve([]);
-						});
-					})
-					]);
-				}
-
-				getPlaylists(json, fs)
-				.then(playlists => {
-					function flatten(arr) {
-						return Array.prototype.concat.apply([], arr);
+				if (json.audio.songs.length > 0 || json.video.videos.length > 0) {
+					if (sort) {
+						json.audio.songs.sort(sortFunc);
+						json.video.videos.sort(sortFunc);
+						json.audio.songs.forEach((object, key) => songs.push(object.fileName));
+						json.video.videos.forEach((object, key) => videos.push(object.fileName));
+					} else {
+						json.audio.songs.forEach((object, key) => songs.push(object.fileName));
+						json.video.videos.forEach((object, key) => videos.push(object.fileName));
 					}
 
-					playlists = flatten(playlists);
-							// If oldest just reverse :P
-							if (url.toLowerCase().indexOf('sort=oldest') > -1) {
-								songs.reverse();
-								videos.reverse();
-								playlists.reverse();
-							}
+					getPlaylists = (json, fs) => {
+						return Promise.all([new Promise((resolve, reject) => {
+							const playlists = [];
 
-							response.send({audio: {songs: songs.filter(val => {return !(settings.ignoredAudioFiles.val.includes(val))}), playlists: playlists}, video: {videos: videos.filter(val => {return !(settings.ignoredVideoFiles.val.includes(val))})}});
-						}).catch(err => response.send({error: "Something went wrong", info: "Either getting the songs or getting the playlists or both went wrong"}));
+							if (sort) playlists.sort(sortFunc);
+							json.audio.playlists.forEach((object, key) => {
+								fileHandler.readPlayList(fs, object.path + object.fileName, json.audio.songs).then(songsArr => {
+									if (songsArr.length > 0) playlists.push(object.fileName);
+									if (key == json.audio.playlists.length - 1) resolve(playlists);
+								}).catch(err => reject(err));
+							});
+						}), new Promise((resolve, reject) => {
+							fs.exists('./playlists.json', exists => {
+								if (exists) {
+									fs.readFile('./playlists.json', 'utf-8', (err, data) => {
+										if (err) resolve(JSON.parse(data));
+										else {
+											const arr = [];
+											data = JSON.parse(data);
+
+											for (key in data)
+												arr.push(key);
+
+											resolve(arr);
+										}
+									});
+								} else resolve([]);
+							});
+						})
+						]);
+					}
+
+					getPlaylists(json, fs).then(playlists => {
+						function flatten(arr) {
+							return Array.prototype.concat.apply([], arr);
+						}
+
+						playlists = flatten(playlists);
+						// If oldest just reverse :P
+						if (url.toLowerCase().indexOf('sort=oldest') > -1) {
+							songs.reverse();
+							videos.reverse();
+							playlists.reverse();
+						}
+
+						response.send({audio: {songs: songs.filter(val => {return !(settings.ignoredAudioFiles.val.includes(val))}), playlists: playlists}, video: {videos: videos.filter(val => {return !(settings.ignoredVideoFiles.val.includes(val))})}});
+					}).catch(err => response.send({error: "Something went wrong", info: "Either getting the songs or getting the playlists or both went wrong"}));
+				} else response.send({error: "Not found", info: "There are no media files found on this device."});
 			}).catch(err => {
 				console.err('There was an error with getting the info', err);
 				response.send({error: "There was an error with getting the info", info: err});
