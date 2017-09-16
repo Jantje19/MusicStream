@@ -5,6 +5,12 @@ module.exports = {
 		desc: "The port the server runs on. If you don't know what this is, don't change it."
 	},
 
+	collectMostListened: {
+		val: true,
+		type: 'bool',
+		desc: 'Store the songs you listened and how many times in a playlist.'
+	},
+
 	mostListenedPlaylistName: {
 		val: 'MostListened',
 		type: 'string',
@@ -34,16 +40,16 @@ module.exports = {
 		type: 'mult',
 		desc: 'Filter out video files that appear in the /data/ request. The videos are still accessible through /video/.'
 	},
-	
+
 	updateJsonOnStart: {
 		val: true,
-		type: "bool",
+		type: 'bool',
 		desc: "If true, it will first check the filesystem for songs and video's, then it will start the server."
 	},
-	
+
 	checkForUpdateOnStart: {
 		val: true,
-		type: "bool",
+		type: 'bool',
 		desc: "If true, it will first check the local version number against Githubs, if it finds a new version it will notify you, otherwise it will just start the server. This makes startup times slower."
 	},
 
