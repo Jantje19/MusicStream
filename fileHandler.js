@@ -33,10 +33,6 @@ module.exports = {
 					fs.readdir(path, (err, files) => {
 						if (err) reject(err);
 						else {
-							Array.prototype.contains = function(str) {
-								return this.indexOf(str) >= 0 ? true : false;
-							}
-
 							// Loop through all the files
 							files.forEach((object, key) => {
 								if (object.toLowerCase() != 'desktop.ini') {
