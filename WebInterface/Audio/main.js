@@ -373,8 +373,8 @@ function load() {
 				if (json.success) alert('Updated JSON');
 				else alert(json.info);
 			});
-		}).catch( err => {
-			console.error('An error occurred', err);
+		}).catch(err => {
+			console.error('An error occurred', JSON.parse(err));
 		});
 	});
 
