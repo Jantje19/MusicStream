@@ -45,15 +45,17 @@ function handlePlaylist(evt, name) {
 function get(url, headers) {
 	return new Promise((resolve, reject) => {
 		fetch(url, headers).then(response => {
-			if (response.type === 'opaque') reject('Received a response, but it\'s opaque so can\'t examine it');
-			else if (response.status !== 200) reject('Looks like there was a problem. Status Code: ' + response.status);
+			if (response.type === 'opaque')
+				reject('Received a response, but it\'s opaque so can\'t examine it');
+			else if (response.status !== 200 && response.status !== 301)
+				reject('Looks like there was a problem. Status Code: ' + response.status);
 			else {
 				response.json().then(json => {
 					if (json.error) reject(json.info);
 					else resolve(json);
 				});
 			}
-		}).catch(err => reject(err));
+		}).catch(err => {reject(err)});
 	});
 }
 
@@ -413,6 +415,7 @@ function load() {
 			});
 		} else playlistsElem.innerHTML = '<i>No playlists found</i>';
 	}).catch(err => {
+		songsElem.innerHTML = `<div style="text-align: center"><h3>Oh no</h3><br><br><p>There was an error: <b>${err}</b></p></div>`;
 		console.error('Something went wrong', err);
 	});
 }
