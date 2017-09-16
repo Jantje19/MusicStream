@@ -199,6 +199,12 @@ module.exports = {
 		app.post('/updateMostListenedPlaylist', (request, response) => {
 			let body = '';
 
+			if (!settings.collectMostListened.val) {
+				response.send({success: false, err: 'Settings specified that this is not permitted.', info: 'The settings specified that the user doesn\'t want to save songs.'});
+				response.set("Connection", "close");
+				return;
+			}
+
 			request.on('data', data => {
 				body += data;
 
