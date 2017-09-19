@@ -422,6 +422,7 @@ app.post('/updateSettings', (request, response) => {
 			});
 });
 
+console.log("TEST")
 require('./serverVideoHandler.js').start(app, dirname, fileHandler, fs, os, settings, utils, querystring);
 require('./serverAudioHandler.js').start(app, dirname, fileHandler, fs, os, settings, utils, querystring, id3, https, URLModule);
 
