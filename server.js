@@ -34,64 +34,65 @@ module.exports = {
 				const songs = [];
 				const videos = [];
 
-				if (sort) {
-					json.audio.songs.sort(sortFunc);
-					json.video.videos.sort(sortFunc);
-					json.audio.songs.forEach((object, key) => songs.push(object.fileName));
-					json.video.videos.forEach((object, key) => videos.push(object.fileName));
-				} else {
-					json.audio.songs.forEach((object, key) => songs.push(object.fileName));
-					json.video.videos.forEach((object, key) => videos.push(object.fileName));
-				}
-
-				getPlaylists = (json, fs) => {
-					return Promise.all([new Promise((resolve, reject) => {
-						const playlists = [];
-
-						if (sort) playlists.sort(sortFunc);
-						json.audio.playlists.forEach((object, key) => {
-							fileHandler.readPlayList(fs, object.path + object.fileName, json.audio.songs).then(songsArr => {
-								if (songsArr.length > 0) playlists.push(object.fileName);
-								if (key == json.audio.playlists.length - 1) resolve(playlists);
-							}).catch(err => reject(err));
-						});
-					}), new Promise((resolve, reject) => {
-						fs.exists('./playlists.json', exists => {
-							if (exists) {
-								fs.readFile('./playlists.json', 'utf-8', (err, data) => {
-									if (err) resolve(JSON.parse(data));
-									else {
-										const arr = [];
-										data = JSON.parse(data);
-
-										for (key in data)
-											arr.push(key);
-
-										resolve(arr);
-									}
-								});
-							} else resolve([]);
-						});
-					})
-					]);
-				}
-
-				getPlaylists(json, fs)
-				.then(playlists => {
-					function flatten(arr) {
-						return Array.prototype.concat.apply([], arr);
+				if (json.audio.songs.length > 0 || json.video.videos.length > 0) {
+					if (sort) {
+						json.audio.songs.sort(sortFunc);
+						json.video.videos.sort(sortFunc);
+						json.audio.songs.forEach((object, key) => songs.push(object.fileName));
+						json.video.videos.forEach((object, key) => videos.push(object.fileName));
+					} else {
+						json.audio.songs.forEach((object, key) => songs.push(object.fileName));
+						json.video.videos.forEach((object, key) => videos.push(object.fileName));
 					}
 
-					playlists = flatten(playlists);
-					// If oldest just reverse :P
-					if (url.toLowerCase().indexOf('sort=oldest') > -1) {
-						songs.reverse();
-						videos.reverse();
-						playlists.reverse();
+					getPlaylists = (json, fs) => {
+						return Promise.all([new Promise((resolve, reject) => {
+							const playlists = [];
+
+							if (sort) playlists.sort(sortFunc);
+							json.audio.playlists.forEach((object, key) => {
+								fileHandler.readPlayList(fs, object.path + object.fileName, json.audio.songs).then(songsArr => {
+									if (songsArr.length > 0) playlists.push(object.fileName);
+									if (key == json.audio.playlists.length - 1) resolve(playlists);
+								}).catch(err => reject(err));
+							});
+						}), new Promise((resolve, reject) => {
+							fs.exists('./playlists.json', exists => {
+								if (exists) {
+									fs.readFile('./playlists.json', 'utf-8', (err, data) => {
+										if (err) resolve(JSON.parse(data));
+										else {
+											const arr = [];
+											data = JSON.parse(data);
+
+											for (key in data)
+												arr.push(key);
+
+											resolve(arr);
+										}
+									});
+								} else resolve([]);
+							});
+						})
+						]);
 					}
 
-					response.send({audio: {songs: songs.filter(val => {return !(settings.ignoredAudioFiles.val.includes(val))}), playlists: playlists}, video: {videos: videos.filter(val => {return !(settings.ignoredVideoFiles.val.includes(val))})}});
-				}).catch(err => response.send({error: "Something went wrong", info: "Either getting the songs or getting the playlists or both went wrong"}));
+					getPlaylists(json, fs).then(playlists => {
+						function flatten(arr) {
+							return Array.prototype.concat.apply([], arr);
+						}
+
+						playlists = flatten(playlists);
+						// If oldest just reverse :P
+						if (url.toLowerCase().indexOf('sort=oldest') > -1) {
+							songs.reverse();
+							videos.reverse();
+							playlists.reverse();
+						}
+
+						response.send({audio: {songs: songs.filter(val => {return !(settings.ignoredAudioFiles.val.includes(val))}), playlists: playlists}, video: {videos: videos.filter(val => {return !(settings.ignoredVideoFiles.val.includes(val))})}});
+					}).catch(err => response.send({error: "Something went wrong", info: "Either getting the songs or getting the playlists or both went wrong"}));
+				} else response.send({error: "Not found", info: "There are no media files found on this device."});
 			}).catch(err => {
 				console.err('There was an error with getting the info', err);
 				response.send({error: "There was an error with getting the info", info: err});
@@ -115,7 +116,7 @@ module.exports = {
 		app.get('/updateJSON/', (request, response) => {
 			console.log(utils.logDate() + ' Got a request for ' + request.url);
 
-			fileHandler.searchSystem(fs, os, settings.audioFileExtensions.val, settings.videoFileExtensions.val, utils).then(json => {
+			fileHandler.searchSystem(fs, os, utils, settings).then(json => {
 				response.send({success: true});
 			}).catch(err => {
 				console.err(err);
@@ -157,13 +158,10 @@ module.exports = {
 			if (id.length == 11) {
 				try {
 					ytdl.getInfo(id, (err, info) => {
-						// For some weird JS reason the type of the parsed info is an object, but the prototype does not work...
 						info = JSON.parse(JSON.stringify(info));
-						// You can edit this
 						const allowed = ['keywords', 'view_count', 'author', 'title', 'thubnail_url', 'description', 'thumbnail_url', 'length_seconds'];
 
 						Object.prototype.filter = function(arr) {
-							// Check if it is a JSON Object
 							if (this.constructor === {}.constructor) {
 								const newObj = {};
 								for (key in this) {
@@ -235,7 +233,6 @@ module.exports = {
 						if (json.beginTime) options.begin = json.beginTime;
 						if (json.endTime) options.end = json.endTime;
 
-
 						if (json.type == 'video') {
 							const path = os.homedir() + '/Videos/' + json.fileName + '.mp4';
 							const video = ytdl(json.url, { filter: function(format) { return format.container === 'mp4'; } });
@@ -243,9 +240,6 @@ module.exports = {
 								seek: json.startTime,
 								duration: json.endTime
 							}
-
-							// if (args.seek) writer.seekInput(/*formatTime(*/args.seek));
-							// if (args.duration) writer.duration(args.duration);
 
 							video.pipe(fs.createWriteStream(path));
 							video.on('progress', (chunkLength, downloaded, total) => {
@@ -260,9 +254,6 @@ module.exports = {
 								fs.exists(path, exists => {
 									if (exists) {
 										console.log(`'${json.fileName}'` + ' downloaded');
-
-										// Tags
-										// if (json.tags) id3.write(json.tags, path);
 
 										fileHandler.searchSystem(fs, os, settings.audioFileExtensions.val, settings.videoFileExtensions.val, utils).then(() => {
 											response.send({success: true, fileName: json.fileName + '.mp4', jsonUpdated: true});
@@ -301,26 +292,17 @@ module.exports = {
 
 								fs.exists(path, exists => {
 									if (exists) {
-										console.log(`'${json.fileName}'` + ' downloaded');
-
-										// Tags
-										// if (json.tags) id3.write(json.tags, path);
-
 										fileHandler.searchSystem(fs, os, settings.audioFileExtensions.val, settings.videoFileExtensions.val, utils).then(() => {
 											response.send({success: true, fileName: json.fileName + '.mp3', jsonUpdated: true});
 										}).catch(err => response.send({success: true, fileName: json.fileName, jsonUpdated: false}));
-									} else sendError('File does not exist. This is a weird problem... You should investigate.');
+									} else sendError("File does not exist. This is a weird problem... You should investigate.");
 								});
 							});
-
-							video.on('error', err => {sendError(err)});
-
-							writer.output(path).run();
 						} else sendError('Type not correct');
 					} else sendError('Tags not found. Expected url, fileName and tags.');
 				} else sendError('No JSON found');
 			});
-});
+		});
 
 app.post('/tags*', (request, response) => {
 	let body = '';
@@ -363,10 +345,10 @@ app.post('/tags*', (request, response) => {
 
 						url = url.replace('https', 'http');
 
-						http.request(url, function(response) {
+						http.request(url, response => {
 							const data = new Stream();
 
-							response.on('data', function(chunk) {
+							response.on('data', chunk => {
 								data.push(chunk);
 							});
 

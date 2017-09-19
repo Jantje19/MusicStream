@@ -18,7 +18,7 @@ const startServer = () => {
 	const startServerModule = () => server.start(__dirname + '/WebInterface/', fileHandler, fs, os, settings, utils, querystring, id3, ytdl, version, https, URLModule);
 
 	if (settings.updateJsonOnStart.val == true) {
-		fileHandler.searchSystem(fs, os, settings.audioFileExtensions.val, settings.videoFileExtensions.val, utils).then(startServerModule).catch(err => {
+		fileHandler.searchSystem(fs, os, utils, settings).then(startServerModule).catch(err => {
 			console.err('Couln\'t update the JSON file.', err);
 			startServerModule();
 		});
@@ -122,16 +122,16 @@ const utils = {
 
 					if (num1 && num2) {
 						if (num1 < num2)
+							return -1;
+						else if (num1 > num2)
 							return 1;
-						else if (num1 != num2)
-							return 0;
 					} else {
 						if (version1[i] != version2[i])
 							return 0;
 					}
 				}
 
-				return -1;
+				return 0;
 			} else return 0;
 		}
 
@@ -143,7 +143,7 @@ const utils = {
 			utils.fetch('https://api.github.com/repos/Jantje19/MusicStream/releases/latest', https, URLModule, header).then(response => {
 				// Check if the returned value is JSON
 				if (response.constructor == {}.constructor) {
-					const versionSame = compareVersions(response.tag_name, version);
+					const versionSame = compareVersions(version, response.tag_name);
 
 					if (versionSame == 0)
 						resolve({isAvailable: false, version: version});
@@ -154,7 +154,7 @@ const utils = {
 					else
 						reject('Version check went wrong.');
 				} else reject('The response is not json, so it is useless');
-			}).catch(err => reject);
+			}).catch(err => reject(err));
 		});
 	},
 
@@ -236,7 +236,7 @@ if (process.argv.includes('check-updates')) {
 
 	return;
 } else if (process.argv.includes('update-json')) {
-	fileHandler.searchSystem(fs, os, settings.audioFileExtensions.val, settings.videoFileExtensions.val, utils).then(json => {
+	fileHandler.searchSystem(fs, os, utils, settings).then(json => {
 		console.log('Successfully updated the JSON file.');
 	}).catch(err => {
 		console.log('There was an error with updating the JSON:', err);

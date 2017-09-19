@@ -81,7 +81,7 @@
 				songs = json.songs;
 				songsElem.innerHTML = '';
 				json.songs.forEach((object, key) => {
-					songsElem.innerHTML += `<button title="${object}" class="song ${key}" onclick="songClick('${object}')">${object}</button><hr>`;
+					songsElem.innerHTML += `<button title="${object}" class="song ${key}" onclick="songClick('${object.replace(/\'/g, "\\\'")}')">${object}</button><hr>`;
 				});
 			}).catch(err => console.error(err));
 
@@ -133,7 +133,7 @@
 
 				songsElem.innerHTML = '';
 				songArr.forEach((object, key) => {
-					songsElem.innerHTML += `<button title="${object}" class="song ${key}" onclick="songClick('${object}')">${object}</button><hr>`;
+					songsElem.innerHTML += `<button title="${object}" class="song ${key}" onclick="songClick('${object.replace(/\'/g, "\\\'")}')">${object}</button><hr>`;
 				});
 
 				function searchArr(query, array) {
