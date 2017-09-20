@@ -8,7 +8,7 @@ A NodeJS server and web client for streaming music (and videos) to your network
 
 ### Steps
 1. Install [Node.js](https://nodejs.org/en/download/package-manager/)
-2. [Download](https://github.com/jantje19/MusicStream/releases/latest/) the latest release from Github
+2. [Download](https://github.com/jantje19/MusicStream/releases/latest/) the latest release from GitHub
 3. Extract the files into a folder
 4. Within the directory run: `npm install && npm start` in a CLI
 5. Go to: http://localhost:8000
@@ -23,6 +23,8 @@ The web-interface only works with browsers that have ES6 support.
 
 This program needs Node-ID3 version 0.0.10 or higher to work with images properly.
 
+Manipulating files (adding/removing tags) requires the side installation of FFMPEG. This is however not required.
+
 Supported browsers with build numbers:
 - Edge: 14
 - Chrome: 49
@@ -35,6 +37,6 @@ Supported browsers with build numbers:
 
 Internet Explorer won't work. (*but why would you use it anyway.*)
 
-**You can still use it on old browsers. On the frontpage it will ask you to move to the old browsers page. The features are very limited tho.**
+**You can still use it on old browsers. On the front page it will ask you to move to the old browsers page. The features are very limited tho.**
 
 **Only tested (and used) on Chrome Canary 60 and Android Chrome 58**
