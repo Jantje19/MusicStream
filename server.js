@@ -422,7 +422,6 @@ app.post('/updateSettings', (request, response) => {
 			});
 });
 
-console.log("TEST")
 require('./serverVideoHandler.js').start(app, dirname, fileHandler, fs, os, settings, utils, querystring);
 require('./serverAudioHandler.js').start(app, dirname, fileHandler, fs, os, settings, utils, querystring, id3, https, URLModule);
 
@@ -436,6 +435,13 @@ require('./serverAudioHandler.js').start(app, dirname, fileHandler, fs, os, sett
 
 		app.use(express.static(dirname));
 		app.listen(port.toString());
-		console.log(utils.logDate() + ' Server is running on port ' + port);
+
+		const ips = utils.getLocalIP(os);
+
+		if (ips.length > 1) {
+			ips.forEach((object, key) => {
+				utils.colorLog(`${utils.logDate()} Server is running on: [[fgGreen, ${object}:${port}]]`, 'reset');
+			});
+		} else utils.colorLog(`${utils.logDate()} Server is running on: [[fgGreen, ${ips[0]}:${port}]]`, 'reset');
 	}
 }
