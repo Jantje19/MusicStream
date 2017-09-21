@@ -204,11 +204,11 @@ module.exports = {
 
 				const urlOk = url => {
 					if (url.indexOf('youtube.com') > 0) {
-						if (url.match(/https?:\/\/youtube\.com\/watch\?v\=(([A-Z]|[a-z]|[0-9]|\-|\_){11})$/))
+						if (url.match(/https?:\/\/(www\.)?youtube\.com\/watch\?v\=(([A-Z]|[a-z]|[0-9]|\-|\_){11})$/))
 							return true;
 						else return false;
 					} else if (url.indexOf('youtu.be') > 0) {
-						if (url.match(/https?:\/\/youtu\.be\/(([A-Z]|[a-z]|[0-9]|\-|\_){11})$/))
+						if (url.match(/https?:\/\/(www\.)?youtu\.be\/(([A-Z]|[a-z]|[0-9]|\-|\_){11})$/))
 							return true;
 						else return false;
 					} else return false;
