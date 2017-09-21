@@ -54,7 +54,6 @@ module.exports = {
 								// Loop through all the files
 								files.forEach((object, key) => {
 									if (object.toLowerCase() != 'desktop.ini') {
-										console.log(object);
 										const fileExtention = utils.getFileExtention(object.toLowerCase());
 
 										fs.stat(path + object, (err, stats) => {

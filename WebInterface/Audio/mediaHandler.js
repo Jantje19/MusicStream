@@ -13,8 +13,7 @@ function enqueue(...vals) {
 		});
 	} else queue[queue.length] = vals[0];
 
-	window.history.pushState(document.body.innerHTML, document.title, "?queue=" + queue.join(','));
-
+	window.history.pushState(document.body.innerHTML, document.title, "?queue=" + queue.map(val => {return escape(val)}).join(','));
 	updateInterface();
 }
 

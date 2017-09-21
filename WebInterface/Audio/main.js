@@ -454,7 +454,8 @@ function checkUrlAttributes(songsArr) {
 		if (window.location.search != '') {
 			const obj = {};
 
-			unescape(window.location.search).substr(1).split('&').map(val => {
+			window.location.search.substr(1).split('&').forEach(val => {
+				val = unescape(val);
 				const splitArr = val.split('=');
 
 				if (toLowerCase) {
