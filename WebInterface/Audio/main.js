@@ -342,7 +342,7 @@ function load() {
 
 				songsElem.innerHTML = '';
 				songs.forEach((object, key) => {
-					songsElem.innerHTML += `<button class="song ${key}" onclick="songClick(event)">${object}</button><hr>`;
+					songsElem.innerHTML += `<button title="${object}" class="song ${key}" onclick="songClick(event)">${object}</button><hr>`;
 				});
 
 				document.getElementById('songCount').innerText = "Amount: " + songs.length;
