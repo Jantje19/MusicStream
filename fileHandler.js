@@ -14,7 +14,9 @@ module.exports = {
 			paths.push(os.homedir() + '/Videos/');
 		}
 
-		paths = paths.concat(settings.mediaPaths.val);
+		if (settings.mediaPaths.val != '')
+			paths = paths.concat(settings.mediaPaths.val);
+
 		utils.colorLog(utils.logDate() + ' [[fgBlue, SEARCHSYSTEM:]] Starting checking files');
 
 		return new Promise((resolve, reject) => {
