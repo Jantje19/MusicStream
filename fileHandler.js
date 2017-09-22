@@ -25,7 +25,8 @@ module.exports = {
 
 			const homedir = os.homedir();
 			const checkDirs = paths.map(val => {
-				handleFolders(val.replace('{homedir}', homedir), utils).then(data => resolve(data)).catch(err => reject(err));
+				// handleFolders(val.replace('{homedir}', homedir), utils).then(data => resolve(data)).catch(err => reject(err));
+				handleFolders(val.replace('{homedir}', homedir), utils).then(data => {}).catch(err => reject(err));
 			});
 
 			// Wait untill the functions both finish
