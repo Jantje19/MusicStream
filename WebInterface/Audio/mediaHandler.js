@@ -291,7 +291,7 @@ function mediaSession() {
 				const dataDiv = document.createElement('div');
 
 				dataDiv.id = 'artistInfo';
-				dataDiv.innerHTML += `<p style="font-size: 120%;">Song info:</p> <img id="infoBtn" onclick="displayLyrics('${escapeString(json.artist)}', '${escapeString(json.title)}')" src="Assets/ic_info_outline_white.svg"><hr>`;
+				dataDiv.innerHTML += `<p style="font-size: 120%;">Song info:</p> <img id="infoBtn" onclick="displayLyrics('${escapeString(json.artist)}', '${escapeString(json.title)}')" src="Assets/ic_music_note_white.svg"><hr>`;
 				dataDiv.innerHTML += `<p><b>Title:</b> ${json.title}</p>`;
 				dataDiv.innerHTML += `<p><b>Artist:</b> ${json.artist}</p>`;
 				dataDiv.innerHTML += `<p><b>Album:</b> ${json.album}</p>`;

@@ -361,7 +361,9 @@ main #controls #mainControls #artistInfo p {
 main #controls #mainControls #artistInfo #infoBtn {
 	float: right;
 	cursor: pointer;
-	transform: translate(-95%, -95%);
+	border-radius: 100%;
+	border: white 2px solid;
+	transform: translate(-95%, -95%) scale(0.8);
 }
 
 main #controls #mainControls #artistInfo #thumbnail {
