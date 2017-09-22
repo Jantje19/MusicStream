@@ -35,176 +35,176 @@
 	<link href="main.css" rel="stylesheet" type="text/css" media="screen"/>
 
 	<style type="text/css">
-		header {
-			z-index: 1000;
-		}
+	header {
+		z-index: 1000;
+	}
 
-		main {
-			width: 100%;
-			overflow: hidden;
-			position: relative;
-			height: calc(100% - 60px);
-			background-color: rgba(0, 0, 0, 0.1);
-		}
+	main {
+		width: 100%;
+		overflow: hidden;
+		position: relative;
+		height: calc(100% - 60px);
+		background-color: rgba(0, 0, 0, 0.1);
+	}
 
-		main > div {
-			top: 50%;
-			left: 50%;
-			width: 100%;
-			position: absolute;
-			will-change: transform;
-			transition: transform 1s ease;
-			transform: translate(-50%, -50%);
-		}
+	main > div {
+		top: 50%;
+		left: 50%;
+		width: 100%;
+		position: absolute;
+		will-change: transform;
+		transition: transform 1s ease;
+		transform: translate(-50%, -50%);
+	}
 
-		main div #link {
-			width: 80%;
-			height: 150px;
-			display: block;
-			padding: 0 20px;
-			background: none;
-			max-width: 500px;
-			max-height: 50px;
-			margin: 20px auto;
-			text-align: center;
-			border-radius: 30px;
-			border: 2px solid #16a085;
-			background-color: rgba(255, 255, 255, 0.4);
+	main div #link {
+		width: 80%;
+		height: 150px;
+		display: block;
+		padding: 0 20px;
+		background: none;
+		max-width: 500px;
+		max-height: 50px;
+		margin: 20px auto;
+		text-align: center;
+		border-radius: 30px;
+		border: 2px solid #16a085;
+		background-color: rgba(255, 255, 255, 0.4);
 
-			font-size: 150%;
-			color: rgba(0, 0, 0, 0.5);
-			box-shadow: 0 0 20px rgba(0, 0, 0, 0.3)
-		}
+		font-size: 150%;
+		color: rgba(0, 0, 0, 0.5);
+		box-shadow: 0 0 20px rgba(0, 0, 0, 0.3)
+	}
 
-		main div input[type=radio] {
-			margin-bottom: 20px;
-		}
+	main div input[type=radio] {
+		margin-bottom: 20px;
+	}
 
-		main div #searchBtn {
-			width: 60%;
-			border: none;
-			margin: auto;
-			height: 150px;
-			display: block;
-			cursor: pointer;
-			background: none;
-			max-width: 350px;
-			max-height: 50px;
-			text-align: center;
-			border-radius: 30px;
-			will-change: transform;
-			background-color: #16a085;
-			transition: transform .3s ease;
+	main div #searchBtn {
+		width: 60%;
+		border: none;
+		margin: auto;
+		height: 150px;
+		display: block;
+		cursor: pointer;
+		background: none;
+		max-width: 350px;
+		max-height: 50px;
+		text-align: center;
+		border-radius: 30px;
+		will-change: transform;
+		background-color: #16a085;
+		transition: transform .3s ease;
 
-			font-size: 150%;
-			color: rgba(0, 0, 0, 0.5);
-			box-shadow: 0 0 20px rgba(0, 0, 0, 0.3)
-		}
+		font-size: 150%;
+		color: rgba(0, 0, 0, 0.5);
+		box-shadow: 0 0 20px rgba(0, 0, 0, 0.3)
+	}
 
-		main div #searchBtn:hover {
-			transform: scale(1.01) translateY(-4%);
-		}
+	main div #searchBtn:hover {
+		transform: scale(1.01) translateY(-4%);
+	}
 
-		main #editContent {
-			display: flex;
-			transform: translate(-50%, 110vh);
-		}
+	main #editContent {
+		display: flex;
+		transform: translate(-50%, 110vh);
+	}
 
-		main #editContent > div {
-			flex: 1;
-			margin: 0 2%;
-			text-align: left;
-		}
+	main #editContent > div {
+		flex: 1;
+		margin: 0 2%;
+		text-align: left;
+	}
 
-		main #editContent div h2 {
-			padding: 20px 0;
-		}
+	main #editContent div h2 {
+		padding: 20px 0;
+	}
 
-		main #editContent div h3 {
-			font-size: 130%;
-			padding: 10px 0;
-		}
+	main #editContent div h3 {
+		font-size: 130%;
+		padding: 10px 0;
+	}
 
-		main #editContent div img[alt=thumbnail] {
-			width: 80%;
-			max-width: 300px;
-			border-radius: 20px;
-		}
+	main #editContent div img[alt=thumbnail] {
+		width: 80%;
+		max-width: 300px;
+		border-radius: 20px;
+	}
 
-		main #editContent div img:not([alt=thumbnail]) {
-			width: 30px;
-			height: 30px;
-			margin-right: 20px;
-			border-radius: 100%;
-		}
+	main #editContent div img:not([alt=thumbnail]) {
+		width: 30px;
+		height: 30px;
+		margin-right: 20px;
+		border-radius: 100%;
+	}
 
-		main #editContent div span {
-			display: inline-block;
-			transform: translateY(-10px);
-		}
+	main #editContent div span {
+		display: inline-block;
+		transform: translateY(-10px);
+	}
 
-		main #editContent div input {
-			margin: 5px;
-			outline: none;
-			padding: 5px 15px;
-			border-radius: 20px;
-			border: 1px #16a085 solid;
-			background-color: rgba(255, 255, 255, 0.5)
-		}
+	main #editContent div input {
+		margin: 5px;
+		outline: none;
+		padding: 5px 15px;
+		border-radius: 20px;
+		border: 1px #16a085 solid;
+		background-color: rgba(255, 255, 255, 0.5)
+	}
 
-		main #editContent div input:active {
-			background-color: rgba(255, 255, 255, 0.8);
-		}
+	main #editContent div input:active {
+		background-color: rgba(255, 255, 255, 0.8);
+	}
 
-		main #editContent div #save {
-			width: 80%;
-			color: white;
-			display: block;
-			cursor: pointer;
-			margin: 10px  auto;
-			padding: 5px 15px;
-			border-radius: 20px;
-			border: 1px #16a085 solid;
-			background-color: #16a085;
-			transition: transform .3s ease;
-		}
+	main #editContent div #save {
+		width: 80%;
+		color: white;
+		display: block;
+		cursor: pointer;
+		margin: 10px  auto;
+		padding: 5px 15px;
+		border-radius: 20px;
+		border: 1px #16a085 solid;
+		background-color: #16a085;
+		transition: transform .3s ease;
+	}
 
-		main #editContent div #save:hover {
-			transform: scale(1.01) translateY(-4%);
-		}
+	main #editContent div #save:hover {
+		transform: scale(1.01) translateY(-4%);
+	}
 
-		main #editContent div #description {
-			padding: 10px 0;
-			max-height: 25vh;
-			overflow-y: auto;
-		}
-	</style>
+	main #editContent div #description {
+		padding: 10px 0;
+		max-height: 25vh;
+		overflow-y: auto;
+	}
+</style>
 
-	<script type="text/javascript">
-		let useTags = true;
+<script type="text/javascript">
+	let useTags = true;
 
-		function load() {
-			document.getElementById('searchBtn').addEventListener('click', evt => {
-				const url = document.getElementById('link').value;
+	function load() {
+		document.getElementById('searchBtn').addEventListener('click', evt => {
+			const url = document.getElementById('link').value;
 
-				evt.target.style.opacity = '0.3';
-				evt.target.style.pointerEvents = 'none';
+			evt.target.style.opacity = '0.3';
+			evt.target.style.pointerEvents = 'none';
 
-				if (url.indexOf('youtube.com') > 0 || url.indexOf('youtu.be') > 0) {
-					fetch('/ytdl/' + url.match(/(.+)v\=((\w+|[0-9]+|\-|\_)+)$/i)[2]).then(response => {
-						response.json().then(json => {
-							if (json.success) {
-								json = json.info;
+			if (url.indexOf('youtube.com') > 0 || url.indexOf('youtu.be') > 0) {
+				fetch('/ytdl/' + url.match(/(.+)v\=((\w+|[0-9]+|\-|\_)+)$/i)[2]).then(response => {
+					response.json().then(json => {
+						if (json.success) {
+							json = json.info;
 
-								const videoInfo = document.getElementById('videoInfo');
-								const nodes = document.querySelector('main').childNodes;
+							const videoInfo = document.getElementById('videoInfo');
+							const nodes = document.querySelector('main').childNodes;
 
-								videoInfo.innerHTML += `<img alt="thumbnail" src="${json.thumbnail_url}" />`;
-								videoInfo.innerHTML += `<h3>${json.title}</h3>`;
-								videoInfo.innerHTML += `<div><img alt="author" src="${json.author.avatar}"><span>${json.author.name}</span></div>`;
-								videoInfo.innerHTML += `<p><b>View Count:</b> ${json.view_count}</p>`;
-								videoInfo.innerHTML += '<hr>';
-								videoInfo.innerHTML += `<p id="description">${json.description.replace(/\n/g, '<br>')}</p>`;
+							videoInfo.innerHTML += `<img alt="thumbnail" src="${json.thumbnail_url}" />`;
+							videoInfo.innerHTML += `<h3>${json.title}</h3>`;
+							videoInfo.innerHTML += `<div><img alt="author" src="${json.author.avatar}"><span>${json.author.name}</span></div>`;
+							videoInfo.innerHTML += `<p><b>View Count:</b> ${json.view_count}</p>`;
+							videoInfo.innerHTML += '<hr>';
+							videoInfo.innerHTML += `<p id="description">${json.description.replace(/\n/g, '<br>')}</p>`;
 
 								// Set values
 								let title = '';
@@ -237,89 +237,89 @@
 								}, 300);
 							} else alert(json.info);
 						});
-					}).catch(err => alert(err));
-				} else alert('Link does not match a youtube url')/*Display toast or something..*/;
+				}).catch(err => alert(err));
+			} else alert('Link does not match a youtube url')/*Display toast or something..*/;
+		});
+
+		function analyzeDescription(text) {
+			const val = {};
+			const arr = text.split('\n');
+
+			arr.forEach((object, key) => {
+				const match = object.match(/(artist|title|album)\s?\:(.+)/i);
+				if (match) val[match[1].toLowerCase()] = match[2].trim();
 			});
 
-			function analyzeDescription(text) {
-				const val = {};
-				const arr = text.split('\n');
-
-				arr.forEach((object, key) => {
-					const match = object.match(/(artist|title|album)\s?\:(.+)/i);
-					if (match) val[match[1].toLowerCase()] = match[2].trim();
-				});
-
-				return val;
-			}
-
-			document.getElementById('save').addEventListener('click', evt => {
-				useTags = Boolean(document.getElementById('use_tags').checked);
-
-				evt.target.style.opacity = '0.3';
-				evt.target.style.pointerEvents = 'none';
-
-				let type;
-
-				if (document.getElementById('typeAudio').checked)
-					type = 'audio';
-				else if (document.document.getElementById('typeVideo').checked)
-					type = 'video';
-				else
-					alert('No type selected somehow...\nYou should refresh the page.');
-
-				let endTime = document.getElementById('startTime').value;
-
-				if (Number(endTime) <= 0)
-					endTime = null;
-
-				const data = {
-					type: type,
-					url: document.getElementById('link').value,
-					fileName: document.getElementById('artist').value + ' - ' + document.getElementById('title').value,
-					startTime: document.getElementById('startTime').value,
-					endTime: endTime,
-					tags: {
-						title: document.getElementById('title').value,
-						album: document.getElementById('album').value,
-						artist: document.getElementById('artist').value
-					}
-				}
-
-				if (document.getElementById('uiac').checked) data.tags.image = document.querySelector('img').src;
-
-				document.getElementById('videoInput').innerHTML = '<b>Downloading... This may take a while.</b>';
-				fetch('/ytdl', {method: "POST", body: JSON.stringify(data)}).then(response => {
-					response.json().then(json => {
-						if (json.success) {
-							if (useTags) {
-								const body = {
-									songName: json.fileName,
-									tags: data.tags
-								}
-
-								document.getElementById('videoInput').innerHTML = '<b>Setting tags...</b>';
-								fetch('/tags', {method: 'POST', body: JSON.stringify(body)}).then(response => {
-									response.json().then(json => {
-										document.getElementById('videoInput').innerHTML = '<b>Done!</b>';
-										if (json.success) {
-											if (confirm('Everything went according to plan. Do you want to go to the home page?')) window.location = window.location.origin;
-										} else alert('Error: ' + json.info);
-									});
-								}).catch( err => {
-									console.error('An error occurred', err);
-								});
-							} else if (confirm('Everything went according to plan. Do you want to go to the home page?')) window.location = window.location.origin;
-						} else alert('Error: ' + json.error)/*Display toast or something..*/;
-					});
-				}).catch( err => {
-					console.error('An error occurred', err);
-				});
-			});
+			return val;
 		}
 
-		window.onload = load;
-	</script>
+		document.getElementById('save').addEventListener('click', evt => {
+			useTags = Boolean(document.getElementById('use_tags').checked);
+
+			evt.target.style.opacity = '0.3';
+			evt.target.style.pointerEvents = 'none';
+
+			let type;
+
+			if (document.getElementById('typeAudio').checked)
+				type = 'audio';
+			else if (document.document.getElementById('typeVideo').checked)
+				type = 'video';
+			else
+				alert('No type selected somehow...\nYou should refresh the page.');
+
+			let endTime = document.getElementById('endTime').value;
+
+			if (Number(endTime) <= 0)
+				endTime = null;
+
+			const data = {
+				type: type,
+				url: document.getElementById('link').value,
+				fileName: document.getElementById('artist').value + ' - ' + document.getElementById('title').value,
+				startTime: document.getElementById('startTime').value,
+				endTime: endTime,
+				tags: {
+					title: document.getElementById('title').value,
+					album: document.getElementById('album').value,
+					artist: document.getElementById('artist').value
+				}
+			}
+
+			if (document.getElementById('uiac').checked) data.tags.image = document.querySelector('img').src;
+
+			document.getElementById('videoInput').innerHTML = '<b>Downloading... This may take a while.</b>';
+			fetch('/ytdl', {method: "POST", body: JSON.stringify(data)}).then(response => {
+				response.json().then(json => {
+					if (json.success) {
+						if (useTags && type == 'audio') {
+							const body = {
+								songName: json.fileName + '.mp3',
+								tags: data.tags
+							}
+
+							document.getElementById('videoInput').innerHTML = '<b>Setting tags...</b>';
+							fetch('/tags', {method: 'POST', body: JSON.stringify(body)}).then(response => {
+								response.json().then(json => {
+									document.getElementById('videoInput').innerHTML = '<b>Done!</b>';
+									if (json.success) {
+										if (confirm('Everything went according to plan. Do you want to go to the home page?')) window.location = window.location.origin;
+									} else alert('Error: ' + json.info);
+								});
+							}).catch( err => {
+								console.error('An error occurred', err);
+							});
+						} else if (confirm('Everything went according to plan. Do you want to go to the home page?')) window.location = window.location.origin;
+					} else alert('Error: ' + json.error)/*Display toast or something..*/;
+				});
+			}).catch( err => {
+				console.error('An error occurred', err);
+			});
+		});
+	}
+
+	window.onload = load;
+</script>
 
 </head>
 <body>
@@ -330,7 +330,7 @@
 
 	<main>
 		<div>
-			<input type="url" id="link" placeholder="https://www.youtube.com/watch?v=gLmcGkvJ-e0">
+			<input type="url" id="link" placeholder="https://www.youtube.com/watch?v=gLmcGkvJ-e0" autofocus="true">
 			<input type="radio" name="type" id="typeAudio" value="Audio" checked>
 			<label for="typeAudio">Audio</label>
 			<input type="radio" name="type" id="typeVideo" value="Video">

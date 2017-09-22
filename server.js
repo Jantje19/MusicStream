@@ -165,7 +165,8 @@ module.exports = {
 							if (this.constructor === {}.constructor) {
 								const newObj = {};
 								for (key in this) {
-									if (arr.includes(key)) newObj[key] = this[key];
+									if (arr.includes(key))
+										newObj[key] = this[key];
 								}
 
 								return newObj;
@@ -255,7 +256,7 @@ module.exports = {
 									if (exists) {
 										console.log(`'${json.fileName}'` + ' downloaded');
 
-										fileHandler.searchSystem(fs, os, settings.audioFileExtensions.val, settings.videoFileExtensions.val, utils).then(() => {
+										fileHandler.searchSystem(fs, os, utils, settings).then(() => {
 											response.send({success: true, fileName: json.fileName + '.mp4', jsonUpdated: true});
 										}).catch(err => response.send({success: true, fileName: json.fileName, jsonUpdated: false}));
 									} else sendError('File does not exist. This is a weird problem... You should investigate.');
@@ -265,126 +266,46 @@ module.exports = {
 							video.on('error', err => {sendError(err)});
 						} else if (json.type == 'audio') {
 							const path = os.homedir() + '/Music/' + json.fileName + '.mp3';
-
-							options.filter = 'audioonly';
-
-							const video = ytdl(json.url, options);
-							const writer = ffmpeg(video)
-							.format('mp3')
-							.audioBitrate(128);
-
 							const args = {
+								bitrate: 128,
+								format: 'mp3',
 								seek: json.startTime,
 								duration: json.endTime
 							}
 
-							if (args.seek) writer.seekInput(/*formatTime(*/args.seek/*)*/);
+							const reader = ytdl(json.url, {filter: 'audioonly'})
+							const writer = ffmpeg(reader)
+							.format(args.format)
+							.audioBitrate(args.bitrate)
+
+							if (args.seek) writer.seekInput(args.seek);
 							if (args.duration) writer.duration(args.duration);
 
-							video.on('progress', (chunkLength, downloaded, total) => {
+							reader.on('progress', (chunkLength, downloaded, total) => {
 								process.stdout.cursorTo(0);
 								process.stdout.clearLine(1);
 								process.stdout.write("DOWNLOADING: " + (downloaded / total * 100).toFixed(2) + '% ');
 							});
 
-							video.on('end', () => {
+							reader.on('end', () => {
 								process.stdout.write('\n');
 
 								fs.exists(path, exists => {
 									if (exists) {
-										fileHandler.searchSystem(fs, os, settings.audioFileExtensions.val, settings.videoFileExtensions.val, utils).then(() => {
+										fileHandler.searchSystem(fs, os, utils, settings).then(() => {
 											response.send({success: true, fileName: json.fileName + '.mp3', jsonUpdated: true});
 										}).catch(err => response.send({success: true, fileName: json.fileName, jsonUpdated: false}));
 									} else sendError("File does not exist. This is a weird problem... You should investigate.");
 								});
 							});
+
+							reader.on('error', err => {sendError(err)});
+							writer.output(path).run();
 						} else sendError('Type not correct');
 					} else sendError('Tags not found. Expected url, fileName and tags.');
 				} else sendError('No JSON found');
 			});
 		});
-
-app.post('/tags*', (request, response) => {
-	let body = '';
-
-	const url = querystring.unescape(request.url);
-	console.log(utils.logDate() + ' Got a POST request for ' + url);
-
-	request.on('data', data => {
-		body += data;
-
-		if (body.length > 1e6) {
-			request.send({success: false, err: 'The amount of data is to much', info: 'The connection was destroyed because the amount of data passed is to much'});
-			request.connection.destroy();
-			return;
-		}
-	});
-
-	request.on('end', () => {
-		let json;
-
-		try {
-			json = JSON.parse(body);
-		} catch (err) {
-			response.send({success: false, info: err});
-			return;
-		}
-
-		if (json.tags && json.songName) {
-			fileHandler.getJSON(fs, os, settings.audioFileExtensions.val, settings.videoFileExtensions.val, utils).then(songs => {
-				function findSong(array, songName) {
-					for (let i = 0; i < array.length; i++) {
-						if (array[i].fileName == songName) return array[i];
-					}
-				}
-
-				function getImage(url) {
-					return new Promise((resolve, reject) => {
-						const http = require('http');
-						Stream = require('stream').Transform;
-
-						url = url.replace('https', 'http');
-
-						http.request(url, response => {
-							const data = new Stream();
-
-							response.on('data', chunk => {
-								data.push(chunk);
-							});
-
-							response.on('error', reject);
-
-							response.on('end', function() {
-								const buffer = data.read();
-
-								if (buffer instanceof Buffer) resolve(buffer);
-								else reject('Not a buffer');
-							});
-						}).end();
-					});
-				}
-
-				function done() {
-					if (id3.write(json.tags, findSong(songs.audio.songs, json.songName).path + json.songName)) response.send({success: true});
-					else response.send({success: false, info: 'Something went wrong with writing the tags'});
-				}
-
-				if (json.tags.delete) {
-					if (id3.removeTags(findSong(songs.audio.songs, json.songName).path + json.songName))
-						response.send({success: true});
-					else response.send({success: false, info: "Tags not deleted"});
-				} else {
-					if (json.tags.image) {
-						getImage(json.tags.image).then(imageBuffer => {
-							json.tags.image = imageBuffer;
-							done();
-						}).catch(err => {console.err(err); response.send({success: false, info: err})});
-					} else done();
-				}
-			}).catch(err => {console.err(err); response.send({success: false, info: err})});
-		} else response.send({success: false, info: 'The required tags (tags, songName) are not found.'});
-	});
-});
 
 app.post('/updateSettings', (request, response) => {
 	let body = '';
