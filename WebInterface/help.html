@@ -5,164 +5,164 @@
 	<title>Help / Shortcuts</title>
 
 	<style type="text/css">
-		* {
-			font-family: -apple-system, BlinkMacSystemFont,
-			"Segoe UI", "Roboto", "Oxygen",
-			"Ubuntu", "Cantarell", "Fira Sans",
-			"Droid Sans", "Helvetica Neue", sans-serif;
-		}
+	* {
+		font-family: -apple-system, BlinkMacSystemFont,
+		"Segoe UI", "Roboto", "Oxygen",
+		"Ubuntu", "Cantarell", "Fira Sans",
+		"Droid Sans", "Helvetica Neue", sans-serif;
+	}
 
-		body {
-			margin: 0;
-		}
+	body {
+		margin: 0;
+	}
 
-		header {
-			margin: 0 10px;
-			text-align: center;
-		}
+	header {
+		margin: 0 10px;
+		text-align: center;
+	}
 
-		main {
-			margin: 30px 10px;
-			margin-bottom: 50px;
-		}
+	main {
+		margin: 30px 10px;
+		margin-bottom: 50px;
+	}
 
-		main > div {
-			width: 80%;
-			margin: auto;
-			background-color: #16a085;
-		}
+	main > div {
+		width: 80%;
+		margin: auto;
+		background-color: #16a085;
+	}
 
-		main div div h2 {
-			color: white;
-			margin: 5px 0;
-			display: inline-block;
-		}
+	main div div h2 {
+		color: white;
+		margin: 5px 0;
+		display: inline-block;
+	}
 
-		main div div button {
-			z-index: 1;
-			float: right;
-			border: none;
-			cursor: pointer;
-			margin-top: 10px;
-			position: relative;
-			transform: rotate(180deg);
-			background-color: transparent;
-			transition: transform .3s ease;
-		}
+	main div div button {
+		z-index: 1;
+		float: right;
+		border: none;
+		cursor: pointer;
+		margin-top: 10px;
+		position: relative;
+		transform: rotate(180deg);
+		background-color: transparent;
+		transition: transform .3s ease;
+	}
 
-		main div div button:after {
-			top: 0;
-			left: 0;
-			opacity: 0;
-			z-index: -1;
-			width: 40px;
-			height: 40px;
-			content: ' ';
-			display: block;
-			position: absolute;
-			border-radius: 100%;
-			background-color: white;
-			transition: opacity .3s ease;
-			transform: translate(-5%, -15%);
-		}
+	main div div button:after {
+		top: 0;
+		left: 0;
+		opacity: 0;
+		z-index: -1;
+		width: 40px;
+		height: 40px;
+		content: ' ';
+		display: block;
+		position: absolute;
+		border-radius: 100%;
+		background-color: white;
+		transition: opacity .3s ease;
+		transform: translate(-5%, -15%);
+	}
 
-		main div div button:hover:after {
-			opacity: 0.3;
-		}
+	main div div button:hover:after {
+		opacity: 0.3;
+	}
 
-		main > div > div {
-			padding: 10px;
-		}
+	main > div > div {
+		padding: 10px;
+	}
 
-		main > div > div hr {
-			border: none;
-			border-bottom: 1px solid lightgray;
-		}
+	main > div > div hr {
+		border: none;
+		border-bottom: 1px solid lightgray;
+	}
 
-		main > div > div code {
-			padding: 10px;
-			display: block;
-			font-family: monospace;
-			background-color: lightgray;
-		}
+	main > div > div code {
+		padding: 10px;
+		display: block;
+		font-family: monospace;
+		background-color: lightgray;
+	}
 
-		main > div > div:last-child {
-			height: auto;
-			max-height: 0px;
-			padding: 0 10px;
-			overflow: hidden;
-			background-color: #EEEEEE;
-			transition: max-height .5s ease;
-		}
+	main > div > div:last-child {
+		height: auto;
+		max-height: 0px;
+		padding: 0 10px;
+		overflow: hidden;
+		background-color: #EEEEEE;
+		transition: max-height .5s ease;
+	}
 
-		main #WAQ {
-			margin: 40px auto;
-			background-color: transparent;
-		}
+	main #WAQ {
+		margin: 40px auto;
+		background-color: transparent;
+	}
 
-		main #WAQ > div {
-			padding: 0;
-			max-height: initial;
-		}
+	main #WAQ > div {
+		padding: 0;
+		max-height: initial;
+	}
 
-		main #WAQ > div b {
-			width: 100%;
-			color: white;
-			padding: 10px;
-			display: block;
-			background-color: #16a085;
-		}
+	main #WAQ > div b {
+		width: 100%;
+		color: white;
+		padding: 10px;
+		display: block;
+		background-color: #16a085;
+	}
 
-		main #WAQ > div p {
-			margin-left: 15px;
-		}
+	main #WAQ > div p {
+		margin-left: 15px;
+	}
 
-		footer {
-			left: 0;
-			bottom: 0;
-			width: 100%;
-			z-index: 1000;
-			position: fixed;
-			text-align: center;
-			background-color: #222222;
-		}
+	footer {
+		left: 0;
+		bottom: 0;
+		width: 100%;
+		z-index: 1000;
+		position: fixed;
+		text-align: center;
+		background-color: #222222;
+	}
 
-		footer p {
-			margin: 0;
-			color: white;
-			padding: 5px;
-		}
-	</style>
+	footer p {
+		margin: 0;
+		color: white;
+		padding: 5px;
+	}
+</style>
 
-	<script type="text/javascript">
-		function load() {
-			const buttons = Array.from(document.querySelectorAll('main div div button'));
+<script type="text/javascript">
+	function load() {
+		const buttons = Array.from(document.querySelectorAll('main div div button'));
 
-			buttons.forEach((object, key) => {
-				object.addEventListener('click', evt => {
-					let btn, elem;
+		buttons.forEach((object, key) => {
+			object.addEventListener('click', evt => {
+				let btn, elem;
 
-					if (evt.target == evt.currentTarget) {
-						btn = evt.target;
-						elem = evt.target.parentElement.parentElement.querySelectorAll('div')[1];
-					} else {
-						btn = evt.target.parentElement;
-						elem = evt.target.parentElement.parentElement.parentElement.querySelectorAll('div')[1];
-					}
+				if (evt.target == evt.currentTarget) {
+					btn = evt.target;
+					elem = evt.target.parentElement.parentElement.querySelectorAll('div')[1];
+				} else {
+					btn = evt.target.parentElement;
+					elem = evt.target.parentElement.parentElement.parentElement.querySelectorAll('div')[1];
+				}
 
-					if (elem.style.maxHeight == elem.getAttribute('maxHeight') + 'px') {
-						elem.style.maxHeight = '0px';
-						btn.style.transform = 'rotate(180deg)';
-					} else {
-						elem.style.maxHeight = elem.getAttribute('maxHeight') + 'px';
-						btn.style.transform = 'rotate(0deg)';
-					}
-				});
+				if (elem.style.maxHeight == elem.getAttribute('maxHeight') + 'px') {
+					elem.style.maxHeight = '0px';
+					btn.style.transform = 'rotate(180deg)';
+				} else {
+					elem.style.maxHeight = elem.getAttribute('maxHeight') + 'px';
+					btn.style.transform = 'rotate(0deg)';
+				}
 			});
-		}
+		});
+	}
 
-		window.onload = load;
-	</script>
+	window.onload = load;
+</script>
 
 </head>
 <body>
@@ -269,7 +269,7 @@
 				<button><img src="/Assets/ic_keyboard_arrow_up_white.svg"></button>
 			</div>
 
-			<div maxHeight="160">
+			<div maxHeight="200">
 				<p>
 					This feature is used for downloading youtube videos. Simply paste the youtube url into the input box, select the type and hit <i>Search</i>, the page and the server will handle the rest.
 					You can monitor the progress in the servers terminal window.<br>
@@ -285,7 +285,34 @@
 				<button><img src="/Assets/ic_keyboard_arrow_up_white.svg"></button>
 			</div>
 
-			<div maxHeight="3500">
+			<div maxHeight="1920">
+				<p>
+					<h3>Index.js Arguments</h3>
+
+					<p>
+						The <i>index.js</i> file can accept a couple of arguments. You can either type: <code>npm start **argument**</code> or <code>node index.js **argument**</code>
+					</p>
+
+					<h4>Arguments are:</h4>
+
+					<ul>
+						<li>
+							<b>check-updates:</b>
+							<span>Checks for updates</span>
+						</li>
+						<li>
+							<b>update-json:</b>
+							<span>Updates the <i>JSON.json</i> file that stores all the songs</span>
+						</li>
+						<li>
+							<b>rename-file:</b>
+							<span>Renames a file in all indexes found by this app. It will change the file name and update playlists.</span>
+						</li>
+					</ul>
+				</p>
+
+				<hr>
+
 				<p>
 					There is a <a href="/settings/">settings page</a> where you can edit basic settings. You will have to restart the server after you save!
 				</p>
