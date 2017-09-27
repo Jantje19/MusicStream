@@ -1,5 +1,5 @@
 module.exports = {
-	searchSystem: function(fs, os, utils, settings) {
+	searchSystem: function(fs, os, utils, settings, silent) {
 		let paths = [];
 		const songsArr = [];
 		const videosArr = [];
@@ -67,8 +67,9 @@ module.exports = {
 											if (audioFileExtensions.includes(fileExtention)) songsArr.push({path: path, fileName: object, lastChanged: ctime});
 											else if (videoFileExtensions.includes(fileExtention)) videosArr.push({path: path, fileName: object, lastChanged: ctime});
 											else if (fileExtention == '.m3u') playlistsArr.push({path: path, fileName: object, lastChanged: ctime});
-											else if (fileExtention) console.wrn('File extention not supported', object);
 											else if (!fileExtention && fs.lstatSync(path + object).isDirectory()) handleFolders(path + object + '/', utils);
+											else if (fileExtention && !silent) console.wrn('File extention not supported', object);
+											else if (fileExtention && silent);
 											else console.wrn('Something is weird...', 'FILENAME:' + object, 'EXTENSION:' + fileExtention);
 										});
 									}
@@ -104,8 +105,10 @@ module.exports = {
 								if (object != '') {
 									const match = object.match(/(.+)(\/|\\)(.+)$/);
 									if (match) {
-										const songName = match[3].trim();
-										if (findSong(songsArr, songName)) songs.push(songName);
+										const songName = match[3].toString().trim();
+
+										if (findSong(songsArr, songName))
+											songs.push(songName);
 									}
 								}
 							});
@@ -117,12 +120,8 @@ module.exports = {
 			});
 		});
 
-		function findSong(songs, songName) {
-			for (let i = 0; i < songs.length; i++) {
-				if (songs[i].fileName == songName) return true;
-			}
-
-			return false;
+		function findSong(songsArr, songName) {
+			return songsArr.map(val => {return val.fileName}).includes(songName);
 		}
 	},
 

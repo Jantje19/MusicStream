@@ -86,7 +86,7 @@
 			}).catch(err => console.error(err));
 
 			document.getElementById('fab').addEventListener('click', evt => {
-				const playlistName = prompt('What should the eplaylist name be?').trim();
+				const playlistName = prompt('What should the playlist name be?').trim();
 				const innerElems = Array.from(document.getElementById('playlist').querySelectorAll('button'));
 
 				if (playlistName != '') {

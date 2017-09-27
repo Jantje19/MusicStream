@@ -137,7 +137,7 @@ module.exports = {
 			} else {
 				utils.fetch(`https://makeitpersonal.co/lyrics?artist=${artist}&title=${songName}`, https, URLModule).then(text => {
 					if (text == "Sorry, We don't have lyrics for this song yet.")
-						response.send({success: false, error: text});
+						response.send({success: false, error: text + " <a style=\"color: gray\" target=\"_blank\" href=\"https://makeitpersonal.co/songs/new\">Add your own.</a>"});
 					else
 						response.send({success: true, lyrics: text});
 				}).catch(err => {

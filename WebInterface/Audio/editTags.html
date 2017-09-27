@@ -227,18 +227,15 @@
 
 		if (title != "" && artist != "") {
 			getTagsFromLastFm(title, artist).then(tags => {
-				document.getElementById('title').value = tags.name;
-				document.getElementById('artist').value = tags.artist.name;
-				document.getElementById('album').value = tags.album.title;
-				document.getElementById('length').value = tags.duration;
-				document.getElementById('image').value = tags.album.image[2]['#text'];
+				try {document.getElementById('title').value = tags.name;} catch (err) {}
+				try {document.getElementById('artist').value = tags.artist.name;} catch (err) {}
+				try {document.getElementById('album').value = tags.album.title;} catch (err) {}
+				try {document.getElementById('length').value = tags.duration;} catch (err) {}
+				try {document.getElementById('image').value = tags.album.image[2]['#text'];} catch (err) {}
+				try {document.getElementById('comment').value = tags.wiki.summary; } catch (err) {}
 
-				console.log(tags.album.image[2]['#text']);
-
-				try {
-					document.getElementById('comment').value = tags.wiki.summary;
-				} catch (err) {}
-			}).catch(err => alert("Error with finding tags: " + err));
+				try {console.log(tags.album.image[2]['#text']);} catch (err) {}
+			}).catch(err => {console.error(err); alert("Error with finding tags: " + err)});
 		} else alert("Title and artist are required for the Last.FM API.");
 	}
 

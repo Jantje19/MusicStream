@@ -117,9 +117,9 @@
 						if (confirm(`There is a new version available: ${json.data.version}, download?`))
 							window.location = json.data.url;
 					} else if (json.data.greater) {
-						alert(`You are on a greater version number (${json.data.version}) than that on GitHub. You should re-download the latest version.`)
+						alert(`You are on a greater version number (${json.data.version}) than that on GitHub. You should re-download the latest version. Don't forget to update the settings file!`)
 					} else {
-						alert(`You are already on the latest version: ${json.data.version}`)
+						alert(`You are already on the latest version: ${json.data.version}. Don't forget to update the settings file!`)
 					}
 				} else alert('Could not get the required data...');
 			});

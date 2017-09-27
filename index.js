@@ -198,7 +198,8 @@ const utils = {
 			bgBlue: "\x1b[44m",
 			bgMagenta: "\x1b[45m",
 			bgCyan: "\x1b[46m",
-			bgWhite: "\x1b[47m"
+			bgWhite: "\x1b[47m",
+			bgGray: "\x1b[100m"
 		}
 
 		try {
@@ -248,9 +249,9 @@ console.wrn = (...args) => console.warn("\x1b[33m", ...args, "\x1b[0m");
 if (process.argv.includes('check-updates')) {
 	utils.newVersionAvailable(version).then(newVersion => {
 		if (newVersion.greater)
-			utils.colorLog(`No update available, running version: ${newVersion.version}. But this version if greater than that on GitHub (${newVersion.version}), Maybe you want to get the newest code from GitHub: [[fgMagenta, ${newVersion.url}]]`, 'fgOrange');
+			utils.colorLog(`No update available, running version: ${newVersion.version}. But this version if greater than that on GitHub (${newVersion.version}), Maybe you want to get the newest code from GitHub: [[fgMagenta, ${newVersion.url}]]. Don't forget to update the settings file!`, 'fgOrange');
 		else if (newVersion.isAvailable == true)
-			utils.colorLog(`A new update is available: ${newVersion.version}. You can download it at: [[fgMagenta, ${newVersion.url}]]`, 'fgGreen');
+			utils.colorLog(`A new update is available: ${newVersion.version}. You can download it at: [[fgMagenta, ${newVersion.url}]]. Don't forget to update the settings file!`, 'fgGreen');
 		else
 			utils.colorLog(`No update available, running version: ${newVersion.version}`, 'fgCyan');
 	}).catch(err => {
@@ -267,15 +268,152 @@ if (process.argv.includes('check-updates')) {
 	});
 
 	return;
+} else if (process.argv.includes('rename-file')) {
+	if (process.argv[3] && process.argv[4]) {
+		const fromFileName = process.argv[3].toString().trim();
+		const toFileName = process.argv[4].toString().trim();
+
+		if (fromFileName != toFileName) {
+			utils.colorLog(`Tying to renaming '${fromFileName}' to '${toFileName}'`, 'fgCyan');
+
+			fileHandler.getJSON(fs, os, settings.audioFileExtensions.val, settings.videoFileExtensions.val, utils).then(val => {
+				console.log('Got all files. Searching...');
+
+				const songsArr = val.audio.songs.map(val => {return val.fileName});
+				const videosArr = val.video.videos.map(val => {return val.fileName});
+
+				if (songsArr.includes(fromFileName))
+					handleFound(songsArr, val.audio.playlists, val.audio.songs, fromFileName, toFileName);
+				else if (videosArr.includes(fromFileName))
+					handleFound(videosArr, null, val.video.videos, fromFileName, toFileName);
+				else
+					utils.colorLog('File not found in list. Try updating the JSON list by running this file with [[bgGray, update-json]] arg.');
+			}).catch(err => {
+				utils.colorLog('Error: ' + err, 'fgRed');
+			});
+		} else utils.colorLog('The filenames are the same', 'fgRed');
+	} else if (process.argv[4]) utils.colorLog('No origional name', 'fgRed');
+	else if (process.argv[3]) utils.colorLog('No new file name', 'fgRed');
+	else utils.colorLog('Bug!!', 'fgRed');
+
+	function handleFound(arr, playlists, valuesArr, fromFileName, toFileName) {
+		function renameFile() {
+			return new Promise((resolve, reject) => {
+				const obj = valuesArr[arr.indexOf(fromFileName)];
+
+				fs.rename(obj.path + obj.fileName, obj.path + toFileName, err => {
+					if (err)
+						reject(err);
+					else {
+						utils.colorLog(`Successfuly renamed '${fromFileName}' to '${toFileName}'.`, 'fgCyan');
+
+						fileHandler.searchSystem(fs, os, utils, settings, true).then(data => {
+							resolve();
+						}).catch(err => {
+							reject(err);
+						});
+					}
+				});
+			});
+		}
+
+		function replaceInM3UFiles() {
+			function handleFile(object, key) {
+				return new Promise((resolve, reject) => {
+					fs.readFile(object.path + object.fileName, 'utf-8', (err, data) => {
+						if (err)
+							reject(err);
+						else {
+							if (data.indexOf(fromFileName) > -1) {
+								data = data.replace(new RegExp(fromFileName, 'g'), toFileName);
+
+								fs.writeFile(object.path + object.fileName, data, err => {
+									if (err)
+										reject(err);
+									else {
+										console.log(`Renamed '${fromFileName}' to '${toFileName}' in '${object.fileName}'`);
+										resolve('Yay');
+									}
+								});
+							}
+						}
+					});
+				});
+			}
+
+			if (playlists) {
+				const promises = [];
+
+				playlists.forEach((object, key) => {
+					promises.push(handleFile(object, key));
+				});
+
+				return Promise.all(promises);
+			} else return Promise.resolve();
+		}
+
+		function renameInPlaylistFile() {
+			return new Promise((resolve, reject) => {
+				fs.readFile('playlists.json', 'utf-8', (err, data) => {
+					if (err)
+						reject(err);
+					else {
+						try {
+							data = JSON.parse(data);
+
+							for (key in data) {
+								if (key == settings.mostListenedPlaylistName.val) {
+									for (val in data[key]) {
+										if (val == fromFileName) {
+											console.log('Found in \'' + key + '\'');
+
+											data[key][toFileName] = data[key][fromFileName];
+											delete data[key][fromFileName];
+										}
+									}
+								} else {
+									data[key].forEach((object, indx) => {
+										if (object == fromFileName) {
+											console.log('Found in \'' + key + '\'');
+											data[key].splice(indx, 1, toFileName);
+										}
+									});
+								}
+							}
+
+							fs.writeFile('playlists.json', JSON.stringify(data), err => {
+								if (err)
+									reject(err);
+								else {
+									console.log(`'${fromFileName}' renamed to '${toFileName}' in all playlists (except the .m3u files).`);
+									resolve();
+								}
+							});
+						} catch (err) {
+							reject(err);
+						}
+					}
+				});
+			});
+		}
+
+		Promise.all([renameFile(), replaceInM3UFiles(), renameInPlaylistFile()]).then(() => {
+			utils.colorLog('Done!', 'fgGreen');
+		}).catch(err => {
+			utils.colorLog('Error: ' + err, 'fgRed');
+		});
+	}
+
+	return;
 }
 
 utils.colorLog(new Date() + ' [[fgGreen, Starting MusicStream]]');
 if (settings.checkForUpdateOnStart.val == true) {
 	utils.newVersionAvailable(version).then(newVersion => {
 		if (newVersion.greater) {
-			utils.colorLog(`No update available, running version: ${newVersion.version}. But this version if greater than that on GitHub (${newVersion.version}), Maybe you want to get the newest code from GitHub: [[fgMagenta, ${newVersion.url}]]`, 'fgOrange');
+			utils.colorLog(`No update available, running version: ${newVersion.version}. But this version if greater than that on GitHub (${newVersion.version}), Maybe you want to get the newest code from GitHub: [[fgMagenta, ${newVersion.url}]]. Don't forget to update the settings file!`, 'fgOrange');
 		} else if (newVersion.isAvailable == true) {
-			utils.colorLog(`A new update is available: ${newVersion.version}`, 'fgGreen');
+			utils.colorLog(`A new update is available: ${newVersion.version}. Don't forget to update the settings file!`, 'fgGreen');
 		} else {
 			utils.colorLog(`No update available, running version: ${newVersion.version}`, 'fgCyan');
 			startServer();

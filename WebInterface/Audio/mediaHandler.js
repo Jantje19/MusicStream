@@ -208,7 +208,7 @@ function displayLyrics(artist, songName) {
 }
 
 function escapeString(string) {
-	return string.replace(/\'/g, "\\'");
+	return string.replace(/\'/g, "\\\'");
 }
 
 
