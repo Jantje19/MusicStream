@@ -139,7 +139,7 @@ function updateInterface() {
 		elem.innerHTML = '';
 		document.getElementById('queueCount').innerText = "Amount: " + queue.length;
 		queue.forEach((object, key) => {
-			if (key == queueIndex) elem.innerHTML += `<button title="${object}" onclick="queueClick(event, '${key}')" style="background-color: lightblue;"><span>${key + 1}</span><span>${object}</button></div><hr>`;
+			if (key == queueIndex) elem.innerHTML += `<button title="${object}" onclick="queueClick(event, '${key}')" style="background-color: rgba(22, 160, 133, 0.5);"><span>${key + 1}</span><span>${object}</button></div><hr>`;
 			else elem.innerHTML += `<button title="${object}" onclick="queueClick(event, '${key}')"><span>${key + 1}</span><span>${object}</button></div><hr>`;
 		});
 	} else elem.innerHTML = '<i>Queue is empty</i>';

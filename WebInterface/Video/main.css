@@ -112,10 +112,13 @@ main > div {
 }
 
 main > div:first-child {
+	height: 90vh;
 	flex-grow: 1.5;
+	max-width: 60%;
+	overflow-y: hidden;
 }
 
-main > div:last-child button {
+main > div:last-child button, main #queue .queueItem {
 	margin: 0;
 	width: 100%;
 	border: none;
@@ -130,14 +133,32 @@ main > div:last-child button {
 	text-overflow: ellipsis;
 }
 
-main > div:last-child button:hover {
+main > div:last-child button:hover, main #queue .queueItem:hover {
 	background-color: rgba(0, 0, 0, 0.15);
+}
+
+main #songName {
+	margin: 10px;
+	height: 25px;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
 }
 
 main #videos {
 	width: 40%;
 	height: 90vh;
 	overflow-y: scroll;
+}
+
+main #videos #loaderWrapper {
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+}
+
+main #videos #loaderWrapper > div {
+	transform: translate(50%, 20px);
 }
 
 main #player {
@@ -147,13 +168,28 @@ main #player {
 	background-color: black;
 }
 
-main #videoInfo {
-	padding: 50px 0;
+main #queueWrapper {
+	padding: 10px 0;
+	border-top: 1px lightgray solid;
 }
 
-main #videoInfo h2 {
-	overflow: hidden;
-	text-overflow: ellipsis;
+main #queueWrapper h4 {
+	margin: 2% 0;
+	font-weight: bold;
+}
+
+main #queueWrapper #queue {
+	max-height: 30vh;
+	min-height: 50px;
+	overflow-y: auto;
+}
+
+main #queueWrapper #queue i {
+	color: grey;
+}
+
+main #queueWrapper #queue button {
+	text-align: center;
 }
 
 main #loader {
@@ -171,14 +207,42 @@ main #loader {
 }
 
 main #loader .ball-scale-multiple {
-	background-color: white;
 	transform: translate(0, -5vh);
 }
 
 main #loader .ball-scale-multiple div:first-child {
 	opacity: .8;
 	animation: none;
-	background-color: white;
+}
+
+main #player #autoplay {
+	top: 0;
+	left: 0;
+	z-index: 5;
+	width: 100%;
+	height: 100%;
+	display: none;
+	position: absolute;
+	align-items: center;
+	pointer-events: all;
+	flex-direction: column;
+	justify-content: center;
+	background-color: rgba(0, 0, 0, 0.7);
+}
+
+main #player #autoplay span {
+	color: white;
+	display: block;
+	margin-bottom: 10px;
+}
+
+main #player #autoplay #autoplay-time {
+	width: 80%;
+	height: 4px;
+	border-radius: 20px;
+	will-change: transform;
+	background-color: #16a085;
+	transition: transform 1s linear;
 }
 
 main #player #videoElem {

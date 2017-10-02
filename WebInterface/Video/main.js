@@ -1,4 +1,4 @@
-let video;
+let video, int;
 
 function load() {
 	video = document.querySelector('video');
@@ -8,18 +8,28 @@ function load() {
 
 	fetch('/data/').then(response => {
 		response.json().then(json => {
+			const videosElem = document.getElementById('videos');
+
+			videosElem.innerHTML = '';
 			json.video.videos.forEach((object, key) => {
-				document.getElementById('videos').innerHTML +=
-				`<button onclick="playVid('${object}')" class="video ${key}">${object}</button><hr>`;
+				videosElem.innerHTML += `<button onclick="playVid('${object}')" draggable="true" ondragstart="drag(event)" class="video ${key}" id="${key}">${object}</button><hr>`;
 			});
 		});
 	}).catch( err => {
 		console.error('An error occurred', err);
 	});
 
+	video.onended = videoEnd;
 	video.onplay = updateInterface;
 	video.onpause = updateInterface;
 	video.onclick = togglePlayState;
+
+	video.addEventListener("playing", evt => {
+		document.getElementById('loader').style.opacity = '1';
+
+		if (video.readyState == 4)
+			document.getElementById('loader').style.opacity = '0';
+	});
 
 	video.addEventListener('timeupdate', evt => {
 		seekBarElem.value = (video.currentTime / video.duration) * 100;
@@ -73,37 +83,64 @@ function load() {
 }
 
 function togglePlayState() {
-	if (video.src != '' || video.src != null) {
-		if (video.paused == true) video.play();
-		else if (video.paused == false) video.pause();
-		else console.error('WUT?');
+	if (video.src != '') {
+		const stateBtn = document.getElementById('playPause');
+
+		if (video.paused == true) {
+			video.play();
+			stateBtn.childNodes[0].src = 'Assets/ic_pause_white.svg';
+		} else if (video.paused == false) {
+			video.pause();
+			stateBtn.childNodes[0].src = 'Assets/ic_play_arrow_white.svg';
+		} else console.error('WUT?');
 	}
 }
 
-function playVid(title) {
+function playVid(title, notQueueTop) {
 	video.src = '/video/' + title;
 	video.play();
 
-	video.addEventListener("playing", function() {
-		document.getElementById('loader').style.opacity = '1';
+	if (!notQueueTop)
+		queueTop(title);
 
-		if (video.readyState == 4) {
-			document.getElementById('loader').style.opacity = '0';
+	clearInterval(int);
+	document.getElementById('songName').innerText = title;
+	document.getElementById('autoplay').style.display = 'none';
+	document.getElementById('playPause').childNodes[0].src = 'Assets/ic_pause_white.svg'
+}
 
-			document.getElementById('title').innerText = title;
-			document.getElementById('length').innerText = 'Duration: ' +  convertToReadableTime(Math.round(video.duration)) + 's';
-		}
-	});
+function videoEnd(evt) {
+	if (getQueue().length > queueIndex) {
+		let i = 1;
+		const time = 2;
+		const timeElem = document.getElementById('autoplay-time');
+		const textElem = document.getElementById('autoplay').querySelector('span');
+
+		document.getElementById('autoplay').style.display = 'flex';
+
+		int = setInterval(() => {
+			if (i <= time) {
+				textElem.innerText = `Autoplay in: ${time - i}s`;
+				timeElem.style.transform = `scaleX(${1 - (i / time)})`;
+			} else {
+				nextQueueItem();
+				clearInterval(int);
+				document.getElementById('autoplay').style.display = 'none';
+				timeElem.style.transform = '';
+			}
+
+			i++;
+		}, 1000);
+	}
 }
 
 function updateInterface() {
-	if (video.paused == true) {
+	if (video.paused == true)
 		document.getElementById('playPause').querySelector('img').src = 'Assets/ic_play_arrow_white.svg';
-	} else if (video.paused == false) {
+	else if (video.paused == false)
 		document.getElementById('playPause').querySelector('img').src = 'Assets/ic_pause_white.svg';
-	} else {
+	else
 		console.error('WUT?');
-	}
 }
 
 function convertToReadableTime(int) {

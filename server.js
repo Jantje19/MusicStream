@@ -239,34 +239,41 @@ module.exports = {
 
 						if (json.type == 'video') {
 							const path = os.homedir() + '/Videos/' + json.fileName + '.mp4';
-							const video = ytdl(json.url, { filter: function(format) { return format.container === 'mp4'; } });
 							const args = {
+								bitrate: 128,
+								format: 'mp4',
 								seek: json.startTime,
 								duration: json.endTime
 							}
 
-							video.pipe(fs.createWriteStream(path));
-							video.on('progress', (chunkLength, downloaded, total) => {
+							const reader = ytdl(json.url, { filter: function(format) { return format.container === 'mp4'; } });
+							const writer = ffmpeg(reader)
+							.format(args.format)
+							.audioBitrate(args.bitrate)
+
+							if (args.seek) writer.seekInput(args.seek);
+							if (args.duration) writer.duration(args.duration);
+
+							reader.on('progress', (chunkLength, downloaded, total) => {
 								process.stdout.cursorTo(0);
 								process.stdout.clearLine(1);
 								process.stdout.write("DOWNLOADING: " + (downloaded / total * 100).toFixed(2) + '% ');
 							});
 
-							video.on('end', () => {
+							reader.on('end', () => {
 								process.stdout.write('\n');
 
 								fs.exists(path, exists => {
 									if (exists) {
-										console.log(`'${json.fileName}'` + ' downloaded');
-
 										fileHandler.searchSystem(fs, os, utils, settings).then(() => {
 											response.send({success: true, fileName: json.fileName + '.mp4', jsonUpdated: true});
 										}).catch(err => response.send({success: true, fileName: json.fileName, jsonUpdated: false}));
-									} else sendError('File does not exist. This is a weird problem... You should investigate.');
+									} else sendError("File does not exist. This is a weird problem... You should investigate.");
 								});
 							});
 
-							video.on('error', err => {sendError(err)});
+							reader.on('error', err => {sendError(err)});
+							writer.output(path).run();
 						} else if (json.type == 'audio') {
 							const path = os.homedir() + '/Music/' + json.fileName + '.mp3';
 							const args = {
@@ -276,10 +283,10 @@ module.exports = {
 								duration: json.endTime
 							}
 
-							const reader = ytdl(json.url, {filter: 'audioonly'})
+							const reader = ytdl(json.url, {filter: 'audioonly'});
 							const writer = ffmpeg(reader)
 							.format(args.format)
-							.audioBitrate(args.bitrate)
+							.audioBitrate(args.bitrate);
 
 							if (args.seek) writer.seekInput(args.seek);
 							if (args.duration) writer.duration(args.duration);
@@ -308,7 +315,7 @@ module.exports = {
 					} else sendError('Tags not found. Expected url, fileName and tags.');
 				} else sendError('No JSON found');
 			});
-		});
+});
 
 app.post('/updateSettings', (request, response) => {
 	let body = '';

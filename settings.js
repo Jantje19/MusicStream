@@ -54,13 +54,13 @@ module.exports = {
 	},
 
 	updateJsonOnStart: {
-		val: true,
+		val: false,
 		type: 'bool',
 		desc: "If true, it will first check the filesystem for songs and video's, then it will start the server."
 	},
 
 	checkForUpdateOnStart: {
-		val: true,
+		val: false,
 		type: 'bool',
 		desc: "If true, it will first check the local version number against Githubs, if it finds a new version it will notify you, otherwise it will just start the server. This makes startup times slower."
 	},
@@ -81,5 +81,11 @@ module.exports = {
 		val: 100,
 		type: 'range',
 		desc: 'The volume that defaults on page load.'
+	},
+
+	autoplayTime: {
+		val: 10,
+		type: 'range',
+		desc: 'The time in seconds you have to wait for the next video to play'
 	}
 }

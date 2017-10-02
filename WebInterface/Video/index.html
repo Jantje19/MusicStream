@@ -36,6 +36,7 @@
 	<link href="seekbarStyle.css" rel="stylesheet" type="text/css" media="screen"/>
 
 	<script type="text/javascript" src="main.js"></script>
+	<script type="text/javascript" src="queueAndDragHandler.js"></script>
 
 </head>
 <body>
@@ -49,6 +50,11 @@
 	<main>
 		<div>
 			<div id="player">
+				<div id="autoplay">
+					<span>Autoplay in: {{autoplayTime}}s</span>
+					<div id="autoplay-time"></div>
+				</div>
+
 				<div id="videoElem">
 					<video></video>
 				</div>
@@ -70,20 +76,27 @@
 				</div>
 
 				<div id="loader">
-					<div class="ball-scale-multiple"><div></div><div></div><div></div><div></div></div>
+					<div class="ball-scale-multiple"><div></div><div></div><div></div></div>
 				</div>
 			</div>
 
-			<div id="videoInfo">
-				<h2 id="title"></h2>
-				<div>
-					<span id="length"></span>
-					<span id="fileSize"></span>
+			<h3 id="songName"></h3>
+
+			<div id="queueWrapper">
+				<h4>Queue</h4>
+				<div id="queue" ondrop="drop(event)" ondragover="allowDrop(event)">
+					<i>Queue is empty</i>
+					<br>
+					<i style="font-size: 0.7em;">Drag videos from the list to here.</i>
 				</div>
 			</div>
 		</div>
 
-		<div id="videos"></div>
+		<div id="videos">
+			<div id="loaderWrapper">
+				<div class="ball-scale-multiple"><div></div><div></div><div></div></div>
+			</div>
+		</div>
 	</main>
 
 </body>
