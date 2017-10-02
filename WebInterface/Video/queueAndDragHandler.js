@@ -1,4 +1,14 @@
+let settings;
 let queueIndex = 0;
+
+fetch('/getSettings/').then(response => {
+	response.json().then(json => {
+		settings = json;
+	}).catch(err => {console.log(err);});
+}).catch(err => {
+	console.error('An error occurred', err);
+	alert('Whoops!\nSettings couldn\'t be fetched! Please reload the page.');
+});
 
 function enqueue(...vals) {
 	const queue = getQueue();

@@ -12,7 +12,7 @@ function load() {
 
 			videosElem.innerHTML = '';
 			json.video.videos.forEach((object, key) => {
-				videosElem.innerHTML += `<button onclick="playVid('${object}')" draggable="true" ondragstart="drag(event)" class="video ${key}" id="${key}">${object}</button><hr>`;
+				videosElem.innerHTML += `<button onclick="vidClick(event, '${object}')" draggable="true" ondragstart="drag(event)" class="video ${key}" id="${key}">${object}</button><hr>`;
 			});
 		});
 	}).catch( err => {
@@ -82,6 +82,13 @@ function load() {
 	});
 }
 
+function vidClick(evt, title) {
+	if (evt.ctrlKey)
+		enqueue(title);
+	else
+		playVid(title);
+}
+
 function togglePlayState() {
 	if (video.src != '') {
 		const stateBtn = document.getElementById('playPause');
@@ -112,7 +119,7 @@ function playVid(title, notQueueTop) {
 function videoEnd(evt) {
 	if (getQueue().length > queueIndex) {
 		let i = 1;
-		const time = 2;
+		const time = Number(settings.autoplayTime) || 10;
 		const timeElem = document.getElementById('autoplay-time');
 		const textElem = document.getElementById('autoplay').querySelector('span');
 
