@@ -23,7 +23,7 @@ The web-interface only works with browsers that have ES6 support.
 
 This program needs Node-ID3 version 0.0.10 or higher to work with images properly.
 
-Manipulating files (adding/removing tags) requires the side installation of FFMPEG. This is however not required when you don't want to do any of these things.
+Manipulating files (adding/removing tags) requires the side installation of [FFMPEG](https://www.ffmpeg.org/download.html). This is however not required when you don't want to do any of these things.
 
 Supported browsers with build numbers:
 - Edge: 14
