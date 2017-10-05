@@ -80,11 +80,6 @@ function load() {
 			if ('webkitRequestFullscreen' in elem) return 'webkit';
 		}
 	});
-
-	// For plugins
-	try {
-		loaded();
-	} catch (err) {}
 }
 
 function vidClick(evt, title) {

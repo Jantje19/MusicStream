@@ -5,58 +5,58 @@
 	<title>Error 404</title>
 
 	<style type="text/css">
-	body {
-		margin: 0;
-		overflow: hidden;
-		font-family: 'Arial', sans-serif;
-	}
+		body {
+			margin: 0;
+			overflow: hidden;
+			font-family: 'Arial', sans-serif;
+		}
 
-	main {
-		top: 0;
-		left: 0;
-		z-index: 10;
-		width: 100%;
-		height: 100%;
-		position: absolute;
+		main {
+			top: 0;
+			left: 0;
+			z-index: 10;
+			width: 100%;
+			height: 100%;
+			position: absolute;
 
-		display: flex;
-		align-items: center;
-		justify-content: center;
-	}
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
 
-	main > div {
-		width: 40vw;
-		height: auto;
-		padding: 5% 10%;
-		text-align: center;
-		border-radius: 20px;
-		background-color: rgba(255, 255, 255, 0.5);
-	}
+		main > div {
+			width: 40vw;
+			height: auto;
+			padding: 5% 10%;
+			text-align: center;
+			border-radius: 20px;
+			background-color: rgba(255, 255, 255, 0.5);
+		}
 
-	main #stopBtnContainer {
-		top: 10px;
-		left: 15%;
-		width: 70%;
-		padding: 0;
-		display: none;
-		position: absolute;
-	}
+		main #stopBtnContainer {
+			top: 10px;
+			left: 15%;
+			width: 70%;
+			padding: 0;
+			display: none;
+			position: absolute;
+		}
 
-	main #stopBtnContainer button {
-		width: 100%;
-		height: 100%;
-		border: none;
-		padding: 5% 10%;
-		cursor: pointer;
-		background-color: transparent;
-	}
-</style>
+		main #stopBtnContainer button {
+			width: 100%;
+			height: 100%;
+			border: none;
+			padding: 5% 10%;
+			cursor: pointer;
+			background-color: transparent;
+		}
+	</style>
 
-<script type="text/javascript" src="https://jantje19.github.io/SideProjects/Canvas/canvas.js"></script>
-<script type="text/javascript">
-	let bgCol;
-	const particles = [];
-	const colors = ['#69D2E7', '#A7DBD8', '#F38630', '#FA6900', '#FF4E50', '#F9D423'];
+	<script type="text/javascript" src="https://jantje19.github.io/SideProjects/Canvas/canvas.js"></script>
+	<script type="text/javascript">
+		let bgCol;
+		const particles = [];
+		const colors = ['#69D2E7', '#A7DBD8', '#F38630', '#FA6900', '#FF4E50', '#F9D423'];
 
 		// Audio
 		const audio = new Audio('http://www.orangefreesounds.com/wp-content/uploads/2016/10/Elevator-music.mp3');
@@ -78,11 +78,6 @@
 					evt.target.parentElement.style.display = 'none';
 				});
 			}, (audio.duration * 2 - 100) * 1000);
-
-			// For plugins
-			try {
-				loaded();
-			} catch (err) {}
 		}
 
 		function draw() {

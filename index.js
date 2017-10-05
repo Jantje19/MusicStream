@@ -8,87 +8,21 @@ const server = require('./server.js');
 const querystring = require('querystring');
 const fileHandler = require('./fileHandler.js');
 
+
+// Settings
 const settings = require('./settings.js');
+// For version checking
 const {version} = require('./package.json');
 
-const pluginDomJs = [];
-const pluginServer = [];
-const loadPlugins = () => {
-	return new Promise((resolve, reject) => {
-		function getPlugins() {
-			return new Promise((resolve, reject) => {
-				const plugins = [];
-				const path = __dirname + '/Plugins/';
-
-				function getPlugin(path, folderName) {
-					const indexPath = path + '/index.js';
-
-					return new Promise((resolve, reject) => {
-						fs.exists(indexPath, exists => {
-							if (exists)
-								resolve({
-									folder: folderName,
-									module: require(indexPath)
-								});
-							else
-								reject('No index.js file found in ' + path);
-						});
-					});
-				}
-
-				fs.readdir(path, (err, data) => {
-					if (err) reject(err);
-					else {
-						data.forEach((object, key) => {
-							plugins.push(getPlugin(path + object, object));
-						});
-
-						Promise.all(plugins).then(plugins => {
-							resolve(plugins);
-						}).catch(err => {
-							reject(err);
-						});
-					}
-				});
-			});
-		}
-
-		console.log('Loading plugins...');
-		getPlugins().then(plugins => {
-			plugins.forEach((object, key) => {
-				if (object.module.clientJS) {
-					object.module.clientJS.pluginFolder = object.folder;
-					pluginDomJs.push(object.module.clientJS);
-				}
-
-				if (object.module.server) {
-					pluginServer.push({
-						folder: object.folder,
-						func: object.module.server
-					});
-				}
-			});
-
-			resolve();
-		}).catch(err => {
-			reject(err);
-		});
-	});
-}
-
 const startServer = () => {
-	loadPlugins().then(() => {
-		const startServerModule = () => server.start(__dirname + '/WebInterface/', fileHandler, fs, os, settings, utils, querystring, id3, ytdl, version, https, URLModule, pluginServer);
+	const startServerModule = () => server.start(__dirname + '/WebInterface/', fileHandler, fs, os, settings, utils, querystring, id3, ytdl, version, https, URLModule);
 
-		if (settings.updateJsonOnStart.val == true) {
-			fileHandler.searchSystem(fs, os, utils, settings).then(startServerModule).catch(err => {
-				console.err('Couln\'t update the JSON file.', err);
-				startServerModule();
-			});
-		} else startServerModule();
-	}).catch(err => {
-		console.err('Error loading plugins:', err);
-	});
+	if (settings.updateJsonOnStart.val == true) {
+		fileHandler.searchSystem(fs, os, utils, settings).then(startServerModule).catch(err => {
+			console.err('Couln\'t update the JSON file.', err);
+			startServerModule();
+		});
+	} else startServerModule();
 }
 
 // Usefull functions
@@ -134,13 +68,6 @@ const utils = {
 							for (key in settings) {
 								data = data.replace(new RegExp(`\{\{${key}\}\}`, 'g'), settings[key].val);
 							}
-
-							// Plugins
-							const thisPath = path.replace(__dirname, '').replace('/WebInterface/', '').replace(/\/\//g, '/');
-							pluginDomJs.forEach((object, key) => {
-								if (thisPath == object.filePath.replace(/^\//, ''))
-									data = data.replace('</head>', `<script type="text/javascript" src="/LoadPluginJS/Test/script.js"></script>\n</head>`);
-							});
 
 							response.status(200).send(data);
 						}

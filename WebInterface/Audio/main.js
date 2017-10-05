@@ -418,11 +418,6 @@ function load() {
 		songsElem.innerHTML = `<div style="text-align: center"><h3>Oh no</h3><br><br><p>There was an error: <b>${err}</b></p></div>`;
 		console.error('Something went wrong', err);
 	});
-
-	// For plugins
-	try {
-		loaded();
-	} catch (err) {}
 }
 
 Array.prototype.shuffle = function() {
