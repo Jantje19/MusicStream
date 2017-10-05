@@ -366,7 +366,7 @@ require('./serverAudioHandler.js').start(app, dirname, fileHandler, fs, os, sett
 
 // Plugins
 serverPlugins.forEach((object, key) => {
-	object.func(app, utils, __dirname + '/Plugins/' + object.folder);
+	object.func(app, utils, __dirname + '/Plugins/' + object.folder, querystring);
 });
 
 		// Just handle the rest

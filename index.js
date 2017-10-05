@@ -145,7 +145,7 @@ const utils = {
 							const thisPath = path.replace(__dirname, '').replace('/WebInterface/', '').replace(/\/\//g, '/');
 							pluginDomJs.forEach((object, key) => {
 								if (thisPath == object.filePath.replace(/^\//, ''))
-									data = data.replace('</head>', `<script type="text/javascript" src="/LoadPluginJS/Test/script.js"></script>\n</head>`);
+									data = data.replace('</head>', `<script type="text/javascript" src="/LoadPluginJS/${object.pluginFolder + '/' + object.script}"></script>\n</head>`);
 							});
 
 							response.status(200).send(data);
