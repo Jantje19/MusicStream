@@ -1,5 +1,5 @@
 module.exports = {
-	start: function(dirname, fileHandler, fs, os, settings, utils, querystring, id3, ytdl, version, https, URLModule) {
+	start: function(dirname, fileHandler, fs, os, settings, utils, querystring, id3, ytdl, version, https, URLModule, serverPlugins) {
 		const express = require('express');
 		const app = express();
 		const port = settings.port.val;
@@ -183,6 +183,14 @@ module.exports = {
 			} else response.send({success: false, error: 'No valid video id', info: 'The video id supplied cannot be from a youtube video'});
 		});
 
+		app.get('/LoadPluginJS/*', (request, response) => {
+			const url = querystring.unescape(request.url);
+			console.log(utils.logDate() + ' Got a request for ' + url);
+
+			const filePath = url.replace(request.headers.referer, '').replace('/LoadPluginJS/', '');
+			utils.sendFile(fs, __dirname + '/Plugins/' + filePath, response);
+		});
+
 		app.post('/ytdl*', (request, response) => {
 			let body = '';
 
@@ -355,6 +363,11 @@ app.post('/updateSettings', (request, response) => {
 
 require('./serverVideoHandler.js').start(app, dirname, fileHandler, fs, os, settings, utils, querystring);
 require('./serverAudioHandler.js').start(app, dirname, fileHandler, fs, os, settings, utils, querystring, id3, https, URLModule);
+
+// Plugins
+serverPlugins.forEach((object, key) => {
+	object.func(app, utils, __dirname + '/Plugins/' + object.folder);
+});
 
 		// Just handle the rest
 		app.get('/*', (request, response) => {

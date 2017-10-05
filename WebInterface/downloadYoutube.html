@@ -316,6 +316,11 @@
 				console.error('An error occurred', err);
 			});
 		});
+
+		// For plugins
+		try {
+			loaded();
+		} catch (err) {}
 	}
 
 	window.onload = load;
