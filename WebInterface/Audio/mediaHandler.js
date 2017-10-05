@@ -100,6 +100,7 @@ function playSong(songName, notAddToQueue) {
 function startSong() {
 	document.getElementById('toggleBtn').querySelector('img').src = 'Assets/ic_play_arrow_white.svg';
 	try {document.getElementById('songName').innerText = queue[queueIndex].replace(/(\.\w{2,5})$/, '');} catch (err) {}
+	try {document.getElementById('lyricsElem').innerHTML = `<h3>Loading</h3><br><div class="ball-scale-multiple"><div></div><div></div><div></div></div>`;} catch (err) {}
 	document.getElementById('showData').setAttribute('activated', false);
 	audio.play().then(mediaSession).catch(err => {
 		console.log(err);
