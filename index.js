@@ -36,40 +36,46 @@ const loadPlugins = () => {
 					});
 				}
 
-				fs.readdir(path, (err, data) => {
-					if (err) reject(err);
-					else {
-						data.forEach((object, key) => {
-							plugins.push(getPlugin(path + object, object));
-						});
+				fs.exists(path, exists => {
+					if (exists) {
+						fs.readdir(path, (err, data) => {
+							if (err) reject(err);
+							else {
+								data.forEach((object, key) => {
+									plugins.push(getPlugin(path + object, object));
+								});
 
-						Promise.all(plugins).then(plugins => {
-							resolve(plugins);
-						}).catch(err => {
-							reject(err);
+								Promise.all(plugins).then(plugins => {
+									resolve(plugins);
+								}).catch(err => {
+									reject(err);
+								});
+							}
 						});
-					}
+					} else resolve();
 				});
 			});
 		}
 
 		console.log('Loading plugins...');
 		getPlugins().then(plugins => {
-			plugins.forEach((object, key) => {
-				if (object.module.clientJS) {
-					object.module.clientJS.pluginFolder = object.folder;
-					pluginDomJs.push(object.module.clientJS);
-				}
+			if (plugins) {
+				plugins.forEach((object, key) => {
+					if (object.module.clientJS) {
+						object.module.clientJS.pluginFolder = object.folder;
+						pluginDomJs.push(object.module.clientJS);
+					}
 
-				if (object.module.server) {
-					pluginServer.push({
-						folder: object.folder,
-						func: object.module.server
-					});
-				}
-			});
+					if (object.module.server) {
+						pluginServer.push({
+							folder: object.folder,
+							func: object.module.server
+						});
+					}
+				});
 
-			resolve();
+				resolve();
+			} else resolve();
 		}).catch(err => {
 			reject(err);
 		});
