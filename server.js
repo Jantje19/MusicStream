@@ -364,9 +364,13 @@ app.post('/updateSettings', (request, response) => {
 require('./serverVideoHandler.js').start(app, dirname, fileHandler, fs, os, settings, utils, querystring);
 require('./serverAudioHandler.js').start(app, dirname, fileHandler, fs, os, settings, utils, querystring, id3, https, URLModule);
 
+const ips = utils.getLocalIP(os);
 // Plugins
 serverPlugins.forEach((object, key) => {
-	object.func(app, utils, __dirname + '/Plugins/' + object.folder, querystring);
+	object.func(app, utils, querystring, {
+		serverURL: ips[0] + ':' + port,
+		path: __dirname + '/Plugins/' + object.folder
+	});
 });
 
 		// Just handle the rest
@@ -379,8 +383,6 @@ serverPlugins.forEach((object, key) => {
 
 		app.use(express.static(dirname));
 		app.listen(port.toString());
-
-		const ips = utils.getLocalIP(os);
 
 		if (ips.length > 1) {
 			ips.forEach((object, key) => {
