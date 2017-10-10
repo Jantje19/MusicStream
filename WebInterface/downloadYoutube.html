@@ -298,17 +298,19 @@
 								tags: data.tags
 							}
 
-							document.getElementById('videoInput').innerHTML = '<b>Setting tags...</b>';
-							fetch('/tags', {method: 'POST', body: JSON.stringify(body)}).then(response => {
-								response.json().then(json => {
-									document.getElementById('videoInput').innerHTML = '<b>Done!</b>';
-									if (json.success) {
-										if (confirm('Everything went according to plan. Do you want to go to the home page?')) window.location = window.location.origin;
-									} else alert('Error: ' + json.info);
+							if (type == 'audio') {
+								document.getElementById('videoInput').innerHTML = '<b>Setting tags...</b>';
+								fetch('/tags', {method: 'POST', body: JSON.stringify(body)}).then(response => {
+									response.json().then(json => {
+										document.getElementById('videoInput').innerHTML = '<b>Done!</b>';
+										if (json.success) {
+											if (confirm('Everything went according to plan. Do you want to go to the home page?')) window.location = window.location.origin;
+										} else alert('Error: ' + json.info);
+									});
+								}).catch( err => {
+									console.error('An error occurred', err);
 								});
-							}).catch( err => {
-								console.error('An error occurred', err);
-							});
+							}
 						} else if (confirm('Everything went according to plan. Do you want to go to the home page?')) window.location = window.location.origin;
 					} else alert('Error: ' + json.error)/*Display toast or something..*/;
 				});

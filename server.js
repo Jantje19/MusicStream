@@ -152,6 +152,14 @@ module.exports = {
 			utils.sendFile(fs, dirname + 'downloadYoutube.html', response);
 		});
 
+		app.get('/LoadPluginJS/*', (request, response) => {
+			const url = querystring.unescape(request.url);
+			console.log(utils.logDate() + ' Got a request for ' + url);
+
+			const filePath = url.replace(request.headers.referer, '').replace('/LoadPluginJS/', '');
+			utils.sendFile(fs, __dirname + '/Plugins/' + filePath, response);
+		});
+
 		app.get('/ytdl/*', (request, response) => {
 			const url = querystring.unescape(request.url);
 			const arr = url.split('/');
@@ -181,14 +189,6 @@ module.exports = {
 					});
 				} catch (err) {response.send({success: false, error: 'Something went wrong', info: err})};
 			} else response.send({success: false, error: 'No valid video id', info: 'The video id supplied cannot be from a youtube video'});
-		});
-
-		app.get('/LoadPluginJS/*', (request, response) => {
-			const url = querystring.unescape(request.url);
-			console.log(utils.logDate() + ' Got a request for ' + url);
-
-			const filePath = url.replace(request.headers.referer, '').replace('/LoadPluginJS/', '');
-			utils.sendFile(fs, __dirname + '/Plugins/' + filePath, response);
 		});
 
 		app.post('/ytdl*', (request, response) => {
@@ -247,28 +247,16 @@ module.exports = {
 
 						if (json.type == 'video') {
 							const path = os.homedir() + '/Videos/' + json.fileName + '.mp4';
-							const args = {
-								bitrate: 128,
-								format: 'mp4',
-								seek: json.startTime,
-								duration: json.endTime
-							}
+							const video = ytdl(json.url, { filter: function(format) { return format.container === 'mp4'; } });
 
-							const reader = ytdl(json.url, { filter: function(format) { return format.container === 'mp4'; } });
-							const writer = ffmpeg(reader)
-							.format(args.format)
-							.audioBitrate(args.bitrate)
-
-							if (args.seek) writer.seekInput(args.seek);
-							if (args.duration) writer.duration(args.duration);
-
-							reader.on('progress', (chunkLength, downloaded, total) => {
+							video.pipe(fs.createWriteStream(path));
+							video.on('progress', (chunkLength, downloaded, total) => {
 								process.stdout.cursorTo(0);
 								process.stdout.clearLine(1);
 								process.stdout.write("DOWNLOADING: " + (downloaded / total * 100).toFixed(2) + '% ');
 							});
 
-							reader.on('end', () => {
+							video.on('end', () => {
 								process.stdout.write('\n');
 
 								fs.exists(path, exists => {
@@ -279,9 +267,6 @@ module.exports = {
 									} else sendError("File does not exist. This is a weird problem... You should investigate.");
 								});
 							});
-
-							reader.on('error', err => {sendError(err)});
-							writer.output(path).run();
 						} else if (json.type == 'audio') {
 							const path = os.homedir() + '/Music/' + json.fileName + '.mp3';
 							const args = {
@@ -323,7 +308,7 @@ module.exports = {
 					} else sendError('Tags not found. Expected url, fileName and tags.');
 				} else sendError('No JSON found');
 			});
-});
+		});
 
 app.post('/updateSettings', (request, response) => {
 	let body = '';
@@ -366,12 +351,14 @@ require('./serverAudioHandler.js').start(app, dirname, fileHandler, fs, os, sett
 
 const ips = utils.getLocalIP(os);
 // Plugins
-serverPlugins.forEach((object, key) => {
-	object.func(app, utils, querystring, {
-		serverURL: ips[0] + ':' + port,
-		path: __dirname + '/Plugins/' + object.folder
+if (serverPlugins) {
+	serverPlugins.forEach((object, key) => {
+		object.func(app, utils, querystring, {
+			serverURL: ips[0] + ':' + port,
+			path: __dirname + '/Plugins/' + object.folder
+		});
 	});
-});
+}
 
 		// Just handle the rest
 		app.get('/*', (request, response) => {

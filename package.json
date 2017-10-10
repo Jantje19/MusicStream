@@ -1,6 +1,6 @@
 {
 	"name": "music_stream",
-	"version": "v0.1.4",
+	"version": "v0.1.5",
 	"description": "Stream media",
 	"main": "index.js",
 	"scripts": {
