@@ -19,6 +19,8 @@ Otherwise move into the folder of your platform and execute one of the files wit
 If both of these methods fail, run `npm start` in a CLI
 
 ## Notes
+**[Plugins](https://github.com/Jantje19/MusicStream-Plugins) are in beta!**
+
 The web-interface only works with browsers that have ES6 support.
 
 This program needs Node-ID3 version 0.0.10 or higher to work with images properly.
