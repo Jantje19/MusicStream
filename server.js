@@ -251,9 +251,11 @@ module.exports = {
 
 							video.pipe(fs.createWriteStream(path));
 							video.on('progress', (chunkLength, downloaded, total) => {
-								process.stdout.cursorTo(0);
-								process.stdout.clearLine(1);
-								process.stdout.write("DOWNLOADING: " + (downloaded / total * 100).toFixed(2) + '% ');
+								try {
+									process.stdout.cursorTo(0);
+									process.stdout.clearLine(1);
+									process.stdout.write("DOWNLOADING: " + (downloaded / total * 100).toFixed(2) + '% ');
+								} catch (err) {}
 							});
 
 							video.on('end', () => {
@@ -285,9 +287,11 @@ module.exports = {
 							if (args.duration) writer.duration(args.duration);
 
 							reader.on('progress', (chunkLength, downloaded, total) => {
-								process.stdout.cursorTo(0);
-								process.stdout.clearLine(1);
-								process.stdout.write("DOWNLOADING: " + (downloaded / total * 100).toFixed(2) + '% ');
+								try {
+									process.stdout.cursorTo(0);
+									process.stdout.clearLine(1);
+									process.stdout.write("DOWNLOADING: " + (downloaded / total * 100).toFixed(2) + '% ');
+								} catch (err) {}
 							});
 
 							reader.on('end', () => {

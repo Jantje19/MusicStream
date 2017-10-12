@@ -23,6 +23,7 @@ function load() {
 	video.onplay = updateInterface;
 	video.onpause = updateInterface;
 	video.onclick = togglePlayState;
+	video.ondblclick = toggleFullScreen;
 
 	video.addEventListener("playing", evt => {
 		document.getElementById('loader').style.opacity = '1';
@@ -49,37 +50,13 @@ function load() {
 			video.currentTime = video.duration / (evt.target.max / evt.target.value)
 	});
 
-	// Player btns
 	document.getElementById('playPause').addEventListener('click', togglePlayState);
+	document.getElementById('fullScreen').addEventListener('click', toggleFullScreen);
 
-	document.getElementById('fullScreen').addEventListener('click', evt => {
-		const elem = document.getElementById('player');
-		const typePrefix = getFullScreenType(elem);
-
-		if (isFullScreen()) {
-			if (typePrefix.length < 1) document['exitFullscreen']();
-			else document[typePrefix + 'ExitFullscreen']();
-			evt.target.querySelector('img').src = 'Assets/ic_fullscreen_white.svg';
-		} else {
-			if (typePrefix.length < 1) elem['requestFullscreen']();
-			else elem[typePrefix + 'RequestFullscreen']();
-			evt.target.querySelector('img').src = 'Assets/ic_fullscreen_exit_white.svg';
-		}
-
-		function isFullScreen() {
-			return !((document.fullScreenElement !== undefined && document.fullScreenElement === null) ||
-				(document.msFullscreenElement !== undefined && document.msFullscreenElement === null) ||
-				(document.mozFullScreen !== undefined && !document.mozFullScreen) ||
-				(document.webkitIsFullScreen !== undefined && !document.webkitIsFullScreen));
-		}
-
-		function getFullScreenType(elem) {
-			if ('requestFullscreen' in elem) return '';
-			if ('msRequestFullscreen' in elem) return 'ms';
-			if ('mozRequestFullscreen' in elem) return 'moz';
-			if ('webkitRequestFullscreen' in elem) return 'webkit';
-		}
-	});
+	document.addEventListener('fullscreenchange', checkFullScreen, false);
+	document.addEventListener('msfullscreenchange', checkFullScreen, false);
+	document.addEventListener('mozfullscreenchange', checkFullScreen, false);
+	document.addEventListener('webkitfullscreenchange', checkFullScreen, false);
 
 	// For plugins
 	try {
@@ -92,6 +69,40 @@ function vidClick(evt, title) {
 		enqueue(title);
 	else
 		playVid(title);
+}
+
+function checkFullScreen(evt) {
+	if (isFullScreen())
+		document.getElementById('fullScreen').querySelector('img').src = 'Assets/ic_fullscreen_exit_white.svg';
+	else
+		document.getElementById('fullScreen').querySelector('img').src = 'Assets/ic_fullscreen_white.svg';
+}
+
+function toggleFullScreen() {
+	const elem = document.getElementById('player');
+	const typePrefix = getFullScreenType(elem);
+
+	if (isFullScreen()) {
+		if (typePrefix.length < 1) document['exitFullscreen']();
+		else document[typePrefix + 'ExitFullscreen']();
+	} else {
+		if (typePrefix.length < 1) elem['requestFullscreen']();
+		else elem[typePrefix + 'RequestFullscreen']();
+	}
+
+	function getFullScreenType(elem) {
+		if ('requestFullscreen' in elem) return '';
+		if ('msRequestFullscreen' in elem) return 'ms';
+		if ('mozRequestFullscreen' in elem) return 'moz';
+		if ('webkitRequestFullscreen' in elem) return 'webkit';
+	}
+}
+
+function isFullScreen() {
+	return !((document.fullScreenElement !== undefined && document.fullScreenElement === null) ||
+		(document.msFullscreenElement !== undefined && document.msFullscreenElement === null) ||
+		(document.mozFullScreen !== undefined && !document.mozFullScreen) ||
+		(document.webkitIsFullScreen !== undefined && !document.webkitIsFullScreen));
 }
 
 function togglePlayState() {
