@@ -13,6 +13,8 @@ const {version} = require('./package.json');
 
 const pluginDomJs = [];
 const pluginServer = [];
+const mainPageMenu = [];
+
 const loadPlugins = () => {
 	return new Promise((resolve, reject) => {
 		function getPlugins() {
@@ -25,13 +27,20 @@ const loadPlugins = () => {
 
 					return new Promise((resolve, reject) => {
 						fs.exists(indexPath, exists => {
-							if (exists)
+							if (exists) {
+								console.log(`Loading '${folderName}' plugin`);
 								resolve({
 									folder: folderName,
 									module: require(indexPath)
 								});
-							else
-								reject('No index.js file found in ' + path);
+							} else {
+								resolve({
+									notfound: true
+								});
+
+								console.err('No index.js file found in ' + path);
+							}
+							// } else reject('No index.js file found in ' + path);
 						});
 					});
 				}
@@ -61,16 +70,29 @@ const loadPlugins = () => {
 		getPlugins().then(plugins => {
 			if (plugins) {
 				plugins.forEach((object, key) => {
-					if (object.module.clientJS) {
-						object.module.clientJS.pluginFolder = object.folder;
-						pluginDomJs.push(object.module.clientJS);
-					}
+					if (!object.notfound) {
+						if (object.module.clientJS) {
+							object.module.clientJS.pluginFolder = object.folder;
+							pluginDomJs.push(object.module.clientJS);
+						}
 
-					if (object.module.server) {
-						pluginServer.push({
-							folder: object.folder,
-							func: object.module.server
-						});
+						if (object.module.server) {
+							pluginServer.push({
+								folder: object.folder,
+								func: object.module.server
+							});
+
+							if (object.module.menu) {
+								object.module.menu.name = object.module.menu.name || object.folder;
+
+								if (object.module.menu.url)
+									object.module.menu.url = object.folder + object.module.menu.url;
+								else
+									object.module.menu.url = object.folder;
+
+								mainPageMenu.push(object.module.menu);
+							}
+						}
 					}
 				});
 
@@ -142,11 +164,21 @@ const utils = {
 							}
 
 							// Plugins
+							let buttonHTML = '';
 							const thisPath = path.replace(__dirname, '').replace('/WebInterface/', '').replace(/\/\//g, '/');
 							pluginDomJs.forEach((object, key) => {
 								if (thisPath == object.filePath.replace(/^\//, ''))
 									data = data.replace('</head>', `<script type="text/javascript" src="/LoadPluginJS/${object.pluginFolder + '/' + object.script}"></script>\n</head>`);
 							});
+
+							if (mainPageMenu.length > 0) {
+								mainPageMenu.forEach((object, key) => {
+									buttonHTML += `<a href="/${object.url}"><button>${object.name}</button></a>`;
+								});
+							}
+
+							data = data.replace('[[EXTRABUTTONS]]', buttonHTML);
+							//
 
 							response.status(200).send(data);
 						}
@@ -355,7 +387,7 @@ if (process.argv.includes('check-updates')) {
 		if (fromFileName != toFileName) {
 			utils.colorLog(`Tying to renaming '${fromFileName}' to '${toFileName}'`, 'fgCyan');
 
-			fileHandler.getJSON(fs, os, settings.audioFileExtensions.val, settings.videoFileExtensions.val, utils).then(val => {
+			fileHandler.getJSON(fs, os, utils, settings.audioFileExtensions.val, settings.videoFileExtensions.val).then(val => {
 				console.log('Got all files. Searching...');
 
 				const songsArr = val.audio.songs.map(val => {return val.fileName});

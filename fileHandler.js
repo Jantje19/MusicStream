@@ -169,7 +169,7 @@ module.exports = {
 		});
 	},
 
-	getJSON: function(fs, os, audioFileExtensions, videoFileExtensions, utils) {
+	getJSON: function(fs, os, utils, audioFileExtensions, videoFileExtensions) {
 		return new Promise((resolve, reject) => {
 			const JSONPath = './JSON.json';
 

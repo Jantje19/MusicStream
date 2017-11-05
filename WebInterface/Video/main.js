@@ -126,6 +126,8 @@ function playVid(title, notQueueTop) {
 	if (!notQueueTop)
 		queueTop(title);
 
+	document.title = 'Video Stream - ' + title.replace('-', '');
+
 	clearInterval(int);
 	document.getElementById('songName').innerText = title;
 	document.getElementById('autoplay').style.display = 'none';

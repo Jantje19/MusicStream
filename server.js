@@ -30,7 +30,7 @@ module.exports = {
 			console.log(utils.logDate() + ' Got a request for ' + url);
 
 			if (url.toLowerCase().indexOf('sort=') > -1) sort = true;
-			fileHandler.getJSON(fs, os, settings.audioFileExtensions.val, settings.videoFileExtensions.val, utils).then(json => {
+			fileHandler.getJSON(fs, os, utils, settings.audioFileExtensions.val, settings.videoFileExtensions.val).then(json => {
 				const songs = [];
 				const videos = [];
 
@@ -314,26 +314,27 @@ module.exports = {
 			});
 		});
 
-app.post('/updateSettings', (request, response) => {
-	let body = '';
+		//
+		app.post('/updateSettings', (request, response) => {
+			let body = '';
 
-	request.on('data', data => {
-		body += data;
+			request.on('data', data => {
+				body += data;
 
-		if (body.length > 1e6) {
-			request.send({success: false, err: 'The amount of data is to much', info: 'The connection was destroyed because the amount of data passed is to much'});
-			request.connection.destroy();
-		}
-	});
+				if (body.length > 1e6) {
+					request.send({success: false, err: 'The amount of data is to much', info: 'The connection was destroyed because the amount of data passed is to much'});
+					request.connection.destroy();
+				}
+			});
 
-	request.on('end', () => {
-		const jsonPath = './settings.js';
-		const url = querystring.unescape(request.url);
+			request.on('end', () => {
+				const jsonPath = './settings.js';
+				const url = querystring.unescape(request.url);
 
-		console.log(utils.logDate() + ' Got a POST request for ' + url);
+				console.log(utils.logDate() + ' Got a POST request for ' + url);
 
-		try {
-			body = JSON.parse(body);
+				try {
+					body = JSON.parse(body);
 
 					// Copy the settings
 					data = JSON.parse(JSON.stringify(settings));
@@ -348,23 +349,80 @@ app.post('/updateSettings', (request, response) => {
 					});
 				} catch (err) {response.send({success: false, info: err})}
 			});
-});
-
-require('./serverVideoHandler.js').start(app, dirname, fileHandler, fs, os, settings, utils, querystring);
-require('./serverAudioHandler.js').start(app, dirname, fileHandler, fs, os, settings, utils, querystring, id3, https, URLModule);
-
-const ips = utils.getLocalIP(os);
-// Plugins
-if (serverPlugins) {
-	serverPlugins.forEach((object, key) => {
-		object.func(app, utils, querystring, {
-			serverURL: ips[0] + ':' + port,
-			path: __dirname + '/Plugins/' + object.folder
 		});
-	});
-}
 
-		// Just handle the rest
+		require('./serverVideoHandler.js').start(app, dirname, fileHandler, fs, os, settings, utils, querystring);
+		require('./serverAudioHandler.js').start(app, dirname, fileHandler, fs, os, settings, utils, querystring, id3, https, URLModule);
+
+		const ips = utils.getLocalIP(os);
+		const imports = {
+			fs: fs,
+			os: os,
+			id3: id3,
+			ytdl: ytdl,
+			utils: utils,
+			https: https,
+			URLModule: URLModule,
+			fileHandler: fileHandler,
+			querystring: querystring
+		}
+
+		// Plugins
+		if (serverPlugins) {
+			class PluginServerHandler {
+				constructor(name) {
+					this.pluginName = name;
+				}
+
+				addGetRequest(...args) {
+					if (args.length > 1) {
+						args.forEach((object, key) => {
+							app.get(`/${this.pluginName}/${object.name}*`, object.func);
+						});
+					} else {
+						args = args[0];
+
+						if (args instanceof Array) {
+							args.forEach((object, key) => {
+								app.get(`/${this.pluginName}/${object.name}*`, object.func);
+							});
+						} else {
+							app.get(`/${this.pluginName}/${args.name}*`, args.func);
+						}
+					}
+				}
+
+				addPostRequest(...args) {
+					if (args.length > 0) {
+						args.forEach((object, key) => {
+							app.post(`/${this.pluginName}/${object.name}*`, object.func);
+						});
+					} else {
+						args = args[0];
+
+						if (args instanceof Array) {
+							args.forEach((object, key) => {
+								app.post(`/${this.pluginName}/${object.name}*`, object.func);
+							});
+						} else {
+							app.post(`/${this.pluginName}/${args.name}*`, args.func);
+						}
+					}
+				}
+			}
+
+			serverPlugins.forEach((object, key) => {
+				const server = new PluginServerHandler(object.folder);
+
+				object.func(server, imports, {
+					version: version,
+					serverURL: ips[0] + ':' + port,
+					path: __dirname + '/Plugins/' + object.folder
+				});
+			});
+		}
+
+		// Just hand]le the rest
 		app.get('/*', (request, response) => {
 			let url = request.url.replace(/\?(\w+)=(.+)/, '');
 			if (url.length > 1) console.log(utils.logDate() + ' Got a request for ' + url);

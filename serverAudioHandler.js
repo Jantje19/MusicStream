@@ -8,7 +8,7 @@ module.exports = {
 			if (!url.endsWith('/')) {
 				// Check if it has a file extention, otherwise read the playlists.json file
 				if (url.match(/(.+)\.(\w{2,5})/)) {
-					fileHandler.getJSON(fs, os, settings.audioFileExtensions.val, settings.videoFileExtensions.val, utils).then(json => {
+					fileHandler.getJSON(fs, os, utils, settings.audioFileExtensions.val, settings.videoFileExtensions.val).then(json => {
 						const playlistName = url.match(/(.+)\/(.+)$/)[2].trim();
 						const inArray = findPlaylist(json.audio.playlists, playlistName);
 
@@ -65,7 +65,7 @@ module.exports = {
 			console.log(utils.logDate() + ' Got a request for ' + url);
 
 			if (!url.endsWith('/')) {
-				fileHandler.getJSON(fs, os, settings.audioFileExtensions.val, settings.videoFileExtensions.val, utils).then(json => {
+				fileHandler.getJSON(fs, os, utils, settings.audioFileExtensions.val, settings.videoFileExtensions.val).then(json => {
 					const songName = url.match(/(.+)\/(.+)$/)[2].trim();
 					const inArray = findSong(json.audio.songs, songName);
 
@@ -92,7 +92,7 @@ module.exports = {
 			console.log(utils.logDate() + ' Got a request for ' + url);
 
 			if (!url.endsWith('/')) {
-				fileHandler.getJSON(fs, os, settings.audioFileExtensions.val, settings.videoFileExtensions.val, utils).then(json => {
+				fileHandler.getJSON(fs, os, utils, settings.audioFileExtensions.val, settings.videoFileExtensions.val).then(json => {
 					const songName = url.match(/(.+)\/(.+)$/)[2].trim();
 					const inArray = findSong(json.audio.songs, songName);
 
@@ -151,7 +151,7 @@ module.exports = {
 
 			console.log('Got a request for ' + url + '. HAHA Your browser sucks');
 
-			fileHandler.getJSON(fs, os, settings.audioFileExtensions.val, settings.videoFileExtensions.val, utils).then(json => {
+			fileHandler.getJSON(fs, os, utils, settings.audioFileExtensions.val, settings.videoFileExtensions.val).then(json => {
 				let html = '';
 				const settings = require('./settings.js');
 				// let html = '<script>function playSong(songName) {var elem = document.getElementById("audio"); elem.src = "/song/" + songName; elem.play()}</script><audio id="audio">YOUR BROWSER DOESN\'T SUPPORT THE AUDIO ELEMENT</audio>';
@@ -225,7 +225,7 @@ module.exports = {
 				if (json.tags && json.songName) {
 					if (json.songName.endsWith('.mp3') || json.songName.endsWith('.MP3')) {
 
-						fileHandler.getJSON(fs, os, settings.audioFileExtensions.val, settings.videoFileExtensions.val, utils).then(songs => {
+						fileHandler.getJSON(fs, os, utils, settings.audioFileExtensions.val, settings.videoFileExtensions.val).then(songs => {
 							function findSong(array, songName) {
 								for (let i = 0; i < array.length; i++) {
 									if (array[i].fileName == songName) return array[i];

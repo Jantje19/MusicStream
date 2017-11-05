@@ -13,7 +13,8 @@ function enqueue(...vals) {
 		});
 	} else queue[queue.length] = vals[0];
 
-	window.history.pushState(document.body.innerHTML, document.title, "?queue=" + queue.map(val => {return escape(val)}).join(','));
+	document.cookie = "queue=" + queue.map(val => {return escape(val)}).join(',');
+	// window.history.pushState(document.body.innerHTML, document.title, "?queue=" + queue.map(val => {return escape(val)}).join(','));
 	updateInterface();
 }
 
@@ -39,9 +40,11 @@ function next() {
 		const newIndex = Number(queueIndex) + 1;
 
 		if (queue.length > newIndex) {
-			queueIndex = newIndex;
+			updateQueueIndex(newIndex);
+			deleteCookie();
 		} else {
-			if (document.getElementById('repeat').getAttribute('activated') == 'true') queueIndex = 0;
+			if (document.getElementById('repeat').getAttribute('activated') == 'true')
+				updateQueueIndex(0);
 			else return;
 		}
 
@@ -55,9 +58,10 @@ function previous() {
 	const newIndex = queueIndex - 1;
 
 	if (queueIndex > 0) {
-		queueIndex = newIndex;
+		updateQueueIndex(newIndex);
 	} else {
-		if (document.getElementById('repeat').getAttribute('activated') == 'true') queueIndex = queue.length - 1;
+		if (document.getElementById('repeat').getAttribute('activated') == 'true')
+			updateQueueIndex(queue.length - 1);
 		else return;
 	}
 
@@ -69,7 +73,8 @@ function deleteQueue() {
 	stopSong();
 	queueIndex = 0;
 	queue.length = 0;
-	window.history.pushState(document.body.innerHTML, document.title, "/");
+
+	deleteCookie();
 	updateInterface();
 }
 
@@ -300,6 +305,8 @@ function mediaSession() {
 				dataDiv.innerHTML += `<p><b>Album:</b> ${json.album}</p>`;
 				dataDiv.innerHTML += `<p><b>Year:</b> ${json.year}</p>`;
 
+				document.title = 'Music Stream - ' + title.replace(/-/g, '');
+
 				try {
 					if (window.innerWidth > 500) {
 						if (json.image.imageBuffer.data.length > 1e7) return;
@@ -339,6 +346,8 @@ function mediaSession() {
 			}).catch(err => console.warn(err));
 		}).catch(err => console.warn(err));
 	}
+
+	document.title = 'Music Stream - ' + title.replace(/-/g, '');
 
 	if ('mediaSession' in navigator) {
 		navigator.mediaSession.metadata = new MediaMetadata({
@@ -395,4 +404,18 @@ function fetchArtistData(artistName) {
 			});
 		}).catch(err => reject(err));
 	});
+}
+
+function deleteCookie() {
+	document.cookie.split(";").forEach((object, key) => {
+		const eqPos = object.indexOf("=");
+		const name = eqPos > -1 ? object.substr(0, eqPos) : object;
+
+		document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT";
+	});
+}
+
+function updateQueueIndex(num) {
+	queueIndex = num;
+	document.cookie = 'queueIndex=' + num;
 }

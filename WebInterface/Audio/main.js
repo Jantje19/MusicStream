@@ -8,7 +8,8 @@ const keyShortcuts = {
 	"escape": stopSong,
 	"arrowright": next,
 	"arrowleft": previous,
-	"enter": () => {
+	"enter": (evt) => {
+		evt.preventDefault();
 		if (audio.src != null) {
 			if (audio.paused) startSong();
 			else pauseSong();
@@ -33,7 +34,6 @@ function handlePlaylist(evt, name) {
 		get('/playlist/' + name).then(json => {
 			if (document.getElementById('shuffle').getAttribute('activated') == 'true') json.songs.shuffle();
 			deleteQueue();
-			queueIndex = 0;
 			enqueue(...json.songs);
 			playSong(queue[0], true);
 		}).catch( err => {
@@ -65,7 +65,7 @@ function queueClick(evt, index) {
 		if (audio.paused || (!audio.paused && index != queueIndex)) updateInterface();
 		else playSong(null, true);
 	} else {
-		queueIndex = Number(index);
+		updateQueueIndex(Number(index));
 		playSong(null, true);
 	}
 }
@@ -86,7 +86,7 @@ function songClick(evt) {
 		if (clickTimer) {
 			clearTimeout(clickTimer);
 			clickTimer = null;
-			queueIndex = queue.length;
+			updateQueueIndex(queue.length);
 			enqueue(object);
 			playSong(object, true);
 		} else {
@@ -387,7 +387,7 @@ function load() {
 		const key = evt.code.toLowerCase();
 		if (key in keyShortcuts) {
 			evt.preventDefault(evt);
-			keyShortcuts[key]();
+			keyShortcuts[key](evt);
 			return false;
 		}
 
@@ -398,7 +398,7 @@ function load() {
 		data = json;
 
 		if (json.songs.length > 0) {
-			checkUrlAttributes(json.songs);
+			checkCookies(json.songs);
 			document.getElementById('songCount').innerText = "Amount: " + json.songs.length;
 			songsElem.innerHTML = '';
 			json.songs.forEach((object, key) => {
@@ -453,38 +453,83 @@ Array.prototype.move = function (old_index, new_index) {
 	return this;
 };
 
-// Location attributes
-function checkUrlAttributes(songsArr) {
-	function getLocationAtts(toLowerCase) {
-		if (window.location.search != '') {
-			const obj = {};
+// Location queue-cookie
+function checkCookies(songsArr) {
+	function getCookieAttributes() {
+		const outp = {};
 
-			window.location.search.substr(1).split('&').forEach(val => {
-				val = unescape(val);
-				const splitArr = val.split('=');
+		document.cookie.split(';').forEach((object, key) => {
+			const splitVal = object.trim().split('=');
 
-				if (toLowerCase) {
-					splitArr[0] = splitArr[0].toLowerCase();
-					splitArr[1] = splitArr[1].toLowerCase();
-				}
+			if (splitVal.length > 2) {
+				for (let i = 2; i < splitVal.length; i++)
+					splitVal[1] += '=' + splitVal[i];
+			}
 
-				obj[splitArr[0]] = splitArr[1];
+			outp[splitVal[0]] = splitVal[1];
+		});
+
+		return outp;
+	}
+
+	function getLocationAttributes() {
+		const json = {};
+		let url = window.location.search;
+
+		if (url.indexOf('?') > -1) {
+			url = url.substr(1);
+			url.split('&').forEach((object, key) => {
+				const regEx = /^(.+)=(.+)$/;
+				const values = regEx.exec(object);
+
+				let name = values[1];
+				let value = values[2];
+
+				json[name] = value;
 			});
 
-			return obj;
+			return json;
 		} else return;
 	}
 
-	const locationAtts =  getLocationAtts(false);
+	function getCookies() {
+		const cookieAtts =  getCookieAttributes();
 
-	if (locationAtts) {
-		if ('queue' in locationAtts) {
-			locationAtts['queue'].split(/(\s+)?\,(\s+)?/).forEach((object, key) => {
-				if (songsArr.includes(object))
-					queue.push(object);
-			});
+		if (cookieAtts) {
+			if ('queue' in cookieAtts) {
+				cookieAtts['queue'].split(',').forEach((object, key) => {
+					object = unescape(object);
+
+					if (songsArr.includes(object))
+						enqueue(object);
+				});
+			}
+
+			if ('queueIndex' in cookieAtts)
+				queueIndex = Number(cookieAtts.queueIndex);
 		}
 	}
+
+	const locationAtts = getLocationAttributes();
+	if (locationAtts) {
+		// Remove the search parameters
+		window.history.replaceState({}, document.title, "/");
+
+		if ('queue' in locationAtts) {
+			const arr = locationAtts['queue'].split(',').map(val => {
+				return unescape(val)
+			}).filter(val => {
+				return songsArr.includes(val);
+			});
+
+			if (arr.length > 0) {
+				arr.forEach((object, key) => {
+					queue.push(object);
+				});
+				playSong(queue[queueIndex], true);
+			} else getCookies();
+		} else getCookies();
+	} else getCookies();
 }
 
 window.onload = load;
