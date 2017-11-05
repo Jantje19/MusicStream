@@ -145,13 +145,6 @@ module.exports = {
 			response.send(settings);
 		});
 
-		app.get('/downloadYoutube*', (request, response) => {
-			const url = querystring.unescape(request.url);
-
-			console.log(utils.logDate() + ' Got a request for ' + url);
-			utils.sendFile(fs, dirname + 'downloadYoutube.html', response);
-		});
-
 		app.get('/LoadPluginJS/*', (request, response) => {
 			const url = querystring.unescape(request.url);
 			console.log(utils.logDate() + ' Got a request for ' + url);
@@ -160,7 +153,7 @@ module.exports = {
 			utils.sendFile(fs, __dirname + '/Plugins/' + filePath, response);
 		});
 
-		app.get('/ytdl/*', (request, response) => {
+		app.get('/youtubeData/*', (request, response) => {
 			const url = querystring.unescape(request.url);
 			const arr = url.split('/');
 			const id = arr[arr.length - 1];

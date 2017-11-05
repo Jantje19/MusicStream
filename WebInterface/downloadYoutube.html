@@ -191,7 +191,7 @@
 			evt.target.style.pointerEvents = 'none';
 
 			if (url.indexOf('youtube.com') > 0 || url.indexOf('youtu.be') > 0) {
-				fetch('/ytdl/' + url.match(/(.+)v\=((\w+|[0-9]+|\-|\_)+)$/i)[2]).then(response => {
+				fetch('/youtubeData/' + url.match(/(.+)v\=((\w+|[0-9]+|\-|\_)+)$/i)[2]).then(response => {
 					response.json().then(json => {
 						if (json.success) {
 							json = json.info;
