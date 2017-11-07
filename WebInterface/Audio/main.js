@@ -5,16 +5,18 @@ const cssRules = [];
 const audio = new Audio();
 
 const keyShortcuts = {
+	"enter": keyPress,
+	"space": keyPress,
 	"escape": stopSong,
 	"arrowright": next,
 	"arrowleft": previous,
-	"enter": (evt) => {
-		evt.preventDefault();
-		if (audio.src != null) {
-			if (audio.paused) startSong();
-			else pauseSong();
-		} else playSong(null, true);
-	}
+}
+
+function keyPress(evt) {
+	if (audio.src != null) {
+		if (audio.paused) startSong();
+		else pauseSong();
+	} else playSong(null, true);
 }
 
 function getData() {
@@ -355,8 +357,13 @@ function load() {
 	document.getElementById('volumeToggle').addEventListener('click', evt => {
 		const popUp = document.getElementById('volumePopUp');
 
-		if (popUp.style.display == 'block') popUp.style.display = 'none';
-		else popUp.style.display = 'block';
+		if (document.getElementById('showData').className.indexOf('active') > -1)
+			popUp.style.transform = 'translateY(-170px)';
+
+		if (popUp.style.display == 'block')
+			popUp.style.display = 'none';
+		else
+			popUp.style.display = 'block';
 	});
 
 	document.getElementById('muteBtn').addEventListener('click', evt => {
@@ -386,9 +393,11 @@ function load() {
 	window.addEventListener('keyup', evt => {
 		const key = evt.code.toLowerCase();
 		if (key in keyShortcuts) {
-			evt.preventDefault(evt);
-			keyShortcuts[key](evt);
-			return false;
+			if (document.activeElement.tagName.toLowerCase() != 'input') {
+				evt.preventDefault();
+				keyShortcuts[key](evt);
+				return false;
+			} else return true;
 		}
 
 		return true;
