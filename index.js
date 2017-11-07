@@ -177,6 +177,9 @@ const utils = {
 								});
 							}
 
+							if (buttonHTML.length > 0)
+								buttonHTML = '<hr>' + buttonHTML;
+
 							data = data.replace('[[EXTRABUTTONS]]', buttonHTML);
 							//
 
