@@ -145,6 +145,13 @@ module.exports = {
 			response.send(settings);
 		});
 
+		app.get('/downloadYoutube*', (request, response) => {
+			const url = querystring.unescape(request.url);
+
+			console.log(utils.logDate() + ' Got a request for ' + url);
+			utils.sendFile(fs, dirname + 'downloadYoutube.html', response);
+		});
+
 		app.get('/LoadPluginJS/*', (request, response) => {
 			const url = querystring.unescape(request.url);
 			console.log(utils.logDate() + ' Got a request for ' + url);

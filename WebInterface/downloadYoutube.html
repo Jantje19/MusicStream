@@ -206,37 +206,37 @@
 							videoInfo.innerHTML += '<hr>';
 							videoInfo.innerHTML += `<p id="description">${json.description.replace(/\n/g, '<br>')}</p>`;
 
-								// Set values
-								let title = '';
-								let album = '';
-								let artist = '';
+							// Set values
+							let title = '';
+							let album = '';
+							let artist = '';
 
-								const vals = analyzeDescription(json.description);
+							const vals = analyzeDescription(json.description);
 
-								if (vals.title) title = vals.title;
-								if (vals.album) album = vals.album;
-								if (vals.artist) artist = vals.artist;
+							if (vals.title) title = vals.title;
+							if (vals.album) album = vals.album;
+							if (vals.artist) artist = vals.artist;
 
-								if (!title || !artist) {
-									const match = json.title.split(/(\-|\–)/).filter(val => {return (val.length > 1 && val.indexOf(/(\-|\–)/) < 0)});;
-									const val = match.splice(0, 1)[0].trim();
+							if (!title || !artist) {
+								const match = json.title.split(/(\-|\–)/).filter(val => {return (val.length > 1 && val.indexOf(/(\-|\–)/) < 0)});;
+								const val = match.splice(0, 1)[0].trim();
 
-									if (!artist) artist = val;
-									if (!title) title = match.join('-').trim();
-								}
+								if (!artist) artist = val;
+								if (!title) title = match.join('-').trim();
+							}
 
-								document.getElementById('title').value = title;
-								document.getElementById('album').value = album;
-								document.getElementById('artist').value = artist;
-								document.getElementById('endTime').value = json.length_seconds;
+							document.getElementById('title').value = title;
+							document.getElementById('album').value = album;
+							document.getElementById('artist').value = artist;
+							document.getElementById('endTime').value = json.length_seconds;
 
-								setTimeout(() => {
-									nodes[3].style.transform = 'translate(-50%, -50%)';
-									nodes[1].style.transform = 'translate(-50%, -110vh)';
-									nodes[3].style.display = 'flex';
-								}, 300);
-							} else alert(json.info);
-						});
+							setTimeout(() => {
+								nodes[3].style.transform = 'translate(-50%, -50%)';
+								nodes[1].style.transform = 'translate(-50%, -110vh)';
+								nodes[3].style.display = 'flex';
+							}, 300);
+						} else alert(json.info);
+					});
 				}).catch(err => alert(err));
 			} else alert('Link does not match a youtube url')/*Display toast or something..*/;
 		});
