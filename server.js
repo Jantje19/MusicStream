@@ -251,7 +251,7 @@ module.exports = {
 					} catch (err) {}
 				}
 
-				const handleVideo = json => {
+				const handleVideo = (json, ffmpeg) => {
 					const path = os.homedir() + '/Videos/' + json.fileName + '.mp4';
 					const video = ytdl(json.url, { filter: function(format) { return format.container === 'mp4'; } });
 
@@ -270,7 +270,7 @@ module.exports = {
 					});
 				}
 
-				const handleAudio = json => {
+				const handleAudio = (json, ffmpeg) => {
 					const path = os.homedir() + '/Music/' + json.fileName + '.mp3';
 					const args = {
 						bitrate: 128,
@@ -332,9 +332,9 @@ module.exports = {
 						if (json.endTime) options.end = json.endTime;
 
 						if (json.type == 'video')
-							handleVideo(json);
+							handleVideo(json, ffmpeg);
 						else if (json.type == 'audio')
-							handleAudio(json);
+							handleAudio(json, ffmpeg);
 						else sendError('Type not correct');
 					} else sendError('Tags not found. Expected url, fileName and tags.');
 				} else sendError('No JSON found');
