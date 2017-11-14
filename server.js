@@ -201,7 +201,7 @@ module.exports = {
 				body += data;
 
 				if (body.length > 1e6) {
-					request.send({success: false, err: 'The amount of data is too much', info: 'The connection was destroyed because the amount of data passed is too much'});
+					response.send({success: false, err: 'The amount of data is too much', info: 'The connection was destroyed because the amount of data passed is too much'});
 					request.connection.destroy();
 				}
 			});
@@ -209,13 +209,28 @@ module.exports = {
 			request.on('end', () => {
 				let json;
 
+				const sendData = data => {
+					response.send(data);
+				}
+
 				const sendError = err => {
-					try {response.send({success: false, error: err, jsonUpdated: false})}
+					try {sendData({success: false, error: err, jsonUpdated: false})}
 					catch (err) {}
 				}
 
 				const urlOk = url => {
-					if (url.indexOf('youtube.com') > 0) {
+					const parsedUrl = URLModule.parse(url);
+					const vidId = querystring.parse(parsedUrl.query).v;
+
+					if (parsedUrl.host.replace('www.', '') == 'youtube.com') {
+						if (vidId) {
+							if (vidId.length == 11)
+								return 'https://youtube.com/watch?v=' + vidId;
+							else return false;
+						} else return false;
+					} else return false;
+
+					/*if (url.indexOf('youtube.com') > 0) {
 						if (url.match(/https?:\/\/(www\.)?youtube\.com\/watch\?v\=(([A-Z]|[a-z]|[0-9]|\-|\_){11})$/))
 							return true;
 						else return false;
@@ -223,7 +238,70 @@ module.exports = {
 						if (url.match(/https?:\/\/(www\.)?youtu\.be\/(([A-Z]|[a-z]|[0-9]|\-|\_){11})$/))
 							return true;
 						else return false;
-					} else return false;
+					} else {
+						return false;
+					}*/
+				}
+
+				const handleProgress = (chunkLength, downloaded, total) => {
+					try {
+						process.stdout.cursorTo(0);
+						process.stdout.clearLine(1);
+						process.stdout.write("DOWNLOADING: " + (downloaded / total * 100).toFixed(2) + '% ');
+					} catch (err) {}
+				}
+
+				const handleVideo = json => {
+					const path = os.homedir() + '/Videos/' + json.fileName + '.mp4';
+					const video = ytdl(json.url, { filter: function(format) { return format.container === 'mp4'; } });
+
+					video.pipe(fs.createWriteStream(path));
+					video.on('progress', handleProgress);
+					video.on('end', () => {
+						process.stdout.write('\n');
+
+						fs.exists(path, exists => {
+							if (exists) {
+								fileHandler.searchSystem(fs, os, utils, settings).then(() => {
+									sendData({success: true, fileName: json.fileName + '.mp4', jsonUpdated: true});
+								}).catch(err => sendData({success: true, fileName: json.fileName, jsonUpdated: false}));
+							} else sendError("File does not exist. This is a weird problem... You should investigate.");
+						});
+					});
+				}
+
+				const handleAudio = json => {
+					const path = os.homedir() + '/Music/' + json.fileName + '.mp3';
+					const args = {
+						bitrate: 128,
+						format: 'mp3',
+						seek: json.startTime,
+						duration: json.endTime
+					}
+
+					const reader = ytdl(json.url, {filter: 'audioonly'});
+					const writer = ffmpeg(reader).format(args.format).audioBitrate(args.bitrate);
+
+					if (args.seek) writer.seekInput(args.seek);
+					if (args.duration) writer.duration(args.duration);
+
+					reader.on('progress', handleProgress);
+					reader.on('end', () => {
+						process.stdout.write('\n');
+
+						fs.exists(path, exists => {
+							if (exists) {
+								fileHandler.searchSystem(fs, os, utils, settings).then(() => {
+									sendData({success: true, fileName: json.fileName + '.mp3', jsonUpdated: true});
+								}).catch(err => {
+									sendData({success: true, fileName: json.fileName, jsonUpdated: false});
+								});
+							} else sendError("File does not exist. This is a weird problem... You should investigate.");
+						});
+					});
+
+					reader.on('error', err => {sendError(err)});
+					writer.output(path).run();
 				}
 
 				try {
@@ -235,85 +313,33 @@ module.exports = {
 
 				if (json) {
 					if (json.url && json.fileName && json.type) {
-						// Slashes don't work in paths
+						// Sanitize file name
 						json.fileName = json.fileName.replace('\/', '\\');
+						json.fileName = json.fileName.replace(/[/\\?%*:|"<>]/g, '');
 
 						const options = {};
 						const ffmpeg = require('fluent-ffmpeg');
 
-						if (!urlOk(json.url)) {sendError('Invalid url'); return;}
+						const checkUrl = urlOk(json.url);
+						if (urlOk(json.url))
+							json.url = checkUrl;
+						else {
+							sendError('Invalid url');
+							return;
+						}
+
 						if (json.beginTime) options.begin = json.beginTime;
 						if (json.endTime) options.end = json.endTime;
 
-						if (json.type == 'video') {
-							const path = os.homedir() + '/Videos/' + json.fileName + '.mp4';
-							const video = ytdl(json.url, { filter: function(format) { return format.container === 'mp4'; } });
-
-							video.pipe(fs.createWriteStream(path));
-							video.on('progress', (chunkLength, downloaded, total) => {
-								try {
-									process.stdout.cursorTo(0);
-									process.stdout.clearLine(1);
-									process.stdout.write("DOWNLOADING: " + (downloaded / total * 100).toFixed(2) + '% ');
-								} catch (err) {}
-							});
-
-							video.on('end', () => {
-								process.stdout.write('\n');
-
-								fs.exists(path, exists => {
-									if (exists) {
-										fileHandler.searchSystem(fs, os, utils, settings).then(() => {
-											response.send({success: true, fileName: json.fileName + '.mp4', jsonUpdated: true});
-										}).catch(err => response.send({success: true, fileName: json.fileName, jsonUpdated: false}));
-									} else sendError("File does not exist. This is a weird problem... You should investigate.");
-								});
-							});
-						} else if (json.type == 'audio') {
-							const path = os.homedir() + '/Music/' + json.fileName + '.mp3';
-							const args = {
-								bitrate: 128,
-								format: 'mp3',
-								seek: json.startTime,
-								duration: json.endTime
-							}
-
-							const reader = ytdl(json.url, {filter: 'audioonly'});
-							const writer = ffmpeg(reader)
-							.format(args.format)
-							.audioBitrate(args.bitrate);
-
-							if (args.seek) writer.seekInput(args.seek);
-							if (args.duration) writer.duration(args.duration);
-
-							reader.on('progress', (chunkLength, downloaded, total) => {
-								try {
-									process.stdout.cursorTo(0);
-									process.stdout.clearLine(1);
-									process.stdout.write("DOWNLOADING: " + (downloaded / total * 100).toFixed(2) + '% ');
-								} catch (err) {}
-							});
-
-							reader.on('end', () => {
-								process.stdout.write('\n');
-
-								fs.exists(path, exists => {
-									if (exists) {
-										fileHandler.searchSystem(fs, os, utils, settings).then(() => {
-											response.send({success: true, fileName: json.fileName + '.mp3', jsonUpdated: true});
-										}).catch(err => response.send({success: true, fileName: json.fileName, jsonUpdated: false}));
-									} else sendError("File does not exist. This is a weird problem... You should investigate.");
-								});
-							});
-
-							reader.on('error', err => {sendError(err)});
-							writer.output(path).run();
-						} else sendError('Type not correct');
+						if (json.type == 'video')
+							handleVideo(json);
+						else if (json.type == 'audio')
+							handleAudio(json);
+						else sendError('Type not correct');
 					} else sendError('Tags not found. Expected url, fileName and tags.');
 				} else sendError('No JSON found');
 			});
-		});
-
+});
 		//
 		app.post('/updateSettings', (request, response) => {
 			let body = '';
@@ -322,7 +348,7 @@ module.exports = {
 				body += data;
 
 				if (body.length > 1e6) {
-					request.send({success: false, err: 'The amount of data is to much', info: 'The connection was destroyed because the amount of data passed is to much'});
+					response.send({success: false, err: 'The amount of data is to much', info: 'The connection was destroyed because the amount of data passed is to much'});
 					request.connection.destroy();
 				}
 			});

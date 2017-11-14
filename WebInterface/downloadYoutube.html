@@ -2,7 +2,7 @@
 <html>
 <head lang="en">
 
-	<title>Download YouTube</title>
+	<title>MusicStream - Download YouTube</title>
 
 	<link rel="shortcut icon" href="Assets/Icons/favicon.ico"/>
 	<link rel="shortcut icon" href="Assets/Icons/favicon.ico" type="image/vnd.microsoft.icon"/>
@@ -185,13 +185,32 @@
 
 	function load() {
 		document.getElementById('searchBtn').addEventListener('click', evt => {
+			let parsedUrl;
 			const url = document.getElementById('link').value;
+			const urlOk = parsedUrl => {
+				if (parsedUrl.searchParams.has('v')) {
+					const vidId = parsedUrl.searchParams.get('v');
+
+					if (vidId.length == 11)
+						return vidId;
+					else return false;
+				} else return false;
+			};
+
+			try {
+				parsedUrl = new URL(url);
+			} catch (err) {
+				alert('Couln\'t parse URL');
+				throw Error('Couln\'t parse URL');
+			}
 
 			evt.target.style.opacity = '0.3';
 			evt.target.style.pointerEvents = 'none';
 
-			if (url.indexOf('youtube.com') > 0 || url.indexOf('youtu.be') > 0) {
-				fetch('/youtubeData/' + url.match(/(.+)v\=((\w+|[0-9]+|\-|\_)+)$/i)[2]).then(response => {
+			const vidId = urlOk(parsedUrl);
+			parsedUrl.host = parsedUrl.host.replace('www.', '');
+			if ((parsedUrl.host == 'youtube.com' || parsedUrl.host == 'youtu.be') && vidId) {
+				fetch('/youtubeData/' + vidId).then(response => {
 					response.json().then(json => {
 						if (json.success) {
 							json = json.info;
