@@ -151,6 +151,36 @@ main #videos {
 	overflow-y: scroll;
 }
 
+main #videos > div > div {
+	overflow: hidden;
+}
+
+main #videos > div > button {
+	border-bottom: 1px lightgray solid;
+	background-color: rgba(22, 160, 133, 0.3);
+}
+
+main #videos > div > button span {
+	margin-top: 3px;
+	display: inline-block;
+}
+
+main #videos > div > button img {
+	width: 20px;
+	height: 20px;
+	float: right;
+	border-radius: 100%;
+	background-color: gray;
+}
+
+main #videos > div.closed > div {
+	height: 0px;
+}
+
+main #videos > div.closed > button img {
+	transform: rotate(180deg);
+}
+
 main #videos #loaderWrapper {
 	width: 100%;
 	height: 100%;

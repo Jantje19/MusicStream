@@ -32,17 +32,28 @@ module.exports = {
 			if (url.toLowerCase().indexOf('sort=') > -1) sort = true;
 			fileHandler.getJSON(fs, os, utils, settings.audioFileExtensions.val, settings.videoFileExtensions.val).then(json => {
 				const songs = [];
-				const videos = [];
+				const videos = {};
 
-				if (json.audio.songs.length > 0 || json.video.videos.length > 0) {
+				const handleVideos = obj => {
+					// REVERSE!!
+
+					for (key in obj)
+						videos[key] = obj[key].map(val => {return val.fileName}).filter(val => {return !(settings.ignoredVideoFiles.val.includes(val))});
+				}
+
+				if (json.audio.songs.length > 0 || Object.keys(json.video.videos).length > 0) {
 					if (sort) {
+						// Sorting videos
+						for (key in json.video.videos)
+							json.video.videos[key] = json.video.videos[key].sort(sortFunc);
+
 						json.audio.songs.sort(sortFunc);
-						json.video.videos.sort(sortFunc);
+						// json.video.videos.sort(sortFunc);
 						json.audio.songs.forEach((object, key) => songs.push(object.fileName));
-						json.video.videos.forEach((object, key) => videos.push(object.fileName));
+						handleVideos(json.video.videos);
 					} else {
 						json.audio.songs.forEach((object, key) => songs.push(object.fileName));
-						json.video.videos.forEach((object, key) => videos.push(object.fileName));
+						handleVideos(json.video.videos);
 					}
 
 					getPlaylists = (json, fs) => {
@@ -88,13 +99,19 @@ module.exports = {
 						playlists = flatten(playlists);
 						// If oldest just reverse :P
 						if (url.toLowerCase().indexOf('sort=oldest') > -1) {
+							// Reverse videos
+							for (key in videos)
+								videos[key] = videos[key].reverse();
+
 							songs.reverse();
-							videos.reverse();
 							playlists.reverse();
 						}
 
-						response.send({audio: {songs: songs.filter(val => {return !(settings.ignoredAudioFiles.val.includes(val))}), playlists: playlists}, video: {videos: videos.filter(val => {return !(settings.ignoredVideoFiles.val.includes(val))})}});
-					}).catch(err => response.send({error: "Something went wrong", info: "Either getting the songs or getting the playlists or both went wrong"}));
+						response.send({audio: {songs: songs.filter(val => {return !(settings.ignoredAudioFiles.val.includes(val))}), playlists: playlists}, video: {videos: videos}});
+					}).catch(err => {
+						console.log(err);
+						response.send({error: "Something went wrong", info: "Either getting the songs or getting the playlists or both went wrong"})
+					});
 				} else response.send({error: "Not found", info: "There are no media files found on this device."});
 			}).catch(err => {
 				console.err('There was an error with getting the info', err);

@@ -2,7 +2,7 @@ module.exports = {
 	searchSystem: function(fs, os, utils, settings, silent) {
 		let paths = [];
 		const songsArr = [];
-		const videosArr = [];
+		const videosObj = {};
 		const playlistsArr = [];
 
 		const audioFileExtensions = settings.audioFileExtensions.val;
@@ -32,7 +32,7 @@ module.exports = {
 			// Wait untill the functions both finish
 			Promise.all(checkDirs).then(() => {
 				setTimeout(() => {
-					jsonFileArr = {audio: {songs: songsArr, playlists: playlistsArr}, video: {videos: videosArr}};
+					jsonFileArr = {audio: {songs: songsArr, playlists: playlistsArr}, video: {videos: videosObj}};
 
 					fs.writeFile(__dirname + '/JSON.json', JSON.stringify(jsonFileArr), err => {
 						if (err) reject(err);
@@ -54,6 +54,21 @@ module.exports = {
 						fs.readdir(path, (err, files) => {
 							if (err) reject(err);
 							else {
+								const addToVidArr = (path, fileName, ctime) => {
+									const getFolderFromPath = path => {
+										return path.replace(/\\/g, '/').split('/').filter(val => {return val.trim().length > 0}).pop();
+									}
+
+									let folderName = getFolderFromPath(path);
+									if (paths.map(val => {return getFolderFromPath(val)}).includes(folderName))
+										folderName = 'Root';
+
+									if (folderName in videosObj)
+										videosObj[folderName].push({path: path, fileName: fileName, lastChanged: ctime});
+									else
+										videosObj[folderName] = [{path: path, fileName: fileName, lastChanged: ctime}];
+								}
+
 								// Loop through all the files
 								files.forEach((object, key) => {
 									if (object.toLowerCase() != 'desktop.ini') {
@@ -65,7 +80,7 @@ module.exports = {
 											// Check if the file has a file extension that is in the arrays in index.js or that it is a playlist
 											// If it is a file just execute this function again
 											if (audioFileExtensions.includes(fileExtention)) songsArr.push({path: path, fileName: object, lastChanged: ctime});
-											else if (videoFileExtensions.includes(fileExtention)) videosArr.push({path: path, fileName: object, lastChanged: ctime});
+											else if (videoFileExtensions.includes(fileExtention)) addToVidArr(path, object, ctime);
 											else if (fileExtention == '.m3u') playlistsArr.push({path: path, fileName: object, lastChanged: ctime});
 											else if (!fileExtention && fs.lstatSync(path + object).isDirectory()) handleFolders(path + object + '/', utils);
 											else if (fileExtention && !silent) console.wrn('File extention not supported', object);

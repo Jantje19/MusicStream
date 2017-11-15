@@ -8,14 +8,37 @@ function load() {
 
 	fetch('/data/').then(response => {
 		response.json().then(json => {
+			const keys = Object.keys(json.video.videos);
 			const videosElem = document.getElementById('videos');
+			const addVideosToDiv = (arr, div) => {
+				arr.forEach((object, key) => {
+					div.innerHTML += `<button onclick="vidClick(event, '${object}')" draggable="true" ondragstart="drag(event)" class="video ${key}" id="${key}">${object}</button><hr>`;
+				});
+			}
 
 			videosElem.innerHTML = '';
-			json.video.videos.forEach((object, key) => {
-				videosElem.innerHTML += `<button onclick="vidClick(event, '${object}')" draggable="true" ondragstart="drag(event)" class="video ${key}" id="${key}">${object}</button><hr>`;
-			});
+			if (keys.length > 1) {
+				keys.forEach((object, key) => {
+					const containerDiv = document.createElement('div');
+					const titleButton = document.createElement('button');
+					const videoDiv = document.createElement('div');
+
+					titleButton.innerHTML = `<span>${object}</span><img src="/Assets/ic_keyboard_arrow_up_white.svg">`;
+					titleButton.onclick = evt => {
+						if (containerDiv.className.indexOf('closed') > -1)
+							containerDiv.className = containerDiv.className.replace('closed', '');
+						else
+							containerDiv.className += 'closed';
+					}
+
+					addVideosToDiv(json.video.videos[object], videoDiv);
+					containerDiv.appendChild(titleButton);
+					containerDiv.appendChild(videoDiv);
+					videosElem.appendChild(containerDiv);
+				});
+			} else addVideosToDiv(json.video.videos[keys[0]], videosElem);
 		});
-	}).catch( err => {
+	}).catch(err => {
 		console.error('An error occurred', err);
 	});
 
@@ -122,6 +145,8 @@ function togglePlayState() {
 function playVid(title, notQueueTop) {
 	video.src = '/video/' + title;
 	video.play();
+
+	console.log(title);
 
 	if (!notQueueTop)
 		queueTop(title);

@@ -10,7 +10,7 @@ module.exports = {
 					const inArray = findSong(json.video.videos, fileName);
 
 					if (inArray.val == true) {
-						const video = json.video.videos[inArray.index];
+						const video = inArray.video;
 						response.sendFile(video.path + video.fileName);
 
 						/*const filePath = video.path + video.fileName;
@@ -35,8 +35,13 @@ module.exports = {
 			}
 
 			function findSong(files, fileName) {
-				for (let i = 0; i < files.length; i++) {
-					if (files[i].fileName == fileName) return {val: true, index: i};
+				const keys = Object.keys(files);
+
+				for (let j = 0; j < keys.length; j++) {
+					for (let i = 0; i < files[keys[j]].length; i++) {
+						if (files[keys[j]][i].fileName == fileName)
+							return {val: true, video: files[keys[j]][i]};
+					}
 				}
 
 				return {val: false, index: -1};
