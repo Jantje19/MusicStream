@@ -2,7 +2,7 @@
 <html>
 <head lang="en">
 
-	<title>Help / Shortcuts</title>
+	<title>MusicStream - Help / Shortcuts</title>
 
 	<style type="text/css">
 	* {
@@ -92,7 +92,7 @@
 		padding: 0 10px;
 		overflow: hidden;
 		background-color: #EEEEEE;
-		transition: max-height .5s ease;
+		/*transition: max-height .5s ease;*/
 	}
 
 	main #WAQ {
@@ -158,7 +158,8 @@
 					elem.style.maxHeight = '0px';
 					btn.style.transform = 'rotate(180deg)';
 				} else {
-					elem.style.maxHeight = elem.getAttribute('maxHeight') + 'px';
+					// elem.style.maxHeight = elem.getAttribute('maxHeight') + 'px';
+					elem.style.maxHeight = '100%';
 					btn.style.transform = 'rotate(0deg)';
 				}
 			});
@@ -196,7 +197,7 @@
 
 				<ul>
 					<li><b>Esc:</b> Stop song</li>
-					<li><b>Enter:</b> Play/pause song</li>
+					<li><b>Enter/Space:</b> Play/pause song</li>
 					<li><b>Right Arrow:</b> Next song</li>
 					<li><b>Left Arrow:</b> Pervious song</li>
 					<li><b>Double click on song:</b> Add to queue and play</li>
@@ -226,7 +227,7 @@
 				<h3>Song Info</h3>
 
 				<p>
-					When a song is played it first queries the <i>Last.fm service</i> for the artist. Then it queries the local server for the song tags. If found, it replaces the artist info.<br>
+					When a song is played, it first queries the <i>Last.fm service</i> for the artist. Then it queries the local server for the song tags. If found, it replaces the artist info.<br>
 					The web MediaSession API also gets initialized.
 				</p>
 
@@ -253,7 +254,7 @@
 				<h3>Old Browsers</h3>
 
 				<p>
-					When an old browser is detected the page asks if you want to switch to a page with limited functionality, so that you can still use it on old browsers. Note: only the home page checks for old browsers.
+					When an old browser is detected, the page asks if you want to switch to a page with limited functionality, so that you can still use it on old browsers. Note: only the home page checks for old browsers.
 				</p>
 			</div>
 		</div>
@@ -308,7 +309,7 @@
 				<p>
 					This feature is used for downloading youtube videos. Simply paste the youtube url into the input box, select the type and hit <i>Search</i>, the page and the server will handle the rest.
 					You can monitor the progress in the servers terminal window.<br>
-					The tag functionality can act a big wonky sometimes and I don't know how to fix it.<br>
+					The tag functionality can act a big wonky sometimes and I don't know how to fix it, but you can add the tags yourself (or auto-add them) on the <a href="/editTags.html">edit tags page</a>.<br>
 					You can use this to download audio and video. It'll automaticly add it to the right folder.
 				</p>
 			</div>
@@ -320,7 +321,7 @@
 				<button><img src="/Assets/ic_keyboard_arrow_up_white.svg"></button>
 			</div>
 
-			<div maxHeight="1920">
+			<div maxHeight="2020">
 				<p>
 					<h3>Index.js Arguments</h3>
 
@@ -498,7 +499,7 @@
 		<div>
 			<b>Can I help the development?</b>
 			<p>
-				You sure can. All the support is greatly appreciated. I am currently maintaining this on my own. Every designer, product developer, software engenierer or other help is always helpfull. Even pointing out spelling mistakes is super useful. You can fork this project on <a href="https://github.com/jantje19/MusicStream/">Github</a>.
+				You sure can. All the support is greatly appreciated. I am currently maintaining this project on my own. Every designer, product developer, software engenierer or other help is always helpfull. Even pointing out spelling mistakes is super useful. You can fork this project on <a href="https://github.com/jantje19/MusicStream/">Github</a>.
 			</p>
 		</div>
 	</div>
