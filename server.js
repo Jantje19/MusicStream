@@ -208,6 +208,43 @@ module.exports = {
 			} else response.send({success: false, error: 'No valid video id', info: 'The video id supplied cannot be from a youtube video'});
 		});
 
+		app.get('/cutFile*', (request, response) => {
+			const url = querystring.unescape(request.url);
+			const params = querystring.parse(URLModule.parse(url).query);
+
+			if ('filename' in params && ('start' in params || 'end' in params)) {
+				fileHandler.getJSON(fs, os, utils, settings.audioFileExtensions.val, settings.videoFileExtensions.val).then(json => {
+					const index = json.audio.songs.map(val => {
+						return val.fileName;
+					}).indexOf(params.filename);
+
+					if (index > -1) {
+						const file = json.audio.songs[index];
+						const ffmpeg = require('fluent-ffmpeg');
+						const ffmpegObj = ffmpeg(file.path + file.fileName);
+
+						if ('end' in params) ffmpegObj.setDuration(params.end);
+						if ('start' in params) ffmpegObj.setStartTime(params.start);
+
+						ffmpegObj.output(file.path + file.fileName);
+						ffmpegObj.on('end', err => {
+							if (err)
+								response.send({success: false, error: JSON.parse(err)});
+							else
+								response.send({success: true});
+						});
+
+						ffmpegObj.on('error', err => {
+							console.log("FFMPEG Error", err);
+							response.send({success: false, error: JSON.parse(err)});
+						});
+
+						ffmpegObj.run();
+					} else response.send({success: false, error: "File not found"});
+				});
+			} else response.send({success: false, error: "Parameters missing"});
+		});
+
 		app.post('/ytdl*', (request, response) => {
 			let body = '';
 

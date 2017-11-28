@@ -54,7 +54,7 @@ module.exports = {
 						fs.readdir(path, (err, files) => {
 							if (err) reject(err);
 							else {
-								const addToVidArr = (path, fileName, ctime) => {
+								const addToVidArr = (path, fileName, mtime) => {
 									const getFolderFromPath = path => {
 										return path.replace(/\\/g, '/').split('/').filter(val => {return val.trim().length > 0}).pop();
 									}
@@ -64,9 +64,9 @@ module.exports = {
 										folderName = 'Root';
 
 									if (folderName in videosObj)
-										videosObj[folderName].push({path: path, fileName: fileName, lastChanged: ctime});
+										videosObj[folderName].push({path: path, fileName: fileName, lastChanged: mtime});
 									else
-										videosObj[folderName] = [{path: path, fileName: fileName, lastChanged: ctime}];
+										videosObj[folderName] = [{path: path, fileName: fileName, lastChanged: mtime}];
 								}
 
 								// Loop through all the files
@@ -75,13 +75,13 @@ module.exports = {
 										const fileExtention = utils.getFileExtention(object.toLowerCase());
 
 										fs.stat(path + object, (err, stats) => {
-											const ctime = new Date(stats.ctime.toString());
+											const mtime = new Date(stats.mtime.toString());
 
 											// Check if the file has a file extension that is in the arrays in index.js or that it is a playlist
 											// If it is a file just execute this function again
-											if (audioFileExtensions.includes(fileExtention)) songsArr.push({path: path, fileName: object, lastChanged: ctime});
-											else if (videoFileExtensions.includes(fileExtention)) addToVidArr(path, object, ctime);
-											else if (fileExtention == '.m3u') playlistsArr.push({path: path, fileName: object, lastChanged: ctime});
+											if (audioFileExtensions.includes(fileExtention)) songsArr.push({path: path, fileName: object, lastChanged: mtime});
+											else if (videoFileExtensions.includes(fileExtention)) addToVidArr(path, object, mtime);
+											else if (fileExtention == '.m3u') playlistsArr.push({path: path, fileName: object, lastChanged: mtime});
 											else if (!fileExtention && fs.lstatSync(path + object).isDirectory()) handleFolders(path + object + '/', utils);
 											else if (fileExtention && !silent) console.wrn('File extention not supported', object);
 											else if (fileExtention && silent);
