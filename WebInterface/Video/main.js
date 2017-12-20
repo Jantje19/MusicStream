@@ -73,6 +73,26 @@ function load() {
 			video.currentTime = video.duration / (evt.target.max / evt.target.value)
 	});
 
+	const videoSettingsElem = document.getElementById('video-settings');
+	videoSettingsElem.getElementsByTagName('button')[0].addEventListener('click', evt => {
+		evt.currentTarget.parentElement.style.display = 'none';
+	});
+
+	document.getElementById('settings-toggle').addEventListener('click', evt => {
+		if (videoSettingsElem.style.display == 'block')
+			videoSettingsElem.style.display = 'none';
+		else
+			videoSettingsElem.style.display = 'block';
+	});
+
+	document.getElementById('vidSpeed').addEventListener('change', evt => {
+		video.playbackRate = evt.currentTarget.value;
+	});
+
+	document.getElementById('captions').addEventListener('change', evt => {
+		addSubtitleTrack(evt.target.files[0]);
+	});
+
 	document.getElementById('playPause').addEventListener('click', togglePlayState);
 	document.getElementById('fullScreen').addEventListener('click', toggleFullScreen);
 
@@ -208,6 +228,18 @@ function convertToReadableTime(int) {
 	outp += seconds;
 
 	return outp;
+}
+
+function addSubtitleTrack(file) {
+	const url = window.URL.createObjectURL(file);
+	const trackElem = document.createElement('track');
+
+	trackElem.src = url;
+	trackElem.srclang = 'en';
+	trackElem.kind = 'captions';
+	trackElem.setAttribute('default', '');
+
+	document.getElementsByTagName('video')[0].appendChild(trackElem);
 }
 
 window.onload = load;

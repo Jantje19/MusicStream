@@ -117,7 +117,7 @@
 
 		document.getElementById('fab').addEventListener('click', evt => {
 			const tags = {};
-			const songName = location.hash.replace('#', '');
+			const songName = unescape(location.hash.replace('#', ''));
 
 			Array.from(document.getElementById('tagEditor').childNodes).forEach((object, key) => {
 				const input = object.querySelector('input');

@@ -419,3 +419,11 @@ function updateQueueIndex(num) {
 	queueIndex = num;
 	document.cookie = 'queueIndex=' + num;
 }
+
+
+
+function addVideoToQueue(name) {
+	if (name) {
+		enqueue('../video/' + name);
+	}
+}

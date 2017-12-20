@@ -483,7 +483,7 @@ function checkCookies(songsArr) {
 
 	function getLocationAttributes() {
 		const json = {};
-		let url = window.location.search;
+		let url = unescape(window.location.search);
 
 		if (url.indexOf('?') > -1) {
 			url = url.substr(1);
@@ -525,9 +525,7 @@ function checkCookies(songsArr) {
 		window.history.replaceState({}, document.title, "/");
 
 		if ('queue' in locationAtts) {
-			const arr = locationAtts['queue'].split(',').map(val => {
-				return unescape(val)
-			}).filter(val => {
+			const arr = locationAtts['queue'].split(',').filter(val => {
 				return songsArr.includes(val);
 			});
 

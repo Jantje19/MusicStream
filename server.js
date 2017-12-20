@@ -186,23 +186,26 @@ module.exports = {
 			if (id.length == 11) {
 				try {
 					ytdl.getInfo(id, (err, info) => {
-						info = JSON.parse(JSON.stringify(info));
-						const allowed = ['keywords', 'view_count', 'author', 'title', 'thubnail_url', 'description', 'thumbnail_url', 'length_seconds'];
+						if (err)
+							response.send({success: false, error: 'No info found for that video id', info: err});
+						else {
+							info = JSON.parse(JSON.stringify(info));
+							const allowed = ['keywords', 'view_count', 'author', 'title', 'thubnail_url', 'description', 'thumbnail_url', 'length_seconds'];
 
-						Object.prototype.filter = function(arr) {
-							if (this.constructor === {}.constructor) {
-								const newObj = {};
-								for (key in this) {
-									if (arr.includes(key))
-										newObj[key] = this[key];
-								}
+							Object.prototype.filter = function(arr) {
+								if (this.constructor === {}.constructor) {
+									const newObj = {};
+									for (key in this) {
+										if (arr.includes(key))
+											newObj[key] = this[key];
+									}
 
-								return newObj;
-							} else this;
+									return newObj;
+								} else this;
+							}
+
+							response.send({success: true, info: info.filter(allowed)});
 						}
-
-						if (err) response.send({success: false, error: 'No info', info: err});
-						else response.send({success: true, info: info.filter(allowed)});
 					});
 				} catch (err) {response.send({success: false, error: 'Something went wrong', info: err})};
 			} else response.send({success: false, error: 'No valid video id', info: 'The video id supplied cannot be from a youtube video'});

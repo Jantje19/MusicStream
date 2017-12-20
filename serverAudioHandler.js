@@ -218,17 +218,18 @@ module.exports = {
 				try {
 					json = JSON.parse(body);
 				} catch (err) {
-					response.send({success: false, info: err});
+					response.send({success: false, info: 'Couln\'t parse JSON'});
 					return;
 				}
 
 				if (json.tags && json.songName) {
-					if (json.songName.endsWith('.mp3') || json.songName.endsWith('.MP3')) {
+					if (json.songName.toLowerCase().endsWith('.mp3')) {
 
 						fileHandler.getJSON(fs, os, utils, settings.audioFileExtensions.val, settings.videoFileExtensions.val).then(songs => {
 							function findSong(array, songName) {
 								for (let i = 0; i < array.length; i++) {
-									if (array[i].fileName == songName) return array[i];
+									if (array[i].fileName == songName)
+										return array[i];
 								}
 							}
 
@@ -259,23 +260,33 @@ module.exports = {
 							}
 
 							function done() {
-								if (id3.write(json.tags, findSong(songs.audio.songs, json.songName).path + json.songName)) response.send({success: true});
-								else response.send({success: false, info: 'Something went wrong with writing the tags'});
+								const songLocation = findSong(songs.audio.songs, json.songName);
+
+								if (songLocation) {
+									if (id3.write(json.tags, songLocation.path + json.songName))
+										response.send({success: true});
+									else
+										response.send({success: false, info: 'Something went wrong with writing the tags'});
+								} else response.send({success: false, info: 'Song not found in JSON'});
 							}
 
 							if (json.tags.delete) {
 								if (id3.removeTags(findSong(songs.audio.songs, json.songName).path + json.songName))
 									response.send({success: true});
-								else response.send({success: false, info: "Tags not deleted"});
+								else
+									response.send({success: false, info: "Tags not deleted"});
 							} else {
 								if (json.tags.image) {
 									getImage(json.tags.image).then(imageBuffer => {
 										json.tags.image = imageBuffer;
 										done();
-									}).catch(err => {console.err(err); response.send({success: false, info: err})});
+									}).catch(err => {
+										console.err(err);
+										response.send({success: false, info: err})
+									});
 								} else done();
 							}
-						}).catch(err => {console.err(err); response.send({success: false, info: err})});
+						}).catch(err => {console.err(err); response.send({success: false, info: JSON.stringify(err)})});
 					} else response.send({success: false, info: 'The required tags (tags, songName) are not found.'});
 				} else response.send({success: false, info: 'Not an audio file.'});
 			});
@@ -305,27 +316,37 @@ module.exports = {
 				const url = querystring.unescape(request.url);
 
 				console.log(utils.logDate() + ' Got a POST request for ' + url);
-				fs.exists(jsonPath, exists => {
-					if (exists) {
-						fs.readFile('./playlists.json', 'utf-8', (err, data) => {
+				fileHandler.getJSON(fs, os, utils, settings.audioFileExtensions, settings.videoFileExtensions).then(data => {
+					if (data.audio.songs.map(val => {return val.fileName}).includes(body)) {
+						fs.exists(jsonPath, exists => {
+							if (exists) {
+								fs.readFile('./playlists.json', 'utf-8', (err, data) => {
 
-							try {data = JSON.parse(data)} catch (err) {return}
-							if (data[settings.mostListenedPlaylistName.val]) {
-								songs = data[settings.mostListenedPlaylistName.val];
+									try {data = JSON.parse(data)} catch (err) {response.send({success: false, data: 'Couldn\'t parse JSON'}); return}
+									if (data[settings.mostListenedPlaylistName.val]) {
+										songs = data[settings.mostListenedPlaylistName.val];
 
-								if (body in songs) songs[body]++;
-								else songs[body] = 1;
-							} else songs[body] = 1;
+										if (body in songs) songs[body]++;
+										else songs[body] = 1;
+									} else songs[body] = 1;
 
-							send();
+									send();
+								});
+							} else {
+								songs[body] = 1;
+								send();
+							}
+
+							function send() {
+								fileHandler.updatePlaylist(fs, {name: settings.mostListenedPlaylistName.val, songs: songs}, settings.mostListenedPlaylistName.val)
+								.then(data => response.send({success: true, data: body + ' successfully added to ' + settings.mostListenedPlaylistName.val}))
+								.catch(err => response.send({success: false, data: 'Something happened when tried to add ' + body + ' to ' + settings.mostListenedPlaylistName.val}));
+							}
 						});
-					} else {
-						songs[body] = 1;
-						send();
-					}
-
-					function send() {fileHandler.updatePlaylist(fs, {name: settings.mostListenedPlaylistName.val, songs: songs}, settings.mostListenedPlaylistName.val).then(data => response.send({success: true, data: body + ' successfully added to ' + settings.mostListenedPlaylistName.val})).catch(err => response.send({success: false, data: 'Something happened when tried to add ' + body + ' to ' + settings.mostListenedPlaylistName.val}));}
-				});
+					} else response.send({success: false, data: 'Song not found'});
+				}).catch(err => {
+					response.send({success: false, data: 'Couldn\'t get songs'});
+				})
 			});
 		});
 	}

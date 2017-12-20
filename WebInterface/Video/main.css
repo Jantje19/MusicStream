@@ -275,6 +275,47 @@ main #player #autoplay #autoplay-time {
 	transition: transform 1s linear;
 }
 
+main #player #video-settings {
+	top: 5%;
+	left: 5%;
+	width: 90%;
+	height: 90%;
+	color: white;
+	z-index: 1000;
+	display: none;
+	position: absolute;
+	pointer-events: all;
+	background-color: rgba(0, 0, 0, 0.8);
+}
+
+main #player #video-settings div {
+	margin: 2% 0;
+	width: 100%;
+	display: flex;
+	align-items: center;
+	flex-direction: column;
+	background-color: rgba(255, 255, 255, 0.2);
+}
+
+main #player #video-settings div * {
+	margin: 2% 0;
+	display: block;
+}
+
+main #player #video-settings div:first-child {
+	margin-top: 10%;
+}
+
+main #player #video-settings button {
+	top: 0;
+	right: 0;
+	color: white;
+	border: none;
+	cursor: pointer;
+	position: absolute;
+	background-color: transparent;
+}
+
 main #player #videoElem {
 	width: 100%;
 	height: 40vw;
@@ -286,7 +327,7 @@ main #player #videoElem video {
 	height: 100%;
 }
 
-main #player #controls {
+main #player #videoElem #controls {
 	left: 0px;
 	width: 100%;
 	bottom: 0px;
@@ -298,11 +339,11 @@ main #player #controls {
 	box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
 }
 
-main #player:hover #controls {
+main #player #videoElem:hover #controls {
 	transform: translateY(0px);
 }
 
-main #player #controls span {
+main #player #videoElem #controls span {
 	width: auto;
 	color: white;
 	height: 100%;
@@ -310,7 +351,7 @@ main #player #controls span {
 	transform: translateY(-3px);
 }
 
-main #player #controls button {
+main #player #videoElem #controls button {
 	height: 110%;
 	border: none;
 	cursor: pointer;
@@ -318,7 +359,7 @@ main #player #controls button {
 	background-color: transparent;
 }
 
-main #player #controls button:before {
+main #player #videoElem #controls button:before {
 	opacity: 0;
 	width: 40px;
 	height: 40px;
@@ -331,11 +372,11 @@ main #player #controls button:before {
 	transform: translate(-20%, -20%);
 }
 
-main #player #controls button:hover:before {
+main #player #videoElem #controls button:hover:before {
 	opacity: 0.15;
 }
 
-main #player #controls > div {
+main #player #videoElem #controls > div {
 	height: 100%;
 }
 

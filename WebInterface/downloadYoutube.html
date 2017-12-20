@@ -254,9 +254,9 @@
 								nodes[1].style.transform = 'translate(-50%, -110vh)';
 								nodes[3].style.display = 'flex';
 							}, 300);
-						} else alert(json.info);
+						} else alert(json.error);
 					});
-				}).catch(err => alert(err));
+				}).catch(alert);
 			} else alert('Link does not match a youtube url')/*Display toast or something..*/;
 		});
 
@@ -313,7 +313,7 @@
 					if (json.success) {
 						if (useTags && type == 'audio') {
 							const body = {
-								songName: json.fileName + '.mp3',
+								songName: json.fileName,
 								tags: data.tags
 							}
 

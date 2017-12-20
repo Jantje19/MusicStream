@@ -53,23 +53,46 @@
 					<div id="autoplay-time"></div>
 				</div>
 
-				<div id="videoElem">
-					<video></video>
+				<div id="video-settings">
+					<div>
+						<label for="vidSpeed">Speed</label>
+						<select id="vidSpeed">
+							<option>0.25</option>
+							<option>0.50</option>
+							<option>0.75</option>
+							<option selected>1.00</option>
+							<option>1.25</option>
+							<option>1.50</option>
+							<option>1.75</option>
+						</select>
+					</div>
+
+					<div>
+						<label for="captions">Captions</label>
+						<input type="file" id="captions">
+					</div>
+
+					<button title="close menu">X</button>
 				</div>
 
-				<div id="controls">
-					<div style="float: left">
-						<button title="play/pause video" id="playPause"><img src="Assets/ic_play_arrow_white.svg"></button>
-					</div>
+				<div id="videoElem">
+					<video></video>
 
-					<div style="width: 79%; display: inline-block;">
-						<span id="time-start">00:00</span>
-						<input type="range" value="0" min="0" max="100" id="seekBar"/>
-						<span id="time-end">00:00</span>
-					</div>
+					<div id="controls">
+						<div style="float: left">
+							<button title="play/pause video" id="playPause"><img src="Assets/ic_play_arrow_white.svg"></button>
+						</div>
 
-					<div style="float: right">
-						<button title="Fullscreen toggle" id="fullScreen"><img src="Assets/ic_fullscreen_white.svg"></button>
+						<div style="width: 69%; display: inline-block;">
+							<span id="time-start">00:00</span>
+							<input type="range" value="0" min="0" max="100" id="seekBar"/>
+							<span id="time-end">00:00</span>
+						</div>
+
+						<div style="float: right">
+							<button title="More settings" id="settings-toggle"><img src="Assets/ic_settings_white.svg"></button>
+							<button title="Fullscreen toggle" id="fullScreen"><img src="Assets/ic_fullscreen_white.svg"></button>
+						</div>
 					</div>
 				</div>
 
@@ -92,7 +115,7 @@
 
 		<div id="videos">
 			<div id="loaderWrapper">
-				<div class="ball-scale-multiple"><div></div><div></div><div></div></div>
+				<div style="width: 60px; height: 60px; 	transform: translate(150%, 20px);" class="ball-scale-multiple"><div style="left: 0"></div><div style="left: 0"></div><div style="left: 0"></div></div>
 			</div>
 		</div>
 	</main>
