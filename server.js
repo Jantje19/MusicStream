@@ -30,7 +30,7 @@ module.exports = {
 			console.log(utils.logDate() + ' Got a request for ' + url);
 
 			if (url.toLowerCase().indexOf('sort=') > -1) sort = true;
-			fileHandler.getJSON(fs, os, utils, settings.audioFileExtensions.val, settings.videoFileExtensions.val).then(json => {
+			fileHandler.getJSON(fs, os, utils, settings).then(json => {
 				const songs = [];
 				const videos = {};
 
@@ -216,7 +216,7 @@ module.exports = {
 			const params = querystring.parse(URLModule.parse(url).query);
 
 			if ('filename' in params && ('start' in params || 'end' in params)) {
-				fileHandler.getJSON(fs, os, utils, settings.audioFileExtensions.val, settings.videoFileExtensions.val).then(json => {
+				fileHandler.getJSON(fs, os, utils, settings).then(json => {
 					const index = json.audio.songs.map(val => {
 						return val.fileName;
 					}).indexOf(params.filename);

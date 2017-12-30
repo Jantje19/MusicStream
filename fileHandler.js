@@ -184,7 +184,7 @@ module.exports = {
 		});
 	},
 
-	getJSON: function(fs, os, utils, audioFileExtensions, videoFileExtensions) {
+	getJSON: function(fs, os, utils, settings) {
 		return new Promise((resolve, reject) => {
 			const JSONPath = './JSON.json';
 
@@ -196,7 +196,7 @@ module.exports = {
 					});
 				} else {
 					console.wrn('The JSON file does not exist, so I am creating one...');
-					resolve(this.searchSystem(fs, os, audioFileExtensions, videoFileExtensions, utils));
+					resolve(this.searchSystem(fs, os, utils, settings));
 				}
 			});
 		});

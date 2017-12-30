@@ -390,7 +390,7 @@ if (process.argv.includes('check-updates')) {
 		if (fromFileName != toFileName) {
 			utils.colorLog(`Tying to renaming '${fromFileName}' to '${toFileName}'`, 'fgCyan');
 
-			fileHandler.getJSON(fs, os, utils, settings.audioFileExtensions.val, settings.videoFileExtensions.val).then(val => {
+			fileHandler.getJSON(fs, os, utils, settings).then(val => {
 				console.log('Got all files. Searching...');
 
 				const songsArr = val.audio.songs.map(val => {return val.fileName});
