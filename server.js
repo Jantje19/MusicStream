@@ -1,8 +1,26 @@
 module.exports = {
-	start: function(dirname, fileHandler, fs, os, settings, utils, querystring, id3, ytdl, version, https, URLModule, serverPlugins) {
+	start: function(dirname, fileHandler, fs, os, settings, utils, querystring, id3, ytdl, version, https, URLModule, serverPlugins, hijackRequestPlugins) {
 		const express = require('express');
 		const app = express();
 		const port = settings.port.val;
+
+		if (hijackRequestPlugins.length > 0) {
+			app.use((request, response, next) => {
+				hijackRequestPlugins.forEach((object, key) => {
+					if (object.func) {
+						if (typeof object.func == 'function') {
+							if (object.preventDefault != true)
+								object.func(request, response);
+							else
+								object.func(request, response, next);
+						} else console.wrn(object.func + ' is not a function');
+					}
+
+					if (object.preventDefault != true)
+						next();
+				});
+			});
+		}
 
 		app.get('*/all.js', (request, response) => {
 			utils.sendFile(fs, dirname + 'all.js', response);
@@ -465,7 +483,7 @@ module.exports = {
 					} else {
 						args = args[0];
 
-						if (args instanceof Array) {
+						if (Array.isArray(args)) {
 							args.forEach((object, key) => {
 								app.get(`/${this.pluginName}/${object.name}*`, object.func);
 							});
@@ -483,7 +501,7 @@ module.exports = {
 					} else {
 						args = args[0];
 
-						if (args instanceof Array) {
+						if (Array.isArray(args)) {
 							args.forEach((object, key) => {
 								app.post(`/${this.pluginName}/${object.name}*`, object.func);
 							});

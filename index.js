@@ -14,6 +14,7 @@ const {version} = require('./package.json');
 const pluginDomJs = [];
 const pluginServer = [];
 const mainPageMenu = [];
+const hijackRequestPlugins = [];
 
 const loadPlugins = () => {
 	return new Promise((resolve, reject) => {
@@ -93,6 +94,9 @@ const loadPlugins = () => {
 								mainPageMenu.push(object.module.menu);
 							}
 						}
+
+						if (object.module.hijackRequests)
+							hijackRequestPlugins.push(object.module.hijackRequests);
 					}
 				});
 
@@ -106,7 +110,7 @@ const loadPlugins = () => {
 
 const startServer = () => {
 	loadPlugins().then(() => {
-		const startServerModule = () => server.start(__dirname + '/WebInterface/', fileHandler, fs, os, settings, utils, querystring, id3, ytdl, version, https, URLModule, pluginServer);
+		const startServerModule = () => server.start(__dirname + '/WebInterface/', fileHandler, fs, os, settings, utils, querystring, id3, ytdl, version, https, URLModule, pluginServer, hijackRequestPlugins);
 
 		if (settings.updateJsonOnStart.val == true) {
 			fileHandler.searchSystem(fs, os, utils, settings).then(startServerModule).catch(err => {

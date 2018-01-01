@@ -1,5 +1,6 @@
 let data;
 let clickTimer;
+let listenTime = 0;
 
 const cssRules = [];
 const audio = new Audio();
@@ -223,6 +224,7 @@ function load() {
 	});
 
 	audio.addEventListener('timeupdate', evt => {
+		listenTime++;
 		seekBarElem.value = (audio.currentTime / audio.duration) * 100;
 
 		if (audio.duration)
