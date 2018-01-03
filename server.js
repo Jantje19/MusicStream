@@ -3,16 +3,41 @@ module.exports = {
 		const express = require('express');
 		const app = express();
 		const port = settings.port.val;
+		const ips = utils.getLocalIP(os);
+
+		app.get('*favicon.ico*', (request, response) => {
+			utils.sendFile(fs, dirname + 'Assets/Icons/favicon.ico', response);
+		});
+
+		const imports = {
+			fs: fs,
+			os: os,
+			id3: id3,
+			ytdl: ytdl,
+			utils: utils,
+			https: https,
+			URLModule: URLModule,
+			fileHandler: fileHandler,
+			querystring: querystring
+		}
+
+		const availableData = {
+			version: version,
+			serverURL: ips[0] + ':' + port,
+		}
 
 		if (hijackRequestPlugins.length > 0) {
 			app.use((request, response, next) => {
 				hijackRequestPlugins.forEach((object, key) => {
+					const data = availableData;
+
+					data.path = __dirname + '/Plugins/' + object.pluginFolder;
 					if (object.func) {
 						if (typeof object.func == 'function') {
 							if (object.preventDefault != true)
-								object.func(request, response);
+								object.func(request, response, imports, data);
 							else
-								object.func(request, response, next);
+								object.func(request, response, next, imports, data);
 						} else console.wrn(object.func + ' is not a function');
 					}
 
@@ -455,19 +480,6 @@ module.exports = {
 		require('./serverVideoHandler.js').start(app, dirname, fileHandler, fs, os, settings, utils, querystring);
 		require('./serverAudioHandler.js').start(app, dirname, fileHandler, fs, os, settings, utils, querystring, id3, https, URLModule);
 
-		const ips = utils.getLocalIP(os);
-		const imports = {
-			fs: fs,
-			os: os,
-			id3: id3,
-			ytdl: ytdl,
-			utils: utils,
-			https: https,
-			URLModule: URLModule,
-			fileHandler: fileHandler,
-			querystring: querystring
-		}
-
 		// Plugins
 		if (serverPlugins) {
 			class PluginServerHandler {
@@ -513,13 +525,11 @@ module.exports = {
 			}
 
 			serverPlugins.forEach((object, key) => {
+				const data = availableData;
 				const server = new PluginServerHandler(object.folder);
 
-				object.func(server, imports, {
-					version: version,
-					serverURL: ips[0] + ':' + port,
-					path: __dirname + '/Plugins/' + object.folder
-				});
+				data.path = __dirname + '/Plugins/' + object.folder;
+				object.func(server, imports, data);
 			});
 		}
 

@@ -1,7 +1,7 @@
 let settings;
 let queueIndex = 0;
 
-fetch('/getSettings/').then(response => {
+fetch('/getSettings/', {credentials: 'same-origin'}).then(response => {
 	response.json().then(json => {
 		settings = json;
 	}).catch(err => {console.log(err);});

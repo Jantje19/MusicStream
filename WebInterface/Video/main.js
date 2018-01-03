@@ -6,7 +6,7 @@ function load() {
 	const seekBarElem = document.getElementById('seekBar');
 	const timeStartElem = document.getElementById('time-start');
 
-	fetch('/data/').then(response => {
+	fetch('/data/', {credentials: 'same-origin'}).then(response => {
 		response.json().then(json => {
 			const keys = Object.keys(json.video.videos);
 			const videosElem = document.getElementById('videos');

@@ -22,12 +22,10 @@ function end() {
 	const songName = queue[queueIndex];
 
 	if (shouldUpdateMostListened) {
-		fetch('/updateMostListenedPlaylist', {method: 'POST', body: songName}).then(response => {
-			response.json().then(json => {
-				if (json.success) console.log(json.data);
-				else console.warn(json.data);
-			});
-		}).catch( err => {
+		get('/updateMostListenedPlaylist', {method: 'POST', body: songName}).then(json => {
+			if (json.success) console.log(json.data);
+			else console.warn(json.data);
+		}).catch(err => {
 			console.error('An error occurred', err);
 		});
 	}
@@ -199,19 +197,17 @@ function displayLyrics(artist, songName) {
 	}, 100);
 
 	if (previousTrack != songName) {
-		fetch(`/getLyrics/${artist}/${songName}`).then(response => {
-			response.json().then(json => {
-				if (json.success) {
-					// Split by upper and lower case difference, then adding a break tag
-					// const lyrics = json.lyrics.split(/(?=[A-Z])/).map(val => {return val.trim();}).join('<br>');
+		get(`/getLyrics/${artist}/${songName}`).then(json => {
+			if (json.success) {
+				// Split by upper and lower case difference, then adding a break tag
+				// const lyrics = json.lyrics.split(/(?=[A-Z])/).map(val => {return val.trim();}).join('<br>');
 
-					const lyrics = json.lyrics.replace(/\n+/g, '<br>');
+				const lyrics = json.lyrics.replace(/\n+/g, '<br>');
 
-					previousTrack = songName;
-					lyricsElem.innerHTML = `<h3>Lyrics</h3><p style="line-height: 1.5;">${lyrics}</p>`;
-				} else lyricsElem.innerHTML = `<h3>Error</h3><br><p>${json.error}</p>`;
-			}).catch(err => {lyricsElem.innerHTML = `<h3>Error</h3><br><p>Nope</p>`;});
-		}).catch(err => {lyricsElem.innerHTML = `<h3>Error</h3><br><p>Nope</p>`;});
+				previousTrack = songName;
+				lyricsElem.innerHTML = `<h3>Lyrics</h3><p style="line-height: 1.5;">${lyrics}</p>`;
+			} else lyricsElem.innerHTML = `<h3>Error</h3><br><p>${json.error}</p>`;
+		}).catch(err => {console.error(err); lyricsElem.innerHTML = `<h3>Error</h3><br><p>Couldn't fetch lyrics</p>`;});
 	}
 }
 
@@ -287,63 +283,61 @@ function mediaSession() {
 			});
 		}
 
-		fetch('/songInfo/' + queue[queueIndex]).then(response => {
-			response.json().then(json => {
-				if (json.error) return;
-				try {document.getElementById('artistInfo').remove()} catch(err) {}
+		get('/songInfo/' + queue[queueIndex]).then(json => {
+			if (json.error) return;
+			try {document.getElementById('artistInfo').remove()} catch(err) {}
 
-				tagsLoaded = true;
+			tagsLoaded = true;
 
-				let imageUrl;
-				const img = new Image();
-				const dataDiv = document.createElement('div');
+			let imageUrl;
+			const img = new Image();
+			const dataDiv = document.createElement('div');
 
-				dataDiv.id = 'artistInfo';
-				dataDiv.innerHTML += `<p style="font-size: 120%;">Song info:</p> <img id="infoBtn" onclick="displayLyrics('${escapeString(json.artist)}', '${escapeString(json.title)}')" src="Assets/ic_music_note_white.svg"><hr>`;
-				dataDiv.innerHTML += `<p><b>Title:</b> ${json.title}</p>`;
-				dataDiv.innerHTML += `<p><b>Artist:</b> ${json.artist}</p>`;
-				dataDiv.innerHTML += `<p><b>Album:</b> ${json.album}</p>`;
-				dataDiv.innerHTML += `<p><b>Year:</b> ${json.year}</p>`;
+			dataDiv.id = 'artistInfo';
+			dataDiv.innerHTML += `<p style="font-size: 120%;">Song info:</p> <img id="infoBtn" onclick="displayLyrics('${escapeString(json.artist)}', '${escapeString(json.title)}')" src="Assets/ic_music_note_white.svg"><hr>`;
+			dataDiv.innerHTML += `<p><b>Title:</b> ${json.title}</p>`;
+			dataDiv.innerHTML += `<p><b>Artist:</b> ${json.artist}</p>`;
+			dataDiv.innerHTML += `<p><b>Album:</b> ${json.album}</p>`;
+			dataDiv.innerHTML += `<p><b>Year:</b> ${json.year}</p>`;
 
-				document.title = 'Music Stream - ' + title.replace(/-/g, '');
+			document.title = 'Music Stream - ' + title.replace(/-/g, '');
 
-				try {
-					if (window.innerWidth > 500) {
-						if (json.image.imageBuffer.data.length > 1e7) return;
-						const arrayBufferView = new Uint8Array(json.image.imageBuffer.data);
-						const blob = new Blob([arrayBufferView], {type: "image/jpeg"});
-						const urlCreator = window.URL || window.webkitURL;
+			try {
+				if (window.innerWidth > 500) {
+					if (json.image.imageBuffer.data.length > 1e7) return;
+					const arrayBufferView = new Uint8Array(json.image.imageBuffer.data);
+					const blob = new Blob([arrayBufferView], {type: "image/jpeg"});
+					const urlCreator = window.URL || window.webkitURL;
 
-						imageUrl = urlCreator.createObjectURL(blob);
-						img.id = 'thumbnail';
-						img.style.top = '40px';
-						img.style.right = '10px';
-						img.style.width = '100px';
-						img.style.height = 'auto';
-						img.style.position = 'absolute';
-						img.style.border = '2px white solid';
-						img.style.boxShadow = '0 0 10px rgba(0, 0, 0, 0.3)';
-						img.src = imageUrl;
-						dataDiv.appendChild(img);
-					}
-				} catch (err) {};
-
-				document.getElementById('mainControls').appendChild(dataDiv);
-				document.getElementById('showData').setAttribute('activated', true);
-
-				if ('mediaSession' in navigator) {
-					navigator.mediaSession.metadata.title = json.title;
-					navigator.mediaSession.metadata.album = json.album;
-					navigator.mediaSession.metadata.artist = json.artist;
-
-					img.onload = evt => {
-						navigator.mediaSession.metadata.artwork.length = 0;
-						navigator.mediaSession.metadata.artwork = [
-						{ src: imageUrl, sizes: '512x512', type: 'image/jpeg' },
-						];
-					}
+					imageUrl = urlCreator.createObjectURL(blob);
+					img.id = 'thumbnail';
+					img.style.top = '40px';
+					img.style.right = '10px';
+					img.style.width = '100px';
+					img.style.height = 'auto';
+					img.style.position = 'absolute';
+					img.style.border = '2px white solid';
+					img.style.boxShadow = '0 0 10px rgba(0, 0, 0, 0.3)';
+					img.src = imageUrl;
+					dataDiv.appendChild(img);
 				}
-			}).catch(err => console.warn(err));
+			} catch (err) {};
+
+			document.getElementById('mainControls').appendChild(dataDiv);
+			document.getElementById('showData').setAttribute('activated', true);
+
+			if ('mediaSession' in navigator) {
+				navigator.mediaSession.metadata.title = json.title;
+				navigator.mediaSession.metadata.album = json.album;
+				navigator.mediaSession.metadata.artist = json.artist;
+
+				img.onload = evt => {
+					navigator.mediaSession.metadata.artwork.length = 0;
+					navigator.mediaSession.metadata.artwork = [
+					{ src: imageUrl, sizes: '512x512', type: 'image/jpeg' },
+					];
+				}
+			}
 		}).catch(err => console.warn(err));
 	}
 
@@ -396,12 +390,10 @@ function fetchArtistData(artistName) {
 	// const url = `https://ws.audioscrobbler.com/2.0/?method=track.getInfo&api_key=f02456f630621a02581b2143a67372f0&artist=${artistName}&track=${songName}&format=json&autocorrect=1`;
 
 	return new Promise((resolve, reject) => {
-		fetch(url).then(response => {
-			response.json().then(json => {
-				if (json.artist) resolve(json.artist);
-				else if (json.error) reject(json.message);
-				else reject('Something went wrong with the JSON');
-			});
+		get(url).then(json => {
+			if (json.artist) resolve(json.artist);
+			else if (json.error) reject(json.message);
+			else reject('Something went wrong with the JSON');
 		}).catch(err => reject(err));
 	});
 }

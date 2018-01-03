@@ -46,6 +46,10 @@ function handlePlaylist(evt, name) {
 }
 
 function get(url, headers) {
+	if (!headers)
+		headers = {};
+
+	headers.credentials = 'same-origin';
 	return new Promise((resolve, reject) => {
 		fetch(url, headers).then(response => {
 			if (response.type === 'opaque')
@@ -130,16 +134,14 @@ function saveQueueToPlaylist() {
 			if (confirm('Are you sure the playlist is okay like this?')) {
 				const jsonData = {name: playlistName, songs: queue};
 
-				fetch('/updatePlaylist/', {method: "POST", body: JSON.stringify(jsonData)}).then(response => {
-					response.json().then(json => {
-						if (json.success) {
-							if (json.error) alert('Something on the server went wrong.\n' + json.info);
-							else if (json.data.toLowerCase().startsWith('playlist with the name ')) {
-								alert(json.data);
-							} else alert('Something went wrong', json.data);
-						} else alert(json.info);
-					});
-				}).catch( err => {
+				get('/updatePlaylist/', {method: "POST", body: JSON.stringify(jsonData)}).then(json => {
+					if (json.success) {
+						if (json.error) alert('Something on the server went wrong.\n' + json.info);
+						else if (json.data.toLowerCase().startsWith('playlist with the name ')) {
+							alert(json.data);
+						} else alert('Something went wrong', json.data);
+					} else alert(json.info);
+				}).catch(err => {
 					console.error('An error occurred', err);
 				});
 			}
@@ -339,18 +341,16 @@ function load() {
 
 		if (val != "none") after = 'sort=' + val;
 
-		fetch('/data/' + after).then(response => {
-			response.json().then(json => {
-				const songs = json.audio.songs;
-				const songsElem = document.getElementById('songs');
+		get('/data/' + after).then(json => {
+			const songs = json.audio.songs;
+			const songsElem = document.getElementById('songs');
 
-				songsElem.innerHTML = '';
-				songs.forEach((object, key) => {
-					songsElem.innerHTML += `<button title="${object}" class="song ${key}" onclick="songClick(event)">${object}</button><hr>`;
-				});
-
-				document.getElementById('songCount').innerText = "Amount: " + songs.length;
+			songsElem.innerHTML = '';
+			songs.forEach((object, key) => {
+				songsElem.innerHTML += `<button title="${object}" class="song ${key}" onclick="songClick(event)">${object}</button><hr>`;
 			});
+
+			document.getElementById('songCount').innerText = "Amount: " + songs.length;
 		}).catch( err => {
 			console.error('An error occurred', err);
 		});
@@ -377,11 +377,9 @@ function load() {
 	document.getElementById('updateJSONBtn').addEventListener('click', evt => {
 		document.getElementById('overflowMenu').style.display = 'none';
 
-		fetch('/updateJSON/').then(response => {
-			response.json().then(json => {
-				if (json.success) alert('Updated JSON');
-				else alert(json.info);
-			});
+		get('/updateJSON/').then(json => {
+			if (json.success) alert('Updated JSON');
+			else alert(json.info);
 		}).catch(err => {
 			console.error('An error occurred', JSON.parse(err));
 		});

@@ -67,7 +67,7 @@ const loadPlugins = () => {
 			});
 		}
 
-		console.log('Loading plugins...');
+		utils.colorLog('Loading plugins...', 'bgGreen');
 		getPlugins().then(plugins => {
 			if (plugins) {
 				plugins.forEach((object, key) => {
@@ -95,8 +95,10 @@ const loadPlugins = () => {
 							}
 						}
 
-						if (object.module.hijackRequests)
+						if (object.module.hijackRequests) {
+							object.module.hijackRequests.pluginFolder = object.folder;
 							hijackRequestPlugins.push(object.module.hijackRequests);
+						}
 					}
 				});
 
@@ -328,8 +330,10 @@ const utils = {
 		} catch(err) {}
 
 		if (color) {
-			if (colors[color]) console.log(colors[color], text, colors.reset);
-			else console.log(text);
+			if (colors[color])
+				console.log(colors[color] + text + colors.reset);
+			else
+				console.log(text);
 		} else console.log(text);
 	},
 
