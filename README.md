@@ -31,15 +31,13 @@ If both of these methods fail, run `npm start` in a CLI.
 I've also created some plug-ins. They can be found [here](https://github.com/Jantje19/MusicStream-Plugins/tree/master/MyPlugins).
 
 ## Notes
-**[Plugins](https://github.com/Jantje19/MusicStream-Plugins) are in beta!**
-
-The web-interface only works with browsers that have ES6 support.
+The web-interface only works with browsers that have ES6 support. Almost all (up to date) modern browsers have this. If it doesn't work on your browser try to update it. See if you have the latest version of your browser [here](https://updatemybrowser.org/).
 
 This program needs Node-ID3 version 0.0.10 or higher to work with images properly.
 
-Manipulating files (adding/removing tags) requires the side installation of [FFMPEG](https://www.ffmpeg.org/download.html). This is however not required when you don't want to do any of these things.
+Manipulating files (adding/removing tags) requires the side installation of [FFMPEG](https://www.ffmpeg.org/download.html). This is not required however.
 
-Supported browsers with build numbers:
+Supported browsers with build numbers (I would hope):
 - Edge: 14
 - Chrome: 49
 - Firefox: 52
@@ -51,6 +49,21 @@ Supported browsers with build numbers:
 
 Internet Explorer won't work. (*but why would you use it anyway.*)
 
-**You can still use it on old browsers. On the front page it will ask you to move to the old browsers page. The features are very limited tho.**
+**You can still use it on old browsers. On the front page it will ask you to move to the old browsers page. It features a limited interface and the features are very limited.**
 
-**Only tested (and used) on Chrome Canary 60 and Android Chrome 58**
+**Only tested (and used) on Google Chrome Canary and Android Chrome**
+
+
+## Crashes
+
+It crashes, why?
+
+1. Make sure you've run `npm install`.
+2. Make sure that you've installed Node-ID3 version 0.0.10 or higher. You can update it with this command: `npm update node-id3`.
+3. If you are editing tags, make sure that you have [FFMPEG](https://www.ffmpeg.org/download.html) installed.
+
+My browser gives error messages or shows a weird page?
+
+- Make sure that you are using the latest version of your browser. You can check if you have the latest version [here](https://updatemybrowser.org/). If you are using *Internet Explorer* you should switch to another browser ([Chrome](https://www.google.com/chrome/browser) or [Firefox](https://www.mozilla.org/firefox/), since they are independently updated of your OS).
+
+Still not working? Add an [issue](https://github.com/Jantje19/MusicStream/issues).
