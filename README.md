@@ -14,7 +14,7 @@ You can [try the new (buggy) GUI installer](https://github.com/jantje19/MusicStr
 
 [![Install video](http://img.youtube.com/vi/UOG_lOcmQlo/0.jpg)](http://www.youtube.com/watch?v=UOG_lOcmQlo)
 
-### Steps
+### Manual Installation Steps
 1. Install [Node.js](https://nodejs.org/en/download/package-manager/)
 2. [Download](https://github.com/jantje19/MusicStream/releases/latest/) the latest release from GitHub
 3. Extract the files into a folder and rename it to *MusicStream*
