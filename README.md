@@ -12,7 +12,7 @@ You can [try the new (buggy) GUI installer](https://github.com/jantje19/MusicStr
 
 ### Windows install video
 
-[![Install video](http://img.youtube.com/vi/UOG_lOcmQlo/0.jpg)](http://www.youtube.com/watch?v=UOG_lOcmQlo)
+[![Install video](https://i.ytimg.com/vi/Laqh05oIK4g/maxresdefault.jpg)](http://www.youtube.com/watch?v=UOG_lOcmQlo)
 
 ### Manual Installation Steps
 1. Install [Node.js](https://nodejs.org/en/download/package-manager/)
@@ -24,7 +24,7 @@ You can [try the new (buggy) GUI installer](https://github.com/jantje19/MusicStr
 ### Running
 Try the *universal_python_executer.py* if you have python installed.
 Otherwise move into the folder of your platform and execute one of the files within that folder.
-If both of these methods fail, run `npm start` in a CLI.
+If both of these methods fail, run `npm start` in the *MusicaStream* directory in a CLI.
 
 ## Plugins
 *MusicStream* supports plug-ins. See how it works [here](https://github.com/jantje19/MusicStream-Plugins/).
