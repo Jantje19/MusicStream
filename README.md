@@ -24,10 +24,11 @@ You can [try the new (buggy) GUI installer](https://github.com/jantje19/MusicStr
 ### Running
 Try the *universal_python_executer.py* if you have python installed.
 Otherwise move into the folder of your platform and execute one of the files within that folder.
-If both of these methods fail, run `npm start` in a CLI
+If both of these methods fail, run `npm start` in a CLI.
 
 ## Plugins
 *MusicStream* supports plug-ins. See how it works [here](https://github.com/jantje19/MusicStream-Plugins/).
+I've also created some plug-ins. They can be found [here](https://github.com/Jantje19/MusicStream-Plugins/tree/master/MyPlugins).
 
 ## Notes
 **[Plugins](https://github.com/Jantje19/MusicStream-Plugins) are in beta!**
