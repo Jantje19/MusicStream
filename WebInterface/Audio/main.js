@@ -539,8 +539,8 @@ function checkCookies(songsArr) {
 	} else getCookies();
 }
 
-window.onload = load;
-
 audio.onended = end;
 audio.onplay = updateInterface;
 audio.onpause = updateInterface;
+
+document.addEventListener('DOMContentLoaded', load);

@@ -79,12 +79,17 @@ function drop(evt) {
 }
 
 function queueClick(evt) {
-	const queue = getQueue();
 	const newId = Number(evt.target.id.replace('newId-', ''));
+	const queue = getQueue();
 
-	queueIndex = newId + 1;
-	updateQueue(queue);
-	playVid(queue[newId], true);
+	if (evt.ctrlKey) {
+		queue.splice(newId, 1);
+		updateQueue(queue);
+	} else {
+		queueIndex = newId + 1;
+		updateQueue(queue);
+		playVid(queue[newId], true);
+	}
 }
 
 function nextQueueItem() {
@@ -105,6 +110,10 @@ function queueTop(video) {
 	queue.move(queue.length - 1, queueIndex);
 	queueIndex++;
 	updateQueue(queue);
+}
+
+function clearQueue() {
+	updateQueue([]);
 }
 
 Array.prototype.move = function (old_index, new_index) {
