@@ -210,7 +210,7 @@
 			const vidId = urlOk(parsedUrl);
 			parsedUrl.host = parsedUrl.host.replace('www.', '');
 			if ((parsedUrl.host == 'youtube.com' || parsedUrl.host == 'youtu.be') && vidId) {
-				fetch('/youtubeData/' + vidId).then(response => {
+				fetch('/youtubeData/' + vidId, {credentials: 'same-origin'}).then(response => {
 					response.json().then(json => {
 						if (json.success) {
 							json = json.info;
@@ -308,7 +308,7 @@
 			if (document.getElementById('uiac').checked) data.tags.image = document.querySelector('img').src;
 
 			document.getElementById('videoInput').innerHTML = '<b>Downloading... This may take a while.</b>';
-			fetch('/ytdl', {method: "POST", body: JSON.stringify(data)}).then(response => {
+			fetch('/ytdl', {method: "POST", body: JSON.stringify(data), credentials: 'same-origin'}).then(response => {
 				response.json().then(json => {
 					if (json.success) {
 						if (useTags && type == 'audio') {
@@ -319,7 +319,7 @@
 
 							if (type == 'audio') {
 								document.getElementById('videoInput').innerHTML = '<b>Setting tags...</b>';
-								fetch('/tags', {method: 'POST', body: JSON.stringify(body)}).then(response => {
+								fetch('/tags', {method: 'POST', body: JSON.stringify(body), credentials: 'same-origin'}).then(response => {
 									response.json().then(json => {
 										document.getElementById('videoInput').innerHTML = '<b>Done!</b>';
 										if (json.success) {

@@ -55,7 +55,7 @@
 
 		switch (type) {
 			case 'mult':
-			html += `<input caseVal="${type}" id="${title}" type="text" value="${val.toString().replace(/\,/g, '; ').replace(/\./g, '')}">`;
+			html += `<input caseVal="${type}" id="${title}" type="text" value="${val.toString().replace(/\,/g, '; ')}">`;
 			break;
 			case 'bool':
 			html += `<input caseVal="${type}" id="${title}" type="checkbox" ${(val == true) ? 'checked' : ''}>`;
@@ -77,8 +77,10 @@
 	function valToJSON(elem, type) {
 		switch (type) {
 			case 'mult':
-			if (elem.value.trim().length > 0) return (elem.value.trim().replace(/(\s+)?\;(\s+)?/g, ',')).split(',').map(val => {return '.' + val});
-			else return [];
+			if (elem.value.trim().length > 0)
+				return (elem.value.trim().replace(/(\s+)?\;(\s+)?/g, ',')).split(',');
+			else
+				return [];
 			case 'bool':
 			return Boolean(elem.checked);
 			case 'range':
@@ -97,11 +99,11 @@
 			json[object.id.substr(0, 1).toLowerCase() + object.id.substr(1)] = valToJSON(object, object.getAttribute('caseVal'));
 		});
 
-		fetch(/updateSettings/, {method: 'POST', body: JSON.stringify(json)}).then(response => {
+		fetch(/updateSettings/, {method: 'POST', body: JSON.stringify(json), credentials: 'same-origin'}).then(response => {
 			response.json().then(json => {
 				if (json.success) {
-					if (confirm('Everything went according to plan. You have to restart the server to see the changes. Do you want to go back?'))
-						window.location = location.host;
+					if (confirm('Everything went according to plan. You have to restart the server to activate the changes! Do you want to go back?'))
+						window.location = location.origin;
 				} else alert('An error occured: ', json.info);
 			});
 		}).catch( err => {
@@ -110,7 +112,7 @@
 	}
 
 	function checkUpdate() {
-		fetch('/checkForUpdates/').then(response => {
+		fetch('/checkForUpdates/', {credentials: 'same-origin'}).then(response => {
 			response.json().then(json => {
 				if (json.success) {
 					if (json.data.isAvailable) {
@@ -129,7 +131,7 @@
 	}
 
 	function load() {
-		fetch('/getSettings/').then(response => {
+		fetch('/getSettings/', {credentials: 'same-origin'}).then(response => {
 			response.json().then(json => {
 				let newHTML = '';
 

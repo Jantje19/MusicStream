@@ -115,7 +115,7 @@ main > div:first-child {
 	height: 90vh;
 	flex-grow: 1.5;
 	max-width: 60%;
-	overflow-y: hidden;
+	/*overflow-y: hidden;*/
 }
 
 main > div:last-child button, main #queue .queueItem {
@@ -148,7 +148,7 @@ main #songName {
 main #videos {
 	width: 40%;
 	height: 90vh;
-	overflow-y: scroll;
+	/*overflow-y: scroll;*/
 }
 
 main #videos > div > div {
