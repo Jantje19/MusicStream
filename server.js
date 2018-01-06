@@ -470,10 +470,17 @@ module.exports = {
 					}
 
 					fs.writeFile(jsonPath, 'module.exports = ' + JSON.stringify(data), err => {
-						if (err) response.send({success: false, info: err});
-						else response.send({success: true});
+						if (err)
+							response.send({success: false, info: err});
+						else {
+							response.send({success: true});
+							console.wrn('MusicStream restarting because the settings updated!');
+							process.exit(131);
+						}
 					});
-				} catch (err) {response.send({success: false, info: err})}
+				} catch (err) {
+					response.send({success: false, info: err});
+				}
 			});
 		});
 
