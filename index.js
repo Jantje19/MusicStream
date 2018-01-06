@@ -1,7 +1,7 @@
 const tries = [];
 let maxTries = 10;
 const children = [];
-const minUpime = 10000; // 10 seconds
+const minUpime = 1000; // 1 second
 const {fork} = require('child_process');
 
 String.prototype.split = function(index) {
@@ -32,7 +32,7 @@ function triedTooManyTimes() {
 	if (tries.length < maxTries) {
 		const lastDate = tries[tries.length - 1];
 
-		if (new Date().getTime() - lastDate.getTime() < minUpime)
+		if (new Date().getTime() - lastDate.getTime() > minUpime)
 			return false;
 	}
 
