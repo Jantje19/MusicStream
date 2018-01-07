@@ -2,6 +2,7 @@ const tries = [];
 let maxTries = 10;
 const children = [];
 const minUpime = 1000; // 1 second
+const stream = require('stream');
 const {fork} = require('child_process');
 
 String.prototype.split = function(index) {
@@ -28,6 +29,10 @@ if (foundVal) {
 	}
 }
 
+function processLine(line) {
+	console.log(line + '!')
+}
+
 function triedTooManyTimes() {
 	if (tries.length < maxTries) {
 		const lastDate = tries[tries.length - 1];
@@ -43,13 +48,16 @@ function specialLog(data) {
 	console.log(`\x1b[4m\x1b[1m${data}\x1b[22m\x1b[24m`, '\x1b[0m');
 }
 
-function start() {
+function removeAllChildren() {
 	for (let i = children.length - 1; i >= 0; i--) {
 		children[i].removeAllListeners();
 		children[i].kill();
 		children.splice(i, 1);
 	}
+}
 
+function start() {
+	removeAllChildren();
 	const child = fork('./main.js', process.argv, {
 		silent: false
 	});
@@ -75,3 +83,18 @@ function start() {
 }
 
 start();
+
+process.stdin.resume();
+process.stdin.setEncoding("ascii");
+process.stdin.on('data', inp => {
+	if (inp.trim() == 'rs') {
+		children.forEach((object, key) => {
+			try {
+				object.exit(1);
+			} catch (err) {}
+		});
+
+		removeAllChildren();
+		start();
+	}
+});
