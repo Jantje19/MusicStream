@@ -3,6 +3,7 @@ module.exports = {
 		let paths = [];
 		const songsArr = [];
 		const videosObj = {};
+		const subtitlesArr = [];
 		const playlistsArr = [];
 
 		const audioFileExtensions = settings.audioFileExtensions.val;
@@ -32,7 +33,16 @@ module.exports = {
 			// Wait untill the functions both finish
 			Promise.all(checkDirs).then(() => {
 				setTimeout(() => {
-					jsonFileArr = {audio: {songs: songsArr, playlists: playlistsArr}, video: {videos: videosObj}};
+					jsonFileArr = {
+						audio: {
+							songs: songsArr,
+							playlists: playlistsArr
+						},
+						video: {
+							videos: videosObj,
+							subtitles: subtitlesArr
+						}
+					};
 
 					fs.writeFile(__dirname + '/JSON.json', JSON.stringify(jsonFileArr), err => {
 						if (err) reject(err);
@@ -79,13 +89,21 @@ module.exports = {
 
 											// Check if the file has a file extension that is in the arrays in index.js or that it is a playlist
 											// If it is a file just execute this function again
-											if (audioFileExtensions.includes(fileExtention)) songsArr.push({path: path, fileName: object, lastChanged: mtime});
-											else if (videoFileExtensions.includes(fileExtention)) addToVidArr(path, object, mtime);
-											else if (fileExtention == '.m3u') playlistsArr.push({path: path, fileName: object, lastChanged: mtime});
-											else if (!fileExtention && fs.lstatSync(path + object).isDirectory()) handleFolders(path + object + '/', utils);
-											else if (fileExtention && !silent) console.wrn('File extention not supported', object);
+											if (audioFileExtensions.includes(fileExtention))
+												songsArr.push({path: path, fileName: object, lastChanged: mtime});
+											else if (videoFileExtensions.includes(fileExtention))
+												addToVidArr(path, object, mtime);
+											else if (fileExtention == '.m3u')
+												playlistsArr.push({path: path, fileName: object, lastChanged: mtime});
+											else if (fileExtention == '.vtt')
+												subtitlesArr.push({path: path, fileName: object});
+											else if (!fileExtention && fs.lstatSync(path + object).isDirectory())
+												handleFolders(path + object + '/', utils);
+											else if (fileExtention && !silent)
+												console.wrn('File extention not supported', object);
 											else if (fileExtention && silent);
-											else console.wrn('Something is weird...', 'FILENAME:' + object, 'EXTENSION:' + fileExtention);
+											else
+												console.wrn('Something is weird...', 'FILENAME:' + object, 'EXTENSION:' + fileExtention);
 										});
 									}
 								});
@@ -100,9 +118,6 @@ module.exports = {
 	},
 
 	readPlayList: function(fs, path, songsArr) {
-		// Check if file exists
-		// Load the file from disk
-		// Check if all the songs are in the json
 		const songs = [];
 
 		return new Promise((resolve, reject) => {
@@ -175,9 +190,12 @@ module.exports = {
 			function write(content, alreadyExists) {
 				fs.writeFile(__dirname + '/' + jsonPath, JSON.stringify(content), (err) => {
 					try {
-						if (err) reject({success: false, error: 'There was an error with creating the playlist file', info: err});
-						else if (alreadyExists) resolve({success: true, data: `Playlist with the name '${body.name}' successfuly updated`});
-						else resolve({success: true, data: `Playlist with the name '${body.name}' successfuly added`});
+						if (err)
+							reject({success: false, error: 'There was an error with creating the playlist file', info: err});
+						else if (alreadyExists)
+							resolve({success: true, data: `Playlist with the name '${body.name}' successfuly updated`});
+						else
+							resolve({success: true, data: `Playlist with the name '${body.name}' successfuly added`});
 					} catch (err) {console.warn('Can\'t do that'); reject({success: false, error: 'There was an error with creating the playlist file', info: err})}
 				});
 			}
@@ -191,8 +209,10 @@ module.exports = {
 			fs.exists(JSONPath, exists => {
 				if (exists) {
 					fs.readFile(JSONPath, 'utf-8', (err, data) => {
-						if (err) reject(err);
-						else resolve(JSON.parse(data));
+						if (err)
+							reject(err);
+						else
+							resolve(JSON.parse(data));
 					});
 				} else {
 					console.wrn('The JSON file does not exist, so I am creating one...');

@@ -47,5 +47,9 @@ module.exports = {
 				return {val: false, index: -1};
 			}
 		});
+
+		app.get('*subtitle*', (request, response) => {
+
+		});
 	}
 }

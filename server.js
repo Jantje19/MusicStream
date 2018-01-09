@@ -76,6 +76,7 @@ module.exports = {
 			fileHandler.getJSON(fs, os, utils, settings).then(json => {
 				const songs = [];
 				const videos = {};
+				const subtitles = ('subtitles' in json.video) ? json.video.subtitles.map(val => {return val.fileName}) : [];
 
 				const handleVideos = obj => {
 					// REVERSE!!
@@ -150,7 +151,18 @@ module.exports = {
 							playlists.reverse();
 						}
 
-						response.send({audio: {songs: songs.filter(val => {return !(settings.ignoredAudioFiles.val.includes(val))}), playlists: playlists}, video: {videos: videos}});
+						response.send({
+							audio: {
+								songs: songs.filter(val => {
+									return !(settings.ignoredAudioFiles.val.includes(val))
+								}),
+								playlists: playlists
+							},
+							video: {
+								videos: videos,
+								subtitles: subtitles
+							}
+						});
 					}).catch(err => {
 						console.log(err);
 						response.send({error: "Something went wrong", info: "Either getting the songs or getting the playlists or both went wrong"})

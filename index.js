@@ -1,3 +1,5 @@
+'use strict';
+
 const tries = [];
 let maxTries = 10;
 const children = [];
@@ -87,7 +89,9 @@ start();
 process.stdin.resume();
 process.stdin.setEncoding("ascii");
 process.stdin.on('data', inp => {
-	if (inp.trim() == 'rs') {
+	inp = inp.trim();
+
+	if (inp == 'rs') {
 		children.forEach((object, key) => {
 			try {
 				object.exit(1);
@@ -96,5 +100,7 @@ process.stdin.on('data', inp => {
 
 		removeAllChildren();
 		start();
+	} else if (inp == 'cls' || inp == 'clear') {
+		process.stdout.write("\u001b[2J\u001b[0;0H");
 	}
 });
