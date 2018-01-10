@@ -49,7 +49,22 @@ module.exports = {
 		});
 
 		app.get('*subtitle*', (request, response) => {
+			const url = querystring.unescape(request.url);
+			const fileName = url.replace('/subtitle/', '');
+			console.log(utils.logDate() + ' Got a request for ' + url);
 
+			fileHandler.getJSON(fs, os, utils, settings).then(json => {
+				const index = json.video.subtitles.map(val => {return val.fileName}).indexOf(fileName);
+
+				if (index > -1) {
+					const fileData = json.video.subtitles[index];
+
+					utils.sendFile(fs, fileData.path + fileData.fileName, response);
+				} else response.send({success: false, error: 'File doesn\'t exist'});
+			}).catch(err => {
+				response.status(500).send({success: false, error: 'Couldn\'t get the JSON file'});
+				console.err(err);
+			});
 		});
 	}
 }

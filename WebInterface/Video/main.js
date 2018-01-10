@@ -1,4 +1,4 @@
-let video, int;
+let video, int, videoSettingsElem;
 
 function load() {
 	video = document.querySelector('video');
@@ -7,6 +7,7 @@ function load() {
 	const timeStartElem = document.getElementById('time-start');
 	const overflowMenuElem = document.getElementById('overflow-menu');
 
+	videoSettingsElem = document.getElementById('video-settings');
 	fetch('/data/', {credentials: 'same-origin'}).then(response => {
 		response.json().then(json => {
 			const keys = Object.keys(json.video.videos);
@@ -15,6 +16,35 @@ function load() {
 				arr.forEach((object, key) => {
 					div.innerHTML += `<button onclick="vidClick(event, '${object}')" draggable="true" ondragstart="drag(event)" class="video ${key}" id="${key}">${object}</button><hr>`;
 				});
+			}
+
+			if (json.video.subtitles) {
+				if (json.video.subtitles.length > 0) {
+					const selectElem = document.createElement('select');
+
+					selectElem.addEventListener('change', evt => {
+						const title = evt.currentTarget.value;
+
+						if (title.length != 0 && title.length != '')
+							setSubtitleTrack('/subtitle/' + title);
+						else
+							removeTracks(document.getElementsByTagName('video')[0]);
+
+						toggleVideoSettingsWindow();
+					});
+
+					json.video.subtitles.unshift('');
+					json.video.subtitles.forEach((object, key) => {
+						const optionElem = document.createElement('option');
+
+						optionElem.value = object;
+						optionElem.innerText = object;
+
+						selectElem.appendChild(optionElem);
+					});
+
+					document.getElementById('captions').parentElement.appendChild(selectElem);
+				}
 			}
 
 			videosElem.innerHTML = '';
@@ -73,7 +103,6 @@ function load() {
 			video.currentTime = video.duration / (evt.target.max / evt.target.value)
 	});
 
-	const videoSettingsElem = document.getElementById('video-settings');
 	videoSettingsElem.getElementsByTagName('button')[0].addEventListener('click', evt => {
 		evt.currentTarget.parentElement.style.display = 'none';
 	});
@@ -87,13 +116,6 @@ function load() {
 		});
 	});
 
-	document.getElementById('settings-toggle').addEventListener('click', evt => {
-		if (videoSettingsElem.style.display == 'block')
-			videoSettingsElem.style.display = 'none';
-		else
-			videoSettingsElem.style.display = 'block';
-	});
-
 	document.getElementById('overflow-btn').addEventListener('click', evt => {
 		if (overflowMenuElem.style.display == 'block')
 			overflowMenuElem.style.display = 'none';
@@ -103,10 +125,12 @@ function load() {
 
 	document.getElementById('vidSpeed').addEventListener('change', evt => {
 		video.playbackRate = evt.currentTarget.value;
+		toggleVideoSettingsWindow();
 	});
 
 	document.getElementById('captions').addEventListener('change', evt => {
-		addSubtitleTrack(evt.target.files[0]);
+		setSubtitleTrack(evt.target.files[0]);
+		toggleVideoSettingsWindow();
 	});
 
 	document.getElementById('back').addEventListener('click', evt => {
@@ -120,6 +144,8 @@ function load() {
 	document.addEventListener('msfullscreenchange', checkFullScreen, false);
 	document.addEventListener('mozfullscreenchange', checkFullScreen, false);
 	document.addEventListener('webkitfullscreenchange', checkFullScreen, false);
+
+	document.getElementById('settings-toggle').addEventListener('click', toggleVideoSettingsWindow);
 
 	// For plugins
 	try {
@@ -250,8 +276,26 @@ function convertToReadableTime(int) {
 	return outp;
 }
 
-function addSubtitleTrack(file) {
-	const url = window.URL.createObjectURL(file);
+function setSubtitleTrack(val) {
+	const videoElem = document.getElementsByTagName('video')[0];
+	let url = '';
+
+	if (val instanceof File)
+		url = window.URL.createObjectURL(file);
+	else
+		url = val;
+
+	removeTracks(videoElem);
+	addSubtitleTrack(url, videoElem);
+}
+
+function removeTracks(videoElem) {
+	Array.from(videoElem.getElementsByTagName('track')).forEach((object, key) => {
+		object.remove();
+	});
+}
+
+function addSubtitleTrack(url, videoElem) {
 	const trackElem = document.createElement('track');
 
 	trackElem.src = url;
@@ -259,13 +303,22 @@ function addSubtitleTrack(file) {
 	trackElem.kind = 'captions';
 	trackElem.setAttribute('default', '');
 
-	document.getElementsByTagName('video')[0].appendChild(trackElem);
+	videoElem.appendChild(trackElem);
 }
 
 function toggleCollapseAll() {
 	Array.from(document.querySelectorAll('#videos > div')).forEach((object, key) => {
 		object.classList.toggle('closed');
 	});
+}
+
+function toggleVideoSettingsWindow() {
+	if (videoSettingsElem) {
+		if (videoSettingsElem.style.display == 'block')
+			videoSettingsElem.style.display = 'none';
+		else
+			videoSettingsElem.style.display = 'block';
+	}
 }
 
 document.addEventListener('DOMContentLoaded', load);
