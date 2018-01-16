@@ -1,9 +1,14 @@
 module.exports = {
 	start: function(dirname, fileHandler, fs, os, settings, utils, querystring, id3, ytdl, version, https, URLModule, serverPlugins, hijackRequestPlugins) {
+		const compression = require('compression');
 		const express = require('express');
 		const app = express();
+
 		const port = settings.port.val;
 		const ips = utils.getLocalIP(os);
+
+		app.use(compression());
+		app.use(express.static(dirname));
 
 		app.get('*favicon.ico*', (request, response) => {
 			utils.sendFile(fs, dirname + 'Assets/Icons/favicon.ico', response);
@@ -477,9 +482,8 @@ module.exports = {
 					// Copy the settings
 					data = JSON.parse(JSON.stringify(settings));
 
-					for (key in body) {
+					for (key in body)
 						data[key].val = body[key];
-					}
 
 					fs.writeFile(jsonPath, 'module.exports = ' + JSON.stringify(data), err => {
 						if (err)
@@ -552,21 +556,25 @@ module.exports = {
 			});
 		}
 
-		// Just hand]le the rest
-		app.get('/*', (request, response) => {
+		// Just handle the rest
+		app.get('*', (request, response) => {
 			let url = request.url.replace(/\?(\w+)=(.+)/, '');
 			if (url.length > 1) console.log(utils.logDate() + ' Got a request for ' + url);
 			if (url.indexOf('/videos') > -1) utils.sendFile(fs, dirname + 'Video/' + url.replace('/videos/', ''), response);
 			else if (url.indexOf('/') > -1) utils.sendFile(fs, dirname + 'Audio/' + url, response);
 		});
 
-		app.use(express.static(dirname));
-		app.listen(port.toString());
+		app.listen(port.toString(), err => {
+			if (err)
+				throw err;
+			else {
+				if (ips.length > 1) {
+					ips.forEach((object, key) => {
+						utils.colorLog(`${utils.logDate()} Server is running on: [[fgGreen, ${object}:${port}]]`, 'reset');
+					});
+				} else utils.colorLog(`${utils.logDate()} Server is running on: [[fgGreen, ${ips[0]}:${port}]]`, 'reset');
+			}
+		});
 
-		if (ips.length > 1) {
-			ips.forEach((object, key) => {
-				utils.colorLog(`${utils.logDate()} Server is running on: [[fgGreen, ${object}:${port}]]`, 'reset');
-			});
-		} else utils.colorLog(`${utils.logDate()} Server is running on: [[fgGreen, ${ips[0]}:${port}]]`, 'reset');
 	}
 }

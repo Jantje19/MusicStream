@@ -18,6 +18,10 @@ function load() {
 				});
 			}
 
+			// document.body.querySelector('button[func=toggleCollapseAll]').style.display = 'hidden'; If more do this!
+			if (Object.keys(json.video.videos).length < 2)
+				document.getElementById('overflow-btn').style.display = 'none';
+
 			if (json.video.subtitles) {
 				if (json.video.subtitles.length > 0) {
 					const selectElem = document.createElement('select');
@@ -134,7 +138,13 @@ function load() {
 	});
 
 	document.getElementById('back').addEventListener('click', evt => {
+		const currentUrl = window.location.href;
+
 		window.history.back();
+		setTimeout(() => {
+			if (currentUrl === window.location.href)
+				window.location.href = '/';
+		}, 100);
 	});
 
 	document.getElementById('playPause').addEventListener('click', togglePlayState);
