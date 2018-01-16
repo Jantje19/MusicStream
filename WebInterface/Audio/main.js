@@ -488,6 +488,8 @@ function checkCookies(songsArr) {
 		if (url.indexOf('?') > -1) {
 			url = url.substr(1);
 			url.split('&').forEach((object, key) => {
+				object = object.replace(/(\[AMP\])/g, '&');
+
 				const regEx = /^(.+)=(.+)$/;
 				const values = regEx.exec(object);
 
