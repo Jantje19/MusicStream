@@ -191,8 +191,9 @@ module.exports = {
 				}
 
 				if (body.name == settings.mostListenedPlaylistName.val)
-					response.send({success: false, error: `Cannot access '${playlistName}'`, info: "This file is not editable"});
-				else fileHandler.updatePlaylist(fs, body, settings.mostListenedPlaylistName.val).then(data => response.send(data)).catch(err => response.send(err));
+					response.send({success: false, error: `Cannot access '${body.name}'`, info: "This file is not editable"});
+				else
+					fileHandler.updatePlaylist(fs, body, settings.mostListenedPlaylistName.val).then(data => response.send(data)).catch(err => response.send(err));
 			});
 		});
 

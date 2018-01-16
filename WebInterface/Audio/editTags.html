@@ -101,7 +101,7 @@
 		if (location.hash) {
 			const songName = location.hash.replace('#', '');
 
-			fetch('/data/').then(response => {
+			fetch('/data/', {credentials: 'same-origin'}).then(response => {
 				response.json().then(json => {
 					if (json.audio.songs.includes(songName)) {
 						songSelected(songName);
@@ -129,7 +129,7 @@
 				} else tags[type] = input.value;
 			});
 
-			fetch('/tags/', {method: "POST", body: JSON.stringify({songName: songName, tags: tags})}).then(response => {
+			fetch('/tags/', {method: "POST", body: JSON.stringify({songName: songName, tags: tags}), credentials: 'same-origin'}).then(response => {
 				response.json().then(json => {
 					if (json.success) {
 						if (confirm('Tags updated! Do you want to go to the home page?'))
@@ -143,7 +143,7 @@
 	}
 
 	function showSongSelect() {
-		fetch('/data/').then(response => {
+		fetch('/data/', {credentials: 'same-origin'}).then(response => {
 			response.json().then(json => selectSong(json));
 		}).catch( err => {
 			console.error('An error occurred', err);
@@ -169,7 +169,7 @@
 
 		location.hash = songName;
 		mainElem.innerHTML = '<div class="ball-scale-multiple"><div></div><div></div><div></div></div>';
-		fetch('/songInfo/' + songName).then(response => {
+		fetch('/songInfo/' + songName, {credentials: 'same-origin'}).then(response => {
 			response.json().then(tags => {
 				const div = document.createElement('div');
 
@@ -208,7 +208,7 @@
 		const songName = location.hash.replace('#', '');
 
 		if (confirm(`Are you sure you want to delete the tags of '${songName}'`)) {
-			fetch('/tags/', {method: "POST", body: JSON.stringify({songName: songName, tags: {delete: true}})}).then(response => {
+			fetch('/tags/', {method: "POST", body: JSON.stringify({songName: songName, tags: {delete: true}}), credentials: 'same-origin'}).then(response => {
 				response.json().then(json => {
 					if (json.success) {
 						if (confirm('Tags removed! Do you want to go to the home page?'))
