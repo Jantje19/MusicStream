@@ -110,15 +110,18 @@ module.exports = {
 							const playlists = [];
 
 							if (sort) playlists.sort(sortFunc);
-							json.audio.playlists.forEach((object, key) => {
-								fileHandler.readPlayList(fs, object.path + object.fileName, json.audio.songs).then(songsArr => {
-									if (songsArr.length > 0)
-										playlists.push(object.fileName);
 
-									if (key == json.audio.playlists.length - 1)
-										resolve(playlists);
-								}).catch(err => reject(err));
-							});
+							if (json.audio.playlists.length > 0) {
+								json.audio.playlists.forEach((object, key) => {
+									fileHandler.readPlayList(fs, object.path + object.fileName, json.audio.songs).then(songsArr => {
+										if (songsArr.length > 0)
+											playlists.push(object.fileName);
+
+										if (key == json.audio.playlists.length - 1)
+											resolve(playlists);
+									}).catch(err => reject(err));
+								});
+							} else resolve([]);
 						}), new Promise((resolve, reject) => {
 							fs.exists('./playlists.json', exists => {
 								if (exists) {

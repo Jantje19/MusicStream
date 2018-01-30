@@ -4,6 +4,7 @@ const tries = [];
 let maxTries = 10;
 const children = [];
 const minUpime = 1000; // 1 second
+let autoRestart = true;
 const stream = require('stream');
 const {fork} = require('child_process');
 
@@ -29,6 +30,16 @@ if (foundVal) {
 				maxTries = newVal;
 		}
 	}
+}
+
+function closeMusicStream() {
+	children.forEach((object, key) => {
+		try {
+			object.exit(1);
+		} catch (err) {}
+	});
+
+	removeAllChildren();
 }
 
 function processLine(line) {
@@ -67,15 +78,17 @@ function start() {
 	child.on('close', code => {
 		specialLog('MusicStream closed with exitcode: ' + code);
 
-		if (code != 0) {
-			if (!triedTooManyTimes()) {
-				specialLog('Trying to restart...');
-				setTimeout(() => {
-					start();
-				}, 1000);
-			} else {
-				specialLog("\x1b[33mTried too many times to restart. Exiting!\x1b[0m");
-				process.exit(1);
+		if (autoRestart) {
+			if (code != 0) {
+				if (!triedTooManyTimes()) {
+					specialLog('Trying to restart...');
+					setTimeout(() => {
+						start();
+					}, 1000);
+				} else {
+					specialLog("\x1b[33mTried too many times to restart. Exiting!\x1b[0m");
+					process.exit(1);
+				}
 			}
 		}
 	});
@@ -84,23 +97,34 @@ function start() {
 	tries.push(new Date());
 }
 
+
+if (process.argv.includes('no-auto-restart'))
+	autoRestart = false;
+else if (process.argv.includes('auto-restart')) {
+	const val = process.argv[process.argv.indexOf('auto-restart')];
+	const equalIndex = val.indexOf('=');
+
+	if (equalIndex > -1) {
+		const splitArr = val.split('=');
+
+		autoRestart = Boolean(splitArr[1]);
+	}
+}
+
 start();
 
+// For handling the commands when running: rs, cls and exit
 process.stdin.resume();
 process.stdin.setEncoding("ascii");
 process.stdin.on('data', inp => {
 	inp = inp.trim();
 
 	if (inp == 'rs') {
-		children.forEach((object, key) => {
-			try {
-				object.exit(1);
-			} catch (err) {}
-		});
-
-		removeAllChildren();
+		closeMusicStream();
 		start();
 	} else if (inp == 'cls' || inp == 'clear') {
 		process.stdout.write("\u001b[2J\u001b[0;0H");
+	} else if (inp == 'exit') {
+		closeMusicStream();
 	}
 });
