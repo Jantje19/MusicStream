@@ -6,6 +6,7 @@ function load() {
 	const timeEndElem = document.getElementById('time-end');
 	const timeStartElem = document.getElementById('time-start');
 	const overflowMenuElem = document.getElementById('overflow-menu');
+	const videoTimeJumpElem = document.getElementById('video-time-jump');
 
 	videoSettingsElem = document.getElementById('video-settings');
 	fetch('/data/', {credentials: 'same-origin'}).then(response => {
@@ -156,6 +157,16 @@ function load() {
 	document.addEventListener('webkitfullscreenchange', checkFullScreen, false);
 
 	document.getElementById('settings-toggle').addEventListener('click', toggleVideoSettingsWindow);
+
+	const skipAmount = Number(settings.skipAmount) || 5;
+	document.addEventListener('keyup', evt => {
+		if (evt.key == 'ArrowRight')
+			jumpVideoTime(skipAmount, videoTimeJumpElem);
+		else if (evt.key == 'ArrowLeft')
+			jumpVideoTime(-skipAmount, videoTimeJumpElem);
+		else if (evt.key == 'Space')
+			togglePlayState();
+	});
 
 	// For plugins
 	try {
@@ -328,6 +339,27 @@ function toggleVideoSettingsWindow() {
 			videoSettingsElem.style.display = 'none';
 		else
 			videoSettingsElem.style.display = 'block';
+	}
+}
+
+function jumpVideoTime(amount, parentElement) {
+	amount = amount || 5;
+	parentElement = parentElement || document.getElementById('videoTimeJumpElem');
+
+	if (amount <= video.duration) {
+		const elem = (amount > 0) ? parentElement.children[0] : parentElement.children[1];
+
+		elem.animate([
+			{opacity: 0},
+			{opacity: 0},
+			{opacity: 0.8},
+			{opacity: 0}
+			], {
+				duration: 700,
+				easing: 'ease-out'
+			})
+
+		return video.currentTime = video.currentTime + amount;
 	}
 }
 

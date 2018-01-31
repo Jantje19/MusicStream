@@ -1,4 +1,4 @@
-let settings;
+let settings = {};
 let queueIndex = 0;
 
 fetch('/getSettings/', {credentials: 'same-origin'}).then(response => {
