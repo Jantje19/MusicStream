@@ -73,5 +73,10 @@ module.exports = {
 		"val": 10,
 		"type": "range",
 		"desc": "The amount of time in seconds that has to pass for the next video to start playing."
+	},
+	"skipAmount": {
+		"val": 5,
+		"type": "range",
+		"desc": "The amount of seconds that skip when you press the arrow keys on the videos page."
 	}
 }
