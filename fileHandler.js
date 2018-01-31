@@ -162,7 +162,8 @@ module.exports = {
 			fs.exists(__dirname + '/' + jsonPath, exists => {
 				if (exists) {
 					fs.readFile(__dirname + '/' + jsonPath, 'utf-8', (err, data) => {
-						if (err) reject({success: false, err: 'An error occured', info: err});
+						if (err)
+							reject({success: false, err: 'An error occured', info: err});
 						else {
 							data = JSON.parse(data);
 
@@ -196,7 +197,9 @@ module.exports = {
 							resolve({success: true, data: `Playlist with the name '${body.name}' successfuly updated`});
 						else
 							resolve({success: true, data: `Playlist with the name '${body.name}' successfuly added`});
-					} catch (err) {console.warn('Can\'t do that'); reject({success: false, error: 'There was an error with creating the playlist file', info: err})}
+					} catch (err) {
+						reject({success: false, error: 'There was an error with creating the playlist file', info: err})
+					}
 				});
 			}
 		});

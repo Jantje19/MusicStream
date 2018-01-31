@@ -109,7 +109,8 @@ module.exports = {
 						return Promise.all([new Promise((resolve, reject) => {
 							const playlists = [];
 
-							if (sort) playlists.sort(sortFunc);
+							if (sort)
+								playlists.sort(sortFunc);
 
 							if (json.audio.playlists.length > 0) {
 								json.audio.playlists.forEach((object, key) => {

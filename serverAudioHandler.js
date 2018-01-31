@@ -30,20 +30,42 @@ module.exports = {
 					});
 				} else {
 					fs.exists('./playlists.json', exists => {
-						const name = url.match(/(.+)\/(.+)/)[2];
+						const parsedUrl = URLModule.parse(url);
+						let showFull = false;
 
-						if (exists) {
-							fs.readFile('./playlists.json', 'utf-8', (err, data) => {
-								if (err) response.send({error: 'Cannot read the file', info: err});
-								else {
-									data = JSON.parse(data);
+						if (parsedUrl) {
+							if ('pathname' in parsedUrl) {
+								const name = querystring.unescape(parsedUrl.pathname.match(/(.+)\/(.+)/)[2]);
 
-									if (name == settings.mostListenedPlaylistName.val)
-										response.send({songs: utils.sortJSON(data[settings.mostListenedPlaylistName.val]).map(val => {return val[0]})});
-									else response.send({songs: data[name]});
+								if ('query' in parsedUrl) {
+									const queryParameters = querystring.parse(parsedUrl.query);
+
+									if ('full' in queryParameters) {
+										if (Boolean(queryParameters.full))
+											showFull = Boolean(queryParameters.full);
+									}
 								}
-							});
-						} else response.send({error: `The playlist '${name}' was not found`, info: "The 'playlists.json' file had no reference to this file"});
+
+								if (exists) {
+									fs.readFile('./playlists.json', 'utf-8', (err, data) => {
+										if (err)
+											response.send({error: 'Cannot read the file', info: err});
+										else {
+											data = JSON.parse(data);
+
+											if (name == settings.mostListenedPlaylistName.val && !showFull && name in data)
+												response.send({songs: utils.sortJSON(data[settings.mostListenedPlaylistName.val]).map(val => {return val[0]})});
+											else if (name == settings.mostListenedPlaylistName.val && showFull && name in data)
+												response.send({songs: utils.sortJSON(data[settings.mostListenedPlaylistName.val])});
+											else if (name in data)
+												response.send({songs: data[name]});
+											else
+												response.send({success: false, error: 'Playlist not found', info: 'The specified playlist wasn\'t found on the server'})
+										}
+									});
+								} else response.send({success: false, error: `The playlist '${name}' was not found`, info: "The 'playlists.json' file had no reference to this file"});
+							} else response.send({success: false, error: 'Non valid URL', info: 'The server couln\'t handle the URL`'})
+						} else response.send({success: false, error: 'Non valid URL', info: 'The server couln\'t handle the URL'})
 					});
 				}
 
@@ -184,8 +206,9 @@ module.exports = {
 
 				console.log(utils.logDate() + ' Got a POST request for ' + url);
 
-				try {body = JSON.parse(body);}
-				catch (err) {
+				try {
+					body = JSON.parse(body);
+				} catch (err) {
 					response.send({error: 'Couldn\'t parse to JSON', info: err});
 					return;
 				}

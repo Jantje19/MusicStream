@@ -286,7 +286,9 @@
 
 	function load() {
 		// Check if passed a YouTube-ID
-		const splitArr = window.location.pathname.trim().split('/');
+		const splitArr = window.location.pathname.trim().split('/').filter(val => {
+			return val.length > 0;
+		});
 
 		if (splitArr.length > 1) {
 			const youtubeId = splitArr.find(val => {
@@ -333,7 +335,7 @@
 				if (document.getElementById('uiac').checked) data.tags.image = document.querySelector('img').src;
 
 				document.getElementById('videoInput').innerHTML = '<b>Downloading... This may take a while.</b>';
-				fetch('/ytdl', {method: "POST", body: JSON.stringify(data), credentials: 'same-origin'}).then(response => {
+				fetch('/ytdl', {method: "POST", credentials: 'same-origin', body: JSON.stringify(data)}).then(response => {
 					response.json().then(json => {
 						if (json.success) {
 							if (useTags && type == 'audio') {

@@ -73,8 +73,16 @@ const loadPlugins = () => {
 				plugins.forEach((object, key) => {
 					if (!object.notfound) {
 						if (object.module.clientJS) {
-							object.module.clientJS.pluginFolder = object.folder;
-							pluginDomJs.push(object.module.clientJS);
+							const handle = (obj) => {
+								obj.pluginFolder = object.folder;
+								pluginDomJs.push(obj);
+							}
+
+							if (Array.isArray(object.module.clientJS)) {
+								object.module.clientJS.forEach((object, key) => {
+									handle(object);
+								});
+							} else handle(object.module.clientJS);
 						}
 
 						if (object.module.server) {
