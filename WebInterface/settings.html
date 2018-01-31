@@ -61,7 +61,7 @@
 			html += `<input caseVal="${type}" id="${title}" type="checkbox" ${(val == true) ? 'checked' : ''}>`;
 			break;
 			case 'range':
-			html += `<input caseVal="${type}" id="${title}" onchange="change(this)" type="range" value="${val}"><label for="${title}">${val}%</label>`;
+			html += `<input caseVal="${type}" id="${title}" onchange="change(this)" type="range" value="${val}"><label for="${title}">${val}</label>`;
 			break;
 			case 'string':
 			html += `<input caseVal="${type}" id="${title}" type="text" value="${val}">`;

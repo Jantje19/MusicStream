@@ -158,8 +158,9 @@ function load() {
 
 	document.getElementById('settings-toggle').addEventListener('click', toggleVideoSettingsWindow);
 
-	const skipAmount = Number(settings.skipAmount) || 5;
 	document.addEventListener('keyup', evt => {
+		const skipAmount = Number(settings.skipAmount.val) || 5;
+
 		if (evt.key == 'ArrowRight')
 			jumpVideoTime(skipAmount, videoTimeJumpElem);
 		else if (evt.key == 'ArrowLeft')
