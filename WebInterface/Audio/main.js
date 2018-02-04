@@ -23,8 +23,10 @@ function keyPress(evt) {
 function getData() {
 	return new Promise((resolve, reject) => {
 		get('/data/').then(json => {
-			if (json.error) reject(json);
-			else resolve(json.audio);
+			if (json.error)
+				reject(json);
+			else
+				resolve(json.audio);
 		}).catch(err => reject(err));
 	});
 }
@@ -58,8 +60,10 @@ function get(url, headers) {
 				reject('Looks like there was a problem. Status Code: ' + response.status);
 			else {
 				response.json().then(json => {
-					if (json.error) reject(json.info);
-					else resolve(json);
+					if (json.error)
+						reject(json.info);
+					else
+						resolve(json);
 				});
 			}
 		}).catch(err => {reject(err)});
@@ -415,7 +419,7 @@ function load() {
 			});
 
 			updateInterface();
-		} else songsElem.innerHTML = '<i>No songs</i>';
+		} else songsElem.innerHTML = '<i>No songs found</i>';
 
 		if (json.playlists.length > 0) {
 			document.getElementById('playlistCount').innerText = "Amount: " + json.playlists.length;

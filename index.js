@@ -79,7 +79,7 @@ function start() {
 		specialLog('MusicStream closed with exitcode: ' + code);
 
 		if (autoRestart) {
-			if (code != 0) {
+			if (code != 0 && code != 1) {
 				if (!triedTooManyTimes()) {
 					specialLog('Trying to restart...');
 					setTimeout(() => {

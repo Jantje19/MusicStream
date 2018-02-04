@@ -2,6 +2,7 @@ let video, int, videoSettingsElem;
 
 function load() {
 	video = document.querySelector('video');
+	const videosElem = document.getElementById('videos');
 	const seekBarElem = document.getElementById('seekBar');
 	const timeEndElem = document.getElementById('time-end');
 	const timeStartElem = document.getElementById('time-start');
@@ -11,70 +12,79 @@ function load() {
 	videoSettingsElem = document.getElementById('video-settings');
 	fetch('/data/', {credentials: 'same-origin'}).then(response => {
 		response.json().then(json => {
-			const keys = Object.keys(json.video.videos);
-			const videosElem = document.getElementById('videos');
-			const addVideosToDiv = (arr, div) => {
-				arr.forEach((object, key) => {
-					div.innerHTML += `<button onclick="vidClick(event, '${object}')" draggable="true" ondragstart="drag(event)" class="video ${key}" id="${key}">${object}</button><hr>`;
-				});
-			}
-
-			// document.body.querySelector('button[func=toggleCollapseAll]').style.display = 'hidden'; If more do this!
-			if (Object.keys(json.video.videos).length < 2)
-				document.getElementById('overflow-btn').style.display = 'none';
-
-			if (json.video.subtitles) {
-				if (json.video.subtitles.length > 0) {
-					const selectElem = document.createElement('select');
-
-					selectElem.addEventListener('change', evt => {
-						const title = evt.currentTarget.value;
-
-						if (title.length != 0 && title.length != '')
-							setSubtitleTrack('/subtitle/' + title);
-						else
-							removeTracks(document.getElementsByTagName('video')[0]);
-
-						toggleVideoSettingsWindow();
+			if (!json.error) {
+				const keys = Object.keys(json.video.videos);
+				const addVideosToDiv = (arr, div) => {
+					arr.forEach((object, key) => {
+						div.innerHTML += `<button onclick="vidClick(event, '${object}')" draggable="true" ondragstart="drag(event)" class="video ${key}" id="${key}">${object}</button><hr>`;
 					});
-
-					json.video.subtitles.unshift('');
-					json.video.subtitles.forEach((object, key) => {
-						const optionElem = document.createElement('option');
-
-						optionElem.value = object;
-						optionElem.innerText = object;
-
-						selectElem.appendChild(optionElem);
-					});
-
-					document.getElementById('captions').parentElement.appendChild(selectElem);
 				}
-			}
 
-			videosElem.innerHTML = '';
-			if (keys.length > 1) {
-				keys.forEach((object, key) => {
-					const containerDiv = document.createElement('div');
-					const titleButton = document.createElement('button');
-					const videoDiv = document.createElement('div');
+				// document.body.querySelector('button[func=toggleCollapseAll]').style.display = 'hidden'; If more do this!
+				if (Object.keys(json.video.videos).length < 2)
+					document.getElementById('overflow-btn').style.display = 'none';
 
-					titleButton.innerHTML = `<span>${object}</span><img src="/Assets/ic_keyboard_arrow_up_white.svg">`;
-					titleButton.onclick = evt => {
-						if (containerDiv.className.indexOf('closed') > -1)
-							containerDiv.className = containerDiv.className.replace('closed', '');
-						else
-							containerDiv.className += 'closed';
+				if (json.video.subtitles) {
+					if (json.video.subtitles.length > 0) {
+						const selectElem = document.createElement('select');
+
+						selectElem.addEventListener('change', evt => {
+							const title = evt.currentTarget.value;
+
+							if (title.length != 0 && title.length != '')
+								setSubtitleTrack('/subtitle/' + title);
+							else
+								removeTracks(document.getElementsByTagName('video')[0]);
+
+							toggleVideoSettingsWindow();
+						});
+
+						json.video.subtitles.unshift('');
+						json.video.subtitles.forEach((object, key) => {
+							const optionElem = document.createElement('option');
+
+							optionElem.value = object;
+							optionElem.innerText = object;
+
+							selectElem.appendChild(optionElem);
+						});
+
+						document.getElementById('captions').parentElement.appendChild(selectElem);
 					}
+				}
 
-					addVideosToDiv(json.video.videos[object], videoDiv);
-					containerDiv.appendChild(titleButton);
-					containerDiv.appendChild(videoDiv);
-					videosElem.appendChild(containerDiv);
-				});
-			} else addVideosToDiv(json.video.videos[keys[0]], videosElem);
+				videosElem.innerHTML = '';
+				if (keys.length > 1) {
+					keys.forEach((object, key) => {
+						const containerDiv = document.createElement('div');
+						const titleButton = document.createElement('button');
+						const videoDiv = document.createElement('div');
+
+						titleButton.innerHTML = `<span>${object}</span><img src="/Assets/ic_keyboard_arrow_up_white.svg">`;
+						titleButton.onclick = evt => {
+							if (containerDiv.className.indexOf('closed') > -1)
+								containerDiv.className = containerDiv.className.replace('closed', '');
+							else
+								containerDiv.className += 'closed';
+						}
+
+						addVideosToDiv(json.video.videos[object], videoDiv);
+						containerDiv.appendChild(titleButton);
+						containerDiv.appendChild(videoDiv);
+						videosElem.appendChild(containerDiv);
+					});
+				} else {
+					const vids = json.video.videos[keys[0]];
+
+					if (vids.length > 0)
+						addVideosToDiv(vids, videosElem);
+					else
+						videosElem.innerHTML = '<b style="display: block; margin-top: 10%">No video files found...<b>';
+				}
+			} else videosElem.innerHTML = '<b style="display: block; margin-top: 10%">No video files found...<b>';
 		});
 	}).catch(err => {
+		videosElem.innerHTML = `<div style="text-align: center; margin-top:10%;"><h3>Oh no</h3><br><br><p>There was an error: <b>${err}</b></p></div>`;
 		console.error('An error occurred', err);
 	});
 
