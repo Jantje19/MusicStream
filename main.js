@@ -41,7 +41,6 @@ const loadPlugins = () => {
 
 								console.err('No index.js file found in ' + path);
 							}
-							// } else reject('No index.js file found in ' + path);
 						});
 					});
 				}
@@ -367,6 +366,41 @@ const utils = {
 		});
 
 		return ips;
+	},
+
+	httpsArgs: function() {
+		for (let i = 0; i < process.argv.length; i++) {
+			const object = process.argv[i];
+
+			if (object.indexOf('--https=') > -1) {
+				const index = object.trim().match(/(--https=)\{(.+)\}/);
+
+				if (index) {
+					if (index[2]) {
+						if (index[2].length > 0) {
+							let JSONData;
+
+							try {
+								JSONData = JSON.parse(`{${index[2]}}`);
+							} catch (err) {}
+
+							if (JSONData) {
+								if ('key' in JSONData && 'cert' in JSONData) {
+									if (fs.existsSync(JSONData.key) && fs.existsSync(JSONData.cert)) {
+										utils.colorLog('Found https argument. Starting server in https mode!', 'bgGreen');
+										return JSONData;
+									} else console.wrn('Found https argument, but the given cert or key path(s) don\'t exist. Starting with default settings...');
+								} else console.wrn('Found https argument, but the given JSON value doesn\'t contain one or both of the required arguments (key, cert). Starting with default settings...');
+							} else console.wrn('Found https argument, but couln\'t parse the given JSON value. Starting with default settings...');
+						}
+					}
+				} else console.wrn('Found https argument, but couln\'t parse the given value. Starting with default settings...');
+
+				return;
+			}
+		}
+
+		return;
 	}
 }
 

@@ -4,6 +4,19 @@ module.exports = {
 		const express = require('express');
 		const app = express();
 
+		// HTTPS Support
+		let httpsServer;
+		const httpsSupport = utils.httpsArgs();
+
+		if (httpsSupport) {
+			const privateKey = fs.readFileSync(httpsSupport.key);
+			const certificate = fs.readFileSync(httpsSupport.cert);
+			const credentials = {key: privateKey, cert: certificate};
+
+			httpsServer = https.createServer(credentials, app);
+		}
+		//
+
 		const port = settings.port.val;
 		const ips = utils.getLocalIP(os);
 
@@ -563,12 +576,20 @@ module.exports = {
 		// Just handle the rest
 		app.get('*', (request, response) => {
 			let url = request.url.replace(/\?(\w+)=(.+)/, '');
-			if (url.length > 1) console.log(utils.logDate() + ' Got a request for ' + url);
-			if (url.indexOf('/videos') > -1) utils.sendFile(fs, dirname + 'Video/' + url.replace('/videos/', ''), response);
-			else if (url.indexOf('/') > -1) utils.sendFile(fs, dirname + 'Audio/' + url, response);
+			if (url.length > 1)
+				console.log(utils.logDate() + ' Got a request for ' + url);
+
+			if (url.indexOf('/videos') > -1)
+				utils.sendFile(fs, dirname + 'Video/' + url.replace('/videos/', ''), response);
+			else if (url.indexOf('/') > -1)
+				utils.sendFile(fs, dirname + 'Audio/' + url, response);
+			else
+				utils.sendFile(fs, 'THIS NAME DOES_NOT EXIST', response);
 		});
 
-		app.listen(port.toString(), err => {
+		const listenerObject = httpsServer || app;
+
+		listenerObject.listen(port.toString(), err => {
 			if (err)
 				throw err;
 			else {
