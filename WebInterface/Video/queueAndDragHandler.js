@@ -15,6 +15,8 @@ function enqueue(...vals) {
 
 	if (vals.length > 1)
 		queue = vals;
+	else if (Array.isArray(vals[0]))
+		vals[0].forEach(val => queue.push(val));
 	else
 		queue.push(vals[0]);
 
@@ -37,7 +39,7 @@ function getQueue() {
 	return queue;
 }
 
-function updateQueue(newQueue) {
+function updateQueue(newQueue, startPlaying) {
 	const queueElem = document.getElementById('queue');
 
 	if (newQueue instanceof Array) {
@@ -49,6 +51,9 @@ function updateQueue(newQueue) {
 				queueElem.innerHTML += `<button onclick="queueClick(event)" draggable="true" ondragstart="drag(event)" class="queueItem ${key}" id="newId-${key}">${object}</button>`;
 		});
 	}
+
+	if (startPlaying)
+		nextQueueItem();
 }
 
 function allowDrop(evt) {

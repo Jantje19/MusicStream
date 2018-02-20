@@ -105,9 +105,19 @@ function startSong() {
 	try {document.getElementById('songName').innerText = queue[queueIndex].replace(/(\.\w{2,5})$/, '');} catch (err) {}
 	try {document.getElementById('lyricsElem').innerHTML = `<h3>Loading</h3><br><div class="ball-scale-multiple"><div></div><div></div><div></div></div>`;} catch (err) {}
 	document.getElementById('showData').setAttribute('activated', false);
-	audio.play().then(mediaSession).catch(err => {
-		console.log(err);
-	});
+
+	const audioPlayReturnVal = audio.play();
+	if (audioPlayReturnVal) {
+		audioPlayReturnVal.then(mediaSession).catch(err => {
+			console.error(err);
+		});
+	} else {
+		try {
+			mediaSession();
+		} catch (err) {
+			console.error('MediaSession Error', err);
+		}
+	}
 
 	try {document.getElementById('artistInfo').remove()} catch(err) {}
 }

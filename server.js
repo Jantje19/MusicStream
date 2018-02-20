@@ -186,7 +186,7 @@ module.exports = {
 							}
 						});
 					}).catch(err => {
-						console.log(err);
+						console.err(err);
 						response.send({error: "Something went wrong", info: "Either getting the songs or getting the playlists or both went wrong"})
 					});
 				} else response.send({error: "Not found", info: "There are no media files found on this device."});

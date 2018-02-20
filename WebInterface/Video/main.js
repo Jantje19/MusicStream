@@ -60,12 +60,16 @@ function load() {
 						const titleButton = document.createElement('button');
 						const videoDiv = document.createElement('div');
 
-						titleButton.innerHTML = `<span>${object}</span><img src="/Assets/ic_keyboard_arrow_up_white.svg">`;
+						titleButton.innerHTML = `<span>${object}</span><div><button title="Add all to queue"><img src="/Assets/ic_playlist_add_black.svg"></button><img class="toggleArrow" src="/Assets/ic_keyboard_arrow_up_black.svg"></div>`;
 						titleButton.onclick = evt => {
-							if (containerDiv.className.indexOf('closed') > -1)
-								containerDiv.className = containerDiv.className.replace('closed', '');
-							else
-								containerDiv.className += 'closed';
+							if (evt.target.title == 'Add all to queue' || evt.target.parentElement.title == 'Add all to queue')
+								updateQueue(json.video.videos[object], true);
+							else {
+								if (containerDiv.className.indexOf('closed') > -1)
+									containerDiv.className = containerDiv.className.replace('closed', '');
+								else
+									containerDiv.className += 'closed';
+							}
 						}
 
 						addVideosToDiv(json.video.videos[object], videoDiv);

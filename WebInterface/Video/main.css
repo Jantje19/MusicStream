@@ -118,7 +118,7 @@ main > div:first-child {
 	/*overflow-y: hidden;*/
 }
 
-main > div:last-child button, main #queue .queueItem {
+main > #videos > div button, main #queue .queueItem {
 	margin: 0;
 	width: 100%;
 	border: none;
@@ -165,19 +165,24 @@ main #videos > div > button span {
 	display: inline-block;
 }
 
-main #videos > div > button img {
-	width: 20px;
-	height: 20px;
+main  #videos > div > button > div {
 	float: right;
+}
+
+main  #videos > div > button > div > button {
+	margin: 0;
+	padding: 0;
+	width: auto;
+	border: none;
+	margin-right: 10px;
 	border-radius: 100%;
-	background-color: gray;
 }
 
 main #videos > div.closed > div {
 	height: 0px;
 }
 
-main #videos > div.closed > button img {
+main #videos > div.closed > button .toggleArrow {
 	transform: rotate(180deg);
 }
 
