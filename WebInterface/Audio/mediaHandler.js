@@ -212,7 +212,7 @@ function displayLyrics(artist, songName) {
 				// Split by upper and lower case difference, then adding a break tag
 				// const lyrics = json.lyrics.split(/(?=[A-Z])/).map(val => {return val.trim();}).join('<br>');
 
-				const lyrics = json.lyrics.replace(/\n+/g, '<br>');
+				const lyrics = json.lyrics.replace(/\n/g, '<br>');
 
 				previousTrack = songName;
 				lyricsElem.innerHTML = `<h3>Lyrics</h3><p style="line-height: 1.5;">${lyrics}</p>`;
