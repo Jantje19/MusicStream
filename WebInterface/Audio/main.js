@@ -61,12 +61,12 @@ function get(url, headers) {
 			else {
 				response.json().then(json => {
 					if (json.error)
-						reject(json.info);
+						reject(json.info || json.error);
 					else
 						resolve(json);
 				});
 			}
-		}).catch(err => {reject(err)});
+		}).catch(reject);
 	});
 }
 
@@ -130,6 +130,36 @@ function moveQueueItem(oldIndex, newIndex) {
 	updateInterface();
 }
 
+function handleSaveMenuClick(type) {
+	try {
+		if (type == 'playlist')
+			saveQueueToPlaylist();
+		else
+			saveQueueToTmp(type);
+	} catch (err) {
+		console.error(err);
+	}
+
+	document.getElementById('saveMenu').style.display = 'none';
+}
+
+function saveQueueToTmp(type) {
+	const data = {
+		queueIndex: queueIndex,
+		queue: queue
+	};
+
+	if (type == 'global')
+		data.for = 'global'
+
+	get('saveQueue', {method: 'post', body: JSON.stringify(data)}).then(data => {
+		console.log(data);
+	}).catch(err => {
+		console.error(err);
+		alert('Unable to save queue')
+	});
+}
+
 function saveQueueToPlaylist() {
 	const playlistName = prompt('What should the eplaylist name be?').trim();
 
@@ -151,6 +181,93 @@ function saveQueueToPlaylist() {
 			}
 		} else alert('The playlist is to short. We cannot accept that :/');
 	} else alert('Your playlist name is empty');
+}
+
+function getTmpSavedQueue(type, autoHandleResponse) {
+	const getTmpSaveQueue = type => {
+		return new Promise((resolve, reject) => {
+			get('saveQueue?for=' + type).then(data => {
+				if (data.success) {
+					if (data.data.queue) {
+						if (data.data.queue.length > 0) {
+							resolve(data.data);
+							return;
+						}
+					}
+
+					reject('No queue data found');
+				} else reject(data.error);
+			}).catch(reject);
+		});
+	}
+
+	if (!type)
+		type = 'ip';
+
+	if (autoHandleResponse) {
+		document.getElementById('queue').innerHTML = '';
+
+		getTmpSaveQueue(type).then(data => {
+			queueIndex = data.queueIndex;
+			enqueue(data.queue);
+			updateInterface();
+		}).catch(err => {
+			console.error('Get TMP queue', err);
+			alert('Unable to get temporary saved queue: ' + err);
+		});
+	} else return getTmpSaveQueue(type);
+}
+
+function sharePlaylist() {
+	const url = `${window.location.origin}?queue=${queue.join(',')}`;
+	const desktopShare = skipClipboardAPI => {
+		skipClipboardAPI = (skipClipboardAPI == true) ? true : false;
+
+		if (navigator.clipboard && !skipClipboardAPI) {
+			navigator.clipboard.writeText(url).then(() => {
+				console.log('Text copied to clipboard');
+			}).catch(err => {
+				console.error('Could not copy text: ', err);
+				desktopShare(true);
+			});
+		} else {
+			let inpElem = document.getElementById('copyTextElem');
+
+			if (!inpElem) {
+				inpElem = document.createElement('input');
+				inpElem.style.pointerEvents = 'none';
+				inpElem.style.opacity = '0';
+				inpElem.id = 'copyTextElem';
+				inpElem.type = 'text';
+
+				document.body.appendChild(inpElem);
+			}
+
+			inpElem.value = url;
+			inpElem.select();
+
+			if (document.execCommand('Copy'))
+				alert('Successfully copied URL to clipboard');
+			else
+				alert(inpElem.value)
+
+			inpElem.blur();
+		}
+	}
+
+	if (navigator.share) {
+		navigator.share({
+			title: 'MusicStream queue',
+			url: url
+		}).then(() => {
+			console.log('Successful share')
+		}).catch(err => {
+			console.log('Error sharing', err);
+
+			if (confirm('Do you want to copy the URL?'))
+				desktopShare();
+		});
+	} else desktopShare();
 }
 
 function convertToReadableTime(int) {
@@ -201,6 +318,7 @@ function load() {
 	const songsElem = document.getElementById('songs');
 	const seekBarElem = document.getElementById('seekBar');
 	const playlistsElem = document.getElementById('playlists');
+	const overflowMenu = document.getElementById('overflowMenu');
 
 	document.getElementById('toggleBtn').addEventListener('click', evt => {
 		if (queue.length > 0) {
@@ -284,12 +402,17 @@ function load() {
 		}
 	});
 
-	document.getElementById('overflowMenuHolder').querySelector('button').addEventListener('click', evt => {
-		const menu = document.getElementById('overflowMenu');
+	Array.from(overflowMenu.querySelectorAll('a')).forEach((object, key) => {
+		object.addEventListener('click', evt => {
+			evt.currentTarget.parentElement.style.display = 'none';
+		});
+	});
 
-		if (menu.style.display == 'block')
-			menu.style.display = 'none';
-		else menu.style.display = 'block';
+	document.getElementById('overflowMenuHolder').querySelector('button').addEventListener('click', evt => {
+		if (overflowMenu.style.display == 'block')
+			overflowMenu.style.display = 'none';
+		else
+			overflowMenu.style.display = 'block';
 	});
 
 	document.getElementById('searchInp').addEventListener('keyup', evt => {
@@ -379,7 +502,7 @@ function load() {
 	});
 
 	document.getElementById('updateJSONBtn').addEventListener('click', evt => {
-		document.getElementById('overflowMenu').style.display = 'none';
+		overflowMenu.style.display = 'none';
 
 		get('/updateJSON/').then(json => {
 			if (json.success) alert('Updated JSON');
@@ -391,6 +514,11 @@ function load() {
 
 	document.getElementById('volumeSlider').addEventListener('change', evt => {
 		audio.volume = Number(evt.target.value) / 100;
+	});
+
+	document.getElementById('saveMenu').addEventListener('click', evt => {
+		if (evt.target == evt.currentTarget)
+			evt.currentTarget.style.display = 'none';
 	});
 
 	// Shortcuts
@@ -544,6 +672,22 @@ function checkCookies(songsArr) {
 		} else getCookies();
 	} else getCookies();
 }
+
+
+// SHORTCUTS
+const shortcuts = {
+	q: evt => {
+		document.getElementById('queue').querySelectorAll('button')[queueIndex].scrollIntoView();
+	}
+}
+
+document.addEventListener('keypress', (evt) => {
+	const key = evt.code.replace('Key', '').toLowerCase();
+
+	if (evt.ctrlKey && key in shortcuts)
+		shortcuts[key](evt)
+});
+//
 
 audio.onended = end;
 audio.onplay = updateInterface;

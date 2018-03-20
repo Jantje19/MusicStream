@@ -489,6 +489,13 @@
 		</div>
 
 		<div>
+			<b>I get a <i>'No info found for that video id'</i> error when I try to download a YouTube video.</b>
+			<p>
+				Unfortunally YouTube updates its video API rather frequently. This means that the NPM-package responsable for downloading the YouTube video has to be updated frequently. So try running the <code>npm update</code> command. If that doesn't work go to <a href="https://www.npmjs.com/package/ytdl-core">this</a> page and find the latest version number (most of the times it looks something like <i>0.20.1</i>), then run <code>npm install ytdl-core@VERSION-NUMBER</code> (of course replace <i>VERSION-NUMBER</i> with the version number found on <a href="https://www.npmjs.com/package/ytdl-core">this</a> page).
+			</p>
+		</div>
+
+		<div>
 			<b>I have found a bug, what do I do?</b>
 			<p>
 				Bugs can be reported on the <a href="https://github.com/Jantje19/MusicStream/issues/new/">Github issue tracker</a> with the <i style="background-color: red">bug</i> label. Please be so thoughtful to try to recreate the bug and submit an as detailed as possible explaination. Screenshots are always appreciated.

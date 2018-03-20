@@ -62,9 +62,11 @@ function load() {
 
 						titleButton.innerHTML = `<span>${object}</span><div><button title="Add all to queue"><img src="/Assets/ic_playlist_add_black.svg"></button><img class="toggleArrow" src="/Assets/ic_keyboard_arrow_up_black.svg"></div>`;
 						titleButton.onclick = evt => {
-							if (evt.target.title == 'Add all to queue' || evt.target.parentElement.title == 'Add all to queue')
+							if (evt.target.title == 'Add all to queue' || evt.target.parentElement.title == 'Add all to queue') {
 								updateQueue(json.video.videos[object], true);
-							else {
+								/*enqueue(json.video.videos[object]);
+								playVid(json.video.videos[object][0], true)*/
+							} else {
 								if (containerDiv.className.indexOf('closed') > -1)
 									containerDiv.className = containerDiv.className.replace('closed', '');
 								else
@@ -140,6 +142,12 @@ function load() {
 			overflowMenuElem.style.display = 'none';
 		else
 			overflowMenuElem.style.display = 'block';
+	});
+
+	document.getElementById('add-all-queue-btn').addEventListener('click', evt => {
+		updateQueue(Array.from(videosElem.querySelectorAll('.video')).map(val => {
+			return val.innerText;
+		}), true);
 	});
 
 	document.getElementById('vidSpeed').addEventListener('change', evt => {

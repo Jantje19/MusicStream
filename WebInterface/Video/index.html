@@ -61,24 +61,36 @@
 		transition: background-color .3s ease;
 	}
 
-	header #overflow-btn {
-		left: unset;
-		right: 25px;
+	header > div:last-child {
+		right: 0;
+		padding: 0;
+		margin: 0 20px;
+		position: absolute;
 	}
 
-	main #queueWrapper > button {
+	header > div:last-child > button {
+		left: unset;
+		margin-left: 10px;
+		position: relative;
+	}
+
+	main #queueWrapper > div#queueBtnHolder {
+		width: 40px;
 		float: left;
+		transform: translateY(-40%);
+	}
+
+	main #queueWrapper > div#queueBtnHolder > button {
 		width: 40px;
 		height: 40px;
 		border: none;
 		cursor: pointer;
 		position: relative;
 		border-radius: 100%;
-		transform: translateY(-90%);
 		background-color: transparent;
 	}
 
-	main #queueWrapper > button:before {
+	main #queueWrapper > div#queueBtnHolder > button:before {
 		top: 0;
 		left: 0;
 		opacity: 0;
@@ -90,10 +102,10 @@
 		border-radius: 100%;
 		will-change: opacity;
 		transition: opacity 0.3s ease;
-		background-color: rgba(0, 0, 0, 0.5);
+		background-color: rgba(0, 0, 0, 0.3);
 	}
 
-	main #queueWrapper > button:hover:before {
+	main #queueWrapper > div#queueBtnHolder > button:hover:before {
 		opacity: 1;
 	}
 </style>
@@ -106,9 +118,12 @@
 	</div>
 
 	<header>
-		<div><button id="back"><img src="../Assets/ic_arrow_back_white.svg"></button></div>
+		<div><button title="Go back" id="back"><img src="/Assets/ic_arrow_back_white.svg"></button></div>
 		<div><h1>Videos</h1></div>
-		<div><button id="overflow-btn"><img src="../Assets/ic_more_vert_white.svg"></button></div>
+		<div>
+			<button title="Add all to queue" id="add-all-queue-btn"><img src="/Assets/ic_playlist_add_white.svg"></button>
+			<button title="Overflow menu" id="overflow-btn"><img src="/Assets/ic_more_vert_white.svg"></button>
+		</div>
 	</header>
 
 	<main>
@@ -176,7 +191,10 @@
 
 			<div id="queueWrapper">
 				<h4>Queue</h4>
-				<button onclick="clearQueue()" title="clear queue"><img src="../Assets/ic_clear_all_black.svg"></button>
+				<div id="queueBtnHolder">
+					<button onclick="clearQueue()" title="Clear queue"><img src="../Assets/ic_clear_all_black.svg"></button>
+					<button onclick="shuffleQueue()" title="Shuffle queue"><img src="../Assets/ic_shuffle_black.svg"></button>
+				</div>
 				<div id="queue" ondrop="drop(event)" ondragover="allowDrop(event)">
 					<i>Queue is empty</i>
 					<br>

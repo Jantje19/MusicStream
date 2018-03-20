@@ -130,6 +130,17 @@
 </head>
 <body>
 
+	<div id="saveMenu">
+		<div>
+			<button onclick="handleSaveMenuClick('playlist')">Save to playlist</button>
+			<hr>
+			<p style="width: 100%; text-align: center; padding-bottom: 10px">Temporarily save queue (saves until server restarts)</p>
+			<small style="display: block; font-size: 0.7em; padding-bottom: 10px;">Anyone can request the <i>global</i> save. If you save <i>IP-based</i> only a device with the save IP-adress can access it.</small>
+			<button onclick="handleSaveMenuClick('ip')">IP-based</button>
+			<button onclick="handleSaveMenuClick('global')">Global</button>
+		</div>
+	</div>
+
 	<header>
 		<div>
 			<h1>Music</h1>
@@ -186,12 +197,15 @@
 			<div id="queueContainer">
 				<h3>Queue</h3>
 				<button title="Empty queue" style="float: right;" onclick="deleteQueue()"><img src="Assets/ic_clear_all_black.svg"/></button>
-				<button title="Save to playlist" style="float: right;" onclick="saveQueueToPlaylist()"><img src="Assets/ic_save_black.svg"/></button>
+				<button title="Save to playlist" style="float: right;" onclick="document.getElementById('saveMenu').style.display = 'block';"><img src="Assets/ic_save_black.svg"/></button>
+				<button title="Share playlist" style="float: right;" onclick="sharePlaylist()"><img src="Assets/ic_share_black.svg"/></button>
 				<hr style="border-bottom-color: lightgray;">
 				<span id="queueCount">Amount: 0</span>
 				<hr>
 				<div id="queue">
 					<i>Queue is empty</i>
+					<button class="tmpBtn" onclick="getTmpSavedQueue(true)">Get temporary saved IP-based queue</button>
+					<button class="tmpBtn" onclick="getTmpSavedQueue(true)">Get temporary saved global queue</button>
 				</div>
 			</div>
 		</div>

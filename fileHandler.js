@@ -228,8 +228,14 @@ module.exports = {
 	getSongInfo: function(path, id3, fs) {
 		return new Promise((resolve, reject) => {
 			fs.exists(path, exists => {
-				if (exists) resolve(id3.read(path));
-				else reject('File does not exist');
+				if (exists) {
+					id3.read(path, (err, tags) => {
+						if (err)
+							reject(err);
+						else
+							resolve(tags);
+					});
+				} else reject('File does not exist');
 			});
 		});
 	}

@@ -332,9 +332,15 @@
 					}
 				}
 
-				if (document.getElementById('uiac').checked) data.tags.image = document.querySelector('img').src;
+				if (document.getElementById('uiac').checked)
+					data.tags.image = document.querySelector('img').src;
 
-				document.getElementById('videoInput').innerHTML = '<b>Downloading... This may take a while.</b>';
+				const videoInputElem = document.getElementById('videoInput');
+
+				videoInputElem.style.display = 'flex';
+				videoInputElem.style.alignItems = 'center';
+				videoInputElem.style.justifyContent = 'center';
+				videoInputElem.innerHTML = '<b>Downloading... This may take a while.</b>';
 				fetch('/ytdl', {method: "POST", credentials: 'same-origin', body: JSON.stringify(data)}).then(response => {
 					response.json().then(json => {
 						if (json.success) {
@@ -345,10 +351,10 @@
 								}
 
 								if (type == 'audio') {
-									document.getElementById('videoInput').innerHTML = '<b>Setting tags...</b>';
+									videoInputElem.innerHTML = '<b>Setting tags...</b>';
 									fetch('/tags', {method: 'POST', body: JSON.stringify(body), credentials: 'same-origin'}).then(response => {
 										response.json().then(json => {
-											document.getElementById('videoInput').innerHTML = '<b>Done!</b>';
+											videoInputElem.innerHTML = '<b>Done!</b>';
 											if (json.success) {
 												if (confirm('Everything went according to plan. Do you want to go to the home page?')) window.location = window.location.origin;
 											} else alert('Error: ' + json.info);

@@ -71,40 +71,62 @@ const loadPlugins = () => {
 			if (plugins) {
 				plugins.forEach((object, key) => {
 					if (!object.notfound) {
-						if (object.module.clientJS) {
-							const handle = (obj) => {
-								obj.pluginFolder = object.folder;
-								pluginDomJs.push(obj);
+						if ((typeof object.module).toLowerCase() == 'function') {
+							const imports = {
+								fs: fs,
+								os: os,
+								id3: id3,
+								ytdl: ytdl,
+								utils: utils,
+								https: https,
+								URLModule: URLModule,
+								fileHandler: fileHandler,
+								querystring: querystring
 							}
 
-							if (Array.isArray(object.module.clientJS)) {
-								object.module.clientJS.forEach((object, key) => {
-									handle(object);
+							const data = {
+								version: version,
+								path: __dirname + '/Plugins/' + object.pluginFolder,
+								serverURL: utils.getLocalIP(os)[0] + ':' + (settings.port || 8000)
+							}
+
+							object.module(imports, data);
+						} else {
+							if (object.module.clientJS) {
+								const handle = (obj) => {
+									obj.pluginFolder = object.folder;
+									pluginDomJs.push(obj);
+								}
+
+								if (Array.isArray(object.module.clientJS)) {
+									object.module.clientJS.forEach((object, key) => {
+										handle(object);
+									});
+								} else handle(object.module.clientJS);
+							}
+
+							if (object.module.server) {
+								pluginServer.push({
+									folder: object.folder,
+									func: object.module.server
 								});
-							} else handle(object.module.clientJS);
-						}
 
-						if (object.module.server) {
-							pluginServer.push({
-								folder: object.folder,
-								func: object.module.server
-							});
+								if (object.module.menu) {
+									object.module.menu.name = object.module.menu.name || object.folder;
 
-							if (object.module.menu) {
-								object.module.menu.name = object.module.menu.name || object.folder;
+									if (object.module.menu.url)
+										object.module.menu.url = object.folder + object.module.menu.url;
+									else
+										object.module.menu.url = object.folder;
 
-								if (object.module.menu.url)
-									object.module.menu.url = object.folder + object.module.menu.url;
-								else
-									object.module.menu.url = object.folder;
-
-								mainPageMenu.push(object.module.menu);
+									mainPageMenu.push(object.module.menu);
+								}
 							}
-						}
 
-						if (object.module.hijackRequests) {
-							object.module.hijackRequests.pluginFolder = object.folder;
-							hijackRequestPlugins.push(object.module.hijackRequests);
+							if (object.module.hijackRequests) {
+								object.module.hijackRequests.pluginFolder = object.folder;
+								hijackRequestPlugins.push(object.module.hijackRequests);
+							}
 						}
 					}
 				});

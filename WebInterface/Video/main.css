@@ -118,7 +118,7 @@ main > div:first-child {
 	/*overflow-y: hidden;*/
 }
 
-main > #videos > div button, main #queue .queueItem {
+main > #videos > div > button, main > #videos .video, main #queue .queueItem {
 	margin: 0;
 	width: 100%;
 	border: none;
@@ -165,17 +165,19 @@ main #videos > div > button span {
 	display: inline-block;
 }
 
-main  #videos > div > button > div {
+main #videos > div > button > div {
 	float: right;
 }
 
-main  #videos > div > button > div > button {
+main #videos > div > button > div > button {
 	margin: 0;
 	padding: 0;
 	width: auto;
 	border: none;
+	cursor: pointer;
 	margin-right: 10px;
 	border-radius: 100%;
+	background-color: transparent;
 }
 
 main #videos > div.closed > div {

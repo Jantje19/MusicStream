@@ -17,7 +17,7 @@ module.exports = {
 		}
 		//
 
-		const port = settings.port.val;
+		const port = settings.port.val || 8000;
 		const ips = utils.getLocalIP(os);
 
 		app.use(compression());
@@ -46,22 +46,40 @@ module.exports = {
 
 		if (hijackRequestPlugins.length > 0) {
 			app.use((request, response, next) => {
-				hijackRequestPlugins.forEach((object, key) => {
-					const data = availableData;
+				let preventDefaultFuncIndex = -1;
+				const preventDefaultFuncs = [];
+				const preventDefaultNextFunc = () => {
+					preventDefaultFuncIndex++;
 
-					data.path = __dirname + '/Plugins/' + object.pluginFolder;
+					if (preventDefaultFuncIndex >= preventDefaultFuncs.length) {
+						if (!response.headerSent && !response.headersSent)
+							next();
+						else
+							console.wrn('Plugins - hijackRequest', 'Headers already sent');
+					} else {
+						const arrVal = preventDefaultFuncs[preventDefaultFuncIndex];
+						arrVal[0].func(request, response, preventDefaultNextFunc, imports, arrVal[1]);
+					}
+				}
+
+				hijackRequestPlugins.forEach((object, key) => {
+					const data = Object.assign({}, availableData);
+
+					data.path = `${__dirname}/Plugins/${object.pluginFolder}/`;
 					if (object.func) {
 						if (typeof object.func == 'function') {
 							if (object.preventDefault != true)
 								object.func(request, response, imports, data);
 							else
-								object.func(request, response, next, imports, data);
+								preventDefaultFuncs.push([object, data]);
 						} else console.wrn(object.func + ' is not a function');
 					}
-
-					if (object.preventDefault != true)
-						next();
 				});
+
+				if (preventDefaultFuncs.length > 0)
+					preventDefaultNextFunc();
+				else
+					next();
 			});
 		}
 
@@ -565,10 +583,10 @@ module.exports = {
 			}
 
 			serverPlugins.forEach((object, key) => {
-				const data = availableData;
+				const data = Object.assign({}, availableData);
 				const server = new PluginServerHandler(object.folder);
 
-				data.path = __dirname + '/Plugins/' + object.folder;
+				data.path = `${__dirname}/Plugins/${object.pluginFolder}/`;
 				object.func(server, imports, data);
 			});
 		}
@@ -589,7 +607,7 @@ module.exports = {
 
 		const listenerObject = httpsServer || app;
 
-		listenerObject.listen(port.toString(), err => {
+		listenerObject.listen(port, err => {
 			if (err)
 				throw err;
 			else {

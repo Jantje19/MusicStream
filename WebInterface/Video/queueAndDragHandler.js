@@ -11,7 +11,7 @@ fetch('/getSettings/', {credentials: 'same-origin'}).then(response => {
 });
 
 function enqueue(...vals) {
-	const queue = getQueue();
+	let queue = getQueue();
 
 	if (vals.length > 1)
 		queue = vals;
@@ -121,6 +121,11 @@ function clearQueue() {
 	updateQueue([]);
 }
 
+function shuffleQueue() {
+	queueIndex = 0;
+	updateQueue(getQueue().shuffle(), true);
+}
+
 Array.prototype.move = function (old_index, new_index) {
 	if (new_index >= this.length) {
 		var k = new_index - this.length;
@@ -130,5 +135,14 @@ Array.prototype.move = function (old_index, new_index) {
 	}
 
 	this.splice(new_index, 0, this.splice(old_index, 1)[0]);
+	return this;
+};
+
+Array.prototype.shuffle = function () {
+	for (let i = this.length - 1; i > 0; i--) {
+		const j = Math.floor(Math.random() * (i + 1));
+		[this[i], this[j]] = [this[j], this[i]];
+	}
+
 	return this;
 };

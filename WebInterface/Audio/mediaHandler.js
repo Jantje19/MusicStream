@@ -4,17 +4,17 @@ let previousTrack;
 let previousArtist;
 
 function enqueue(...vals) {
-	if (vals.length > 1) {
-		if (document.getElementById('shuffle').getAttribute('activated') == 'true')
-			vals.shuffle();
+	if (Array.isArray(vals[0]))
+		vals = vals[0];
 
-		vals.forEach((object, key) => {
-			queue[queue.length] = object;
-		});
-	} else queue[queue.length] = vals[0];
+	if (document.getElementById('shuffle').getAttribute('activated') == 'true')
+		vals.shuffle();
+
+	vals.forEach((object, key) => {
+		queue[queue.length] = object;
+	});
 
 	document.cookie = "queue=" + queue.map(val => {return escape(val)}).join(',');
-	// window.history.pushState(document.body.innerHTML, document.title, "?queue=" + queue.map(val => {return escape(val)}).join(','));
 	updateInterface();
 }
 
@@ -156,7 +156,7 @@ function updateInterface() {
 			if (key == queueIndex) elem.innerHTML += `<button title="${object}" onclick="queueClick(event, '${key}')" style="background-color: rgba(22, 160, 133, 0.5);"><span>${key + 1}</span><span>${object}</button></div><hr>`;
 			else elem.innerHTML += `<button title="${object}" onclick="queueClick(event, '${key}')"><span>${key + 1}</span><span>${object}</button></div><hr>`;
 		});
-	} else elem.innerHTML = '<i>Queue is empty</i>';
+	} else elem.innerHTML = '<i>Queue is empty</i><button class="tmpBtn" onclick="getTmpSavedQueue(\'ip\', true)">Get temporary saved IP-based queue</button><button class="tmpBtn" onclick="getTmpSavedQueue(\'global\', true)">Get temporary saved global queue</button>';
 
 	if (audio.src != '' && audio.src != undefined) {
 		if (audio.paused == true) {
@@ -212,7 +212,7 @@ function displayLyrics(artist, songName) {
 				// Split by upper and lower case difference, then adding a break tag
 				// const lyrics = json.lyrics.split(/(?=[A-Z])/).map(val => {return val.trim();}).join('<br>');
 
-				const lyrics = json.lyrics.replace(/\n/g, '<br>');
+				const lyrics = json.lyrics.trim().replace(/\n/g, '<br>');
 
 				previousTrack = songName;
 				lyricsElem.innerHTML = `<h3>Lyrics</h3><p style="line-height: 1.5;">${lyrics}</p>`;
@@ -425,7 +425,6 @@ function updateQueueIndex(num) {
 
 
 function addVideoToQueue(name) {
-	if (name) {
+	if (name)
 		enqueue('../video/' + name);
-	}
 }

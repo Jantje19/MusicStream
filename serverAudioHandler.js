@@ -1,3 +1,5 @@
+const tmpQueueSave = {global: {}};
+
 module.exports = {
 	start: (app, dirname, fileHandler, fs, os, settings, utils, querystring, id3, https, URLModule) => {
 		app.get('/playlist/*', (request, response) => {
@@ -171,7 +173,7 @@ module.exports = {
 		app.get('/OldBrowsers/*', (request, response) => {
 			const url = request.url;
 
-			console.log('Got a request for ' + url + '. HAHA Your browser sucks');
+			console.log(utils.logDate() + ' Got a request for ' + url);
 
 			fileHandler.getJSON(fs, os, utils, settings).then(json => {
 				let html = '';
@@ -187,6 +189,39 @@ module.exports = {
 
 				response.send(html);
 			}).catch(err => response.status(404).send('Error: ' + err));
+		});
+
+		app.get('/saveQueue', (request, response) => {
+			const url = querystring.unescape(request.url);
+			const params = querystring.parse(URLModule.parse(url).query);
+
+			console.log(utils.logDate() + ' Got a request for ' + url);
+
+			const sendData = (data) => {
+				if (data) {
+					if (data.queue)
+						response.send({success: true, data: data})
+					else
+						response.send({success: false, error: 'Nothing saved (yet)'})
+				} else response.send({success: false, error: 'Nothing saved (yet)'});
+			}
+
+			if (params) {
+				let objectKey = ('for' in params) ? params.for : request.connection.remoteAddress;
+
+				if (objectKey) {
+					if (objectKey.toLowerCase() == 'global')
+						sendData(tmpQueueSave.global);
+					else {
+						objectKey = request.connection.remoteAddress;
+
+						if (objectKey in tmpQueueSave)
+							sendData(tmpQueueSave[objectKey]);
+						else
+							sendData(null);
+					}
+				} else sendData(tmpQueueSave.global);
+			} else sendData(null);
 		});
 
 		app.post('/updatePlaylist', (request, response) => {
@@ -371,6 +406,52 @@ module.exports = {
 				}).catch(err => {
 					response.send({success: false, data: 'Couldn\'t get songs'});
 				})
+			});
+		});
+
+		app.post('/saveQueue', (request, response) => {
+			let body = '';
+
+			request.on('data', data => {
+				body += data;
+
+				if (body.length > 1e6) {
+					request.send({success: false, error: 'The amount of data is to high', info: 'The connection was destroyed because the amount of data passed is to much'});
+					request.connection.destroy();
+				}
+			});
+
+			request.on('end', () => {
+				const url = querystring.unescape(request.url);
+
+				console.log(utils.logDate() + ' Got a POST request for ' + url);
+
+				try {
+					body = JSON.parse(body);
+				} catch (err) {
+					response.send({success: false, error: 'Unable to parse JSON', info: err});
+					return;
+				}
+
+				let objectKey = ('for' in body) ? body.for : request.connection.remoteAddress;
+				const queueIndex = ('queueIndex' in body) ? body.queueIndex : 0;
+				const queue = ('queue' in body) ? body.queue : [];
+
+				if (objectKey.toLowerCase() == 'global') {
+					tmpQueueSave.global = {
+						queueIndex: queueIndex,
+						queue: queue
+					}
+
+					response.send({success: true});
+				} else {
+					tmpQueueSave[request.connection.remoteAddress] = {
+						queueIndex: queueIndex,
+						queue: queue
+					}
+
+					response.send({success: true});
+				}
 			});
 		});
 	}
