@@ -1,4 +1,4 @@
-let video, int, videoSettingsElem;
+let video, int, videoSettingsElem, selectElem;
 
 function load() {
 	video = document.querySelector('video');
@@ -26,8 +26,7 @@ function load() {
 
 				if (json.video.subtitles) {
 					if (json.video.subtitles.length > 0) {
-						const selectElem = document.createElement('select');
-
+						selectElem = document.createElement('select');
 						selectElem.addEventListener('change', evt => {
 							const title = evt.currentTarget.value;
 
@@ -39,9 +38,15 @@ function load() {
 							toggleVideoSettingsWindow();
 						});
 
-						json.video.subtitles.unshift('');
+						json.video.subtitles.unshift('Select subtitle');
 						json.video.subtitles.forEach((object, key) => {
 							const optionElem = document.createElement('option');
+
+							if (key == 0) {
+								optionElem.setAttribute('hidden');
+								optionElem.setAttribute('disabled');
+								optionElem.setAttribute('selected');
+							}
 
 							optionElem.value = object;
 							optionElem.innerText = object;

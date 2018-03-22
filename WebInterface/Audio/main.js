@@ -11,6 +11,9 @@ const keyShortcuts = {
 	"escape": stopSong,
 	"arrowright": next,
 	"arrowleft": previous,
+	"q": evt => {
+		document.getElementById('queue').querySelectorAll('button')[queueIndex].scrollIntoView();
+	}
 }
 
 function keyPress(evt) {
@@ -37,7 +40,9 @@ function handlePlaylist(evt, name) {
 			window.location = '/managePlaylist.html#' + name;
 	} else {
 		get('/playlist/' + name).then(json => {
-			if (document.getElementById('shuffle').getAttribute('activated') == 'true') json.songs.shuffle();
+			if (document.getElementById('shuffle').getAttribute('activated') == 'true')
+				json.songs.shuffle();
+
 			deleteQueue();
 			enqueue(...json.songs);
 			playSong(queue[0], true);
@@ -112,7 +117,8 @@ function songClick(evt) {
 function addWholeSongsToQueue() {
 	const buttons = document.getElementById('songs').querySelectorAll('button');
 
-	if (document.getElementById('shuffle').getAttribute('activated') == 'true') Array.from(buttons).shuffle();
+	if (document.getElementById('shuffle').getAttribute('activated') == 'true')
+		Array.from(buttons).shuffle();
 
 	buttons.forEach((object, key) => {
 		enqueue(object.innerText);
@@ -380,11 +386,21 @@ function load() {
 	document.getElementById('shuffle').addEventListener('click', evt => {
 		const val = evt.target.getAttribute('activated');
 
-		if (val == 'true') {
+		if (val == 'true')
 			evt.target.setAttribute('activated', false);
-		} else {
-			queue.shuffle();
-			playSong(null, true);
+		else {
+			if (queueIndex > 0) {
+				const queueCopy = queue.slice();
+
+				queue.length = 0;
+				queue.push(queueCopy.splice(queueIndex, 1)[0]);
+				queueIndex = 0;
+				enqueue(queueCopy.shuffle());
+			} else {
+				queue.shuffle();
+				playSong(null, true);
+			}
+
 			evt.target.setAttribute('activated', true);
 		}
 	});
@@ -599,7 +615,7 @@ function checkCookies(songsArr) {
 	function getCookieAttributes() {
 		const outp = {};
 
-		document.cookie.split(';').forEach((object, key) => {
+		decodeURIComponent(document.cookie).split(';').forEach((object, key) => {
 			const splitVal = object.trim().split('=');
 
 			if (splitVal.length > 2) {
@@ -672,22 +688,6 @@ function checkCookies(songsArr) {
 		} else getCookies();
 	} else getCookies();
 }
-
-
-// SHORTCUTS
-const shortcuts = {
-	q: evt => {
-		document.getElementById('queue').querySelectorAll('button')[queueIndex].scrollIntoView();
-	}
-}
-
-document.addEventListener('keypress', (evt) => {
-	const key = evt.code.replace('Key', '').toLowerCase();
-
-	if (evt.ctrlKey && key in shortcuts)
-		shortcuts[key](evt)
-});
-//
 
 audio.onended = end;
 audio.onplay = updateInterface;

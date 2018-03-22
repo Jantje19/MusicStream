@@ -586,7 +586,7 @@ module.exports = {
 				const data = Object.assign({}, availableData);
 				const server = new PluginServerHandler(object.folder);
 
-				data.path = `${__dirname}/Plugins/${object.pluginFolder}/`;
+				data.path = `${__dirname}/Plugins/${object.folder}/`;
 				object.func(server, imports, data);
 			});
 		}

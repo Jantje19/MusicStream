@@ -104,8 +104,22 @@ function nextQueueItem() {
 		queueIndex++;
 	else return;
 
+	if (selectElem) {
+		const optsElemArr = Array.from(selectElem.getElementsByTagName('option'));
+
+		for (let i = 0; i < optsElemArr.length; i++) {
+			if (object.defaultSelected) {
+				object.selected = '';
+				return;
+			}
+		}
+
+		optsElemArr[0].selected = '';
+	}
+
 	updateQueue(queue);
 	playVid(queue[queueIndex - 1], true);
+	removeTracks(document.getElementsByTagName('video')[0]);
 }
 
 function queueTop(video) {

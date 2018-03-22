@@ -14,7 +14,7 @@ function enqueue(...vals) {
 		queue[queue.length] = object;
 	});
 
-	document.cookie = "queue=" + queue.map(val => {return escape(val)}).join(',');
+	document.cookie = "queue=" + encodeURIComponent(queue.map(val => {return escape(val)}).join(','));
 	updateInterface();
 }
 
@@ -37,10 +37,9 @@ function next() {
 	if (!(document.getElementById('repeat').getAttribute('activated') == 'true' && document.getElementById('repeat').getAttribute('repeatOne') == 'true')) {
 		const newIndex = Number(queueIndex) + 1;
 
-		if (queue.length > newIndex) {
+		if (queue.length > newIndex)
 			updateQueueIndex(newIndex);
-			deleteCookie();
-		} else {
+		else {
 			if (document.getElementById('repeat').getAttribute('activated') == 'true')
 				updateQueueIndex(0);
 			else return;
@@ -409,7 +408,8 @@ function fetchArtistData(artistName) {
 }
 
 function deleteCookie() {
-	document.cookie.split(";").forEach((object, key) => {
+	console.trace();
+	decodeURIComponent(document.cookie).split(";").forEach((object, key) => {
 		const eqPos = object.indexOf("=");
 		const name = eqPos > -1 ? object.substr(0, eqPos) : object;
 
