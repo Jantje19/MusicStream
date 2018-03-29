@@ -14,8 +14,8 @@ function enqueue(...vals) {
 		queue[queue.length] = object;
 	});
 
-	document.cookie = "queue=" + encodeURIComponent(queue.map(val => {return escape(val)}).join(','));
 	updateInterface();
+	updateCookies();
 }
 
 function end() {
@@ -152,8 +152,10 @@ function updateInterface() {
 		elem.innerHTML = '';
 		document.getElementById('queueCount').innerText = "Amount: " + queue.length;
 		queue.forEach((object, key) => {
-			if (key == queueIndex) elem.innerHTML += `<button title="${object}" onclick="queueClick(event, '${key}')" style="background-color: rgba(22, 160, 133, 0.5);"><span>${key + 1}</span><span>${object}</button></div><hr>`;
-			else elem.innerHTML += `<button title="${object}" onclick="queueClick(event, '${key}')"><span>${key + 1}</span><span>${object}</button></div><hr>`;
+			if (key == queueIndex)
+				elem.innerHTML += `<button title="${object}" onclick="queueClick(event, '${key}')" active><span>${key + 1}</span><span>${object}</button></div><hr>`;
+			else
+				elem.innerHTML += `<button title="${object}" onclick="queueClick(event, '${key}')"><span>${key + 1}</span><span>${object}</button></div><hr>`;
 		});
 	} else elem.innerHTML = '<i>Queue is empty</i><button class="tmpBtn" onclick="getTmpSavedQueue(\'ip\', true)">Get temporary saved IP-based queue</button><button class="tmpBtn" onclick="getTmpSavedQueue(\'global\', true)">Get temporary saved global queue</button>';
 
@@ -222,6 +224,11 @@ function displayLyrics(artist, songName) {
 
 function escapeString(string) {
 	return string.replace(/\'/g, "\\\'");
+}
+
+function updateCookies() {
+	document.cookie = 'queueIndex=' + queueIndex;
+	document.cookie = 'queue=' + encodeURIComponent(queue.map(val => {return escape(val)}).join(','));
 }
 
 
@@ -408,7 +415,6 @@ function fetchArtistData(artistName) {
 }
 
 function deleteCookie() {
-	console.trace();
 	decodeURIComponent(document.cookie).split(";").forEach((object, key) => {
 		const eqPos = object.indexOf("=");
 		const name = eqPos > -1 ? object.substr(0, eqPos) : object;
@@ -419,7 +425,7 @@ function deleteCookie() {
 
 function updateQueueIndex(num) {
 	queueIndex = num;
-	document.cookie = 'queueIndex=' + num;
+	updateCookies();
 }
 
 

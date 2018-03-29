@@ -16,7 +16,7 @@ function load() {
 				const keys = Object.keys(json.video.videos);
 				const addVideosToDiv = (arr, div) => {
 					arr.forEach((object, key) => {
-						div.innerHTML += `<button onclick="vidClick(event, '${object}')" draggable="true" ondragstart="drag(event)" class="video ${key}" id="${key}">${object}</button><hr>`;
+						div.innerHTML += `<button onclick="vidClick(event, '${object.replace(/\'/g, '\\\'')}')" draggable="true" ondragstart="drag(event)" class="video ${key}" id="${key}">${object}</button><hr>`;
 					});
 				}
 
@@ -65,7 +65,7 @@ function load() {
 						const titleButton = document.createElement('button');
 						const videoDiv = document.createElement('div');
 
-						titleButton.innerHTML = `<span>${object}</span><div><button title="Add all to queue"><img src="/Assets/ic_playlist_add_black.svg"></button><img class="toggleArrow" src="/Assets/ic_keyboard_arrow_up_black.svg"></div>`;
+						titleButton.innerHTML = `<span>${object}</span><div><button title="Add all to queue"><img src="/Assets/ic_playlist_add_white.svg"></button><img class="toggleArrow" src="/Assets/ic_keyboard_arrow_up_white.svg"></div>`;
 						titleButton.onclick = evt => {
 							if (evt.target.title == 'Add all to queue' || evt.target.parentElement.title == 'Add all to queue') {
 								updateQueue(json.video.videos[object], true);
@@ -87,10 +87,12 @@ function load() {
 				} else {
 					const vids = json.video.videos[keys[0]];
 
-					if (vids.length > 0)
-						addVideosToDiv(vids, videosElem);
-					else
-						videosElem.innerHTML = '<b style="display: block; margin-top: 10%">No video files found...<b>';
+					if (vids) {
+						if (vids.length > 0)
+							addVideosToDiv(vids, videosElem);
+						else
+							videosElem.innerHTML = '<b style="display: block; margin-top: 10%">No video files found...<b>';
+					} else videosElem.innerHTML = '<b style="display: block; margin-top: 10%">No video files found...<b>';
 				}
 			} else videosElem.innerHTML = '<b style="display: block; margin-top: 10%">No video files found...<b>';
 		});
@@ -356,8 +358,33 @@ function addSubtitleTrack(url, videoElem) {
 }
 
 function toggleCollapseAll() {
-	Array.from(document.querySelectorAll('#videos > div')).forEach((object, key) => {
-		object.classList.toggle('closed');
+	Array.prototype.most = function(val, greaterOrEqual) {
+		const trueArr = [];
+		const falseArr = [];
+
+		this.forEach(obj => {
+			if (obj == val)
+				trueArr.push(obj);
+			else
+				falseArr.push(obj);
+		});
+
+		if (greaterOrEqual)
+			return trueArr.length >= falseArr.length;
+		else
+			return trueArr.length > falseArr.length;
+	}
+
+	const elements = Array.from(document.querySelectorAll('#videos > div'));
+	const setClass = elements.map(val => {
+		return val.classList.contains('closed');
+	}).most(true);
+
+	elements.forEach((object, key) => {
+		if (setClass)
+			object.classList.remove('closed');
+		else
+			object.classList.add('closed');
 	});
 }
 

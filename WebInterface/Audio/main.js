@@ -35,20 +35,22 @@ function getData() {
 }
 
 function handlePlaylist(evt, name) {
-	if (evt.ctrlKey) {
-		if (!name.match(/(.+)\.((\w+|[0-9]+){2,5})$/))
-			window.location = '/managePlaylist.html#' + name;
-	} else {
-		get('/playlist/' + name).then(json => {
-			if (document.getElementById('shuffle').getAttribute('activated') == 'true')
-				json.songs.shuffle();
+	if (evt.target == evt.currentTarget) {
+		if (evt.ctrlKey) {
+			if (!name.match(/(.+)\.((\w+|[0-9]+){2,5})$/))
+				window.location = '/managePlaylist.html#' + name;
+		} else {
+			get('/playlist/' + name).then(json => {
+				if (document.getElementById('shuffle').getAttribute('activated') == 'true')
+					json.songs.shuffle();
 
-			deleteQueue();
-			enqueue(...json.songs);
-			playSong(queue[0], true);
-		}).catch( err => {
-			console.error('An error occurred', err);
-		});
+				deleteQueue();
+				enqueue(...json.songs);
+				playSong(queue[0], true);
+			}).catch( err => {
+				console.error('An error occurred', err);
+			});
+		}
 	}
 }
 
@@ -76,40 +78,44 @@ function get(url, headers) {
 }
 
 function queueClick(evt, index) {
-	if (evt.ctrlKey) {
-		queue.splice(index, 1);
-		if (audio.paused || (!audio.paused && index != queueIndex)) updateInterface();
-		else playSong(null, true);
-	} else {
-		updateQueueIndex(Number(index));
-		playSong(null, true);
+	if (evt.target == evt.currentTarget) {
+		if (evt.ctrlKey) {
+			queue.splice(index, 1);
+			if (audio.paused || (!audio.paused && index != queueIndex)) updateInterface();
+			else playSong(null, true);
+		} else {
+			updateQueueIndex(Number(index));
+			playSong(null, true);
+		}
 	}
 }
 
 function songClick(evt) {
-	const elem = evt.target;
+	if (evt.target == evt.currentTarget) {
+		const elem = evt.target;
 
-	if (evt.ctrlKey) {
-		if (queue.length < 1) {
-			enqueue(elem.innerText);
+		if (evt.ctrlKey) {
+			if (queue.length < 1) {
+				enqueue(elem.innerText);
+			} else {
+				enqueue(elem.innerText);
+				moveQueueItem(queue.length - 1, queueIndex + 1);
+			}
 		} else {
-			enqueue(elem.innerText);
-			moveQueueItem(queue.length - 1, queueIndex + 1);
-		}
-	} else {
-		const object = elem.innerText;
+			const object = elem.innerText;
 
-		if (clickTimer) {
-			clearTimeout(clickTimer);
-			clickTimer = null;
-			updateQueueIndex(queue.length);
-			enqueue(object);
-			playSong(object, true);
-		} else {
-			clickTimer = setTimeout(() => {
+			if (clickTimer) {
+				clearTimeout(clickTimer);
 				clickTimer = null;
+				updateQueueIndex(queue.length);
 				enqueue(object);
-			}, 200);
+				playSong(object, true);
+			} else {
+				clickTimer = setTimeout(() => {
+					clickTimer = null;
+					enqueue(object);
+				}, 200);
+			}
 		}
 	}
 }
@@ -151,6 +157,7 @@ function handleSaveMenuClick(type) {
 
 function saveQueueToTmp(type) {
 	const data = {
+		timeStamp: audio.currentTime || 0,
 		queueIndex: queueIndex,
 		queue: queue
 	};
@@ -217,6 +224,7 @@ function getTmpSavedQueue(type, autoHandleResponse) {
 			queueIndex = data.queueIndex;
 			enqueue(data.queue);
 			updateInterface();
+			audio.currentTime = data.timeStamp;
 		}).catch(err => {
 			console.error('Get TMP queue', err);
 			alert('Unable to get temporary saved queue: ' + err);
@@ -401,6 +409,7 @@ function load() {
 				playSong(null, true);
 			}
 
+			updateCookies();
 			evt.target.setAttribute('activated', true);
 		}
 	});
@@ -479,14 +488,17 @@ function load() {
 	});
 
 	document.getElementById('sort').addEventListener('change', evt => {
-		let after = '';
+		const songsElem = document.getElementById('songs');
 		const val = evt.target.value;
+		let after = '';
 
-		if (val != "none") after = 'sort=' + val;
+		if (val != "none")
+			after = 'sort=' + val;
+
+		songsElem.innerHTML = '<div class="ball-scale-multiple"><div></div><div></div><div></div></div>';
 
 		get('/data/' + after).then(json => {
 			const songs = json.audio.songs;
-			const songsElem = document.getElementById('songs');
 
 			songsElem.innerHTML = '';
 			songs.forEach((object, key) => {

@@ -435,11 +435,13 @@ module.exports = {
 
 				let objectKey = ('for' in body) ? body.for : request.connection.remoteAddress;
 				const queueIndex = ('queueIndex' in body) ? body.queueIndex : 0;
+				const timeStamp = ('timeStamp' in body) ? body.timeStamp : 0;
 				const queue = ('queue' in body) ? body.queue : [];
 
 				if (objectKey.toLowerCase() == 'global') {
 					tmpQueueSave.global = {
 						queueIndex: queueIndex,
+						timeStamp: timeStamp,
 						queue: queue
 					}
 
@@ -447,6 +449,7 @@ module.exports = {
 				} else {
 					tmpQueueSave[request.connection.remoteAddress] = {
 						queueIndex: queueIndex,
+						timeStamp: timeStamp,
 						queue: queue
 					}
 

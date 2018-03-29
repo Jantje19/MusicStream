@@ -156,8 +156,9 @@ main #videos > div > div {
 }
 
 main #videos > div > button {
-	border-bottom: 1px lightgray solid;
-	background-color: rgba(22, 160, 133, 0.3);
+	color: white;
+	background-color: #12876f;
+	/*border-bottom: 1px lightgray solid;*/
 }
 
 main #videos > div > button span {

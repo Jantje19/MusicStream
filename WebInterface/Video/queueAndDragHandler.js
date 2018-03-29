@@ -46,7 +46,7 @@ function updateQueue(newQueue, startPlaying) {
 		queueElem.innerHTML = '';
 		newQueue.forEach((object, key) => {
 			if (key == queueIndex - 1)
-				queueElem.innerHTML += `<button style="background-color: rgba(22, 160, 133, 0.5);" onclick="queueClick(event)" draggable="true" ondragstart="drag(event)" class="queueItem ${key}" id="newId-${key}">${object}</button>`;
+				queueElem.innerHTML += `<button style="background-color: #12876f; color: white;" onclick="queueClick(event)" draggable="true" ondragstart="drag(event)" class="queueItem ${key}" id="newId-${key}">${object}</button>`;
 			else
 				queueElem.innerHTML += `<button onclick="queueClick(event)" draggable="true" ondragstart="drag(event)" class="queueItem ${key}" id="newId-${key}">${object}</button>`;
 		});
