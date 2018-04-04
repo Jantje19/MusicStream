@@ -37,7 +37,7 @@ module.exports = {
 
 						if (parsedUrl) {
 							if ('pathname' in parsedUrl) {
-								const name = querystring.unescape(parsedUrl.pathname.match(/(.+)\/(.+)/)[2]);
+								const name = querystring.unescape(parsedUrl.href.match(/(.+)\/(.+)/)[2]);
 
 								if ('query' in parsedUrl) {
 									const queryParameters = querystring.parse(parsedUrl.query);
@@ -123,11 +123,17 @@ module.exports = {
 					if (inArray.val == true) {
 						const song = json.audio.songs[inArray.index];
 						fileHandler.getSongInfo(song.path + song.fileName, id3, fs).then(tags => {
-							if (tags.image.imageBuffer) {
-								// if (tags.image.imageBuffer.length > 1e7) response.send({error: 'Way to long', info: 'The image was way to large'});
-								if (tags.image.imageBuffer.length > 1e7) delete tags.image;
-								response.send(tags);
-							} else response.send(tags);
+							if (tags.image) {
+								if (tags.image.imageBuffer) {
+									if (tags.image.imageBuffer.length > 1e7)
+										delete tags.image;
+
+									response.send(tags);
+									return;
+								}
+							}
+
+							response.send(tags);
 						}).catch(err => response.send({error: 'Couldn\'t find ID3 tags', info: err}));
 					} else response.send({error: `The song '${songName}' was not found`, info: "The cached JSON file had no reference to this file"});
 				}).catch(err => response.send({error: "There was an error with getting the song", info: err}));

@@ -35,22 +35,20 @@ function getData() {
 }
 
 function handlePlaylist(evt, name) {
-	if (evt.target == evt.currentTarget) {
-		if (evt.ctrlKey) {
-			if (!name.match(/(.+)\.((\w+|[0-9]+){2,5})$/))
-				window.location = '/managePlaylist.html#' + name;
-		} else {
-			get('/playlist/' + name).then(json => {
-				if (document.getElementById('shuffle').getAttribute('activated') == 'true')
-					json.songs.shuffle();
+	if (evt.ctrlKey) {
+		if (!name.match(/(.+)\.((\w+|[0-9]+){2,5})$/))
+			window.location = '/managePlaylist.html#' + name;
+	} else {
+		get('/playlist/' + name).then(json => {
+			if (document.getElementById('shuffle').getAttribute('activated') == 'true')
+				json.songs.shuffle();
 
-				deleteQueue();
-				enqueue(...json.songs);
-				playSong(queue[0], true);
-			}).catch( err => {
-				console.error('An error occurred', err);
-			});
-		}
+			deleteQueue();
+			enqueue(...json.songs);
+			playSong(queue[0], true);
+		}).catch( err => {
+			console.error('An error occurred', err);
+		});
 	}
 }
 
@@ -78,44 +76,40 @@ function get(url, headers) {
 }
 
 function queueClick(evt, index) {
-	if (evt.target == evt.currentTarget) {
-		if (evt.ctrlKey) {
-			queue.splice(index, 1);
-			if (audio.paused || (!audio.paused && index != queueIndex)) updateInterface();
-			else playSong(null, true);
-		} else {
-			updateQueueIndex(Number(index));
-			playSong(null, true);
-		}
+	if (evt.ctrlKey) {
+		queue.splice(index, 1);
+		if (audio.paused || (!audio.paused && index != queueIndex)) updateInterface();
+		else playSong(null, true);
+	} else {
+		updateQueueIndex(Number(index));
+		playSong(null, true);
 	}
 }
 
 function songClick(evt) {
-	if (evt.target == evt.currentTarget) {
-		const elem = evt.target;
+	const elem = evt.target;
 
-		if (evt.ctrlKey) {
-			if (queue.length < 1) {
-				enqueue(elem.innerText);
-			} else {
-				enqueue(elem.innerText);
-				moveQueueItem(queue.length - 1, queueIndex + 1);
-			}
+	if (evt.ctrlKey) {
+		if (queue.length < 1) {
+			enqueue(elem.innerText);
 		} else {
-			const object = elem.innerText;
+			enqueue(elem.innerText);
+			moveQueueItem(queue.length - 1, queueIndex + 1);
+		}
+	} else {
+		const object = elem.innerText;
 
-			if (clickTimer) {
-				clearTimeout(clickTimer);
+		if (clickTimer) {
+			clearTimeout(clickTimer);
+			clickTimer = null;
+			updateQueueIndex(queue.length);
+			enqueue(object);
+			playSong(object, true);
+		} else {
+			clickTimer = setTimeout(() => {
 				clickTimer = null;
-				updateQueueIndex(queue.length);
 				enqueue(object);
-				playSong(object, true);
-			} else {
-				clickTimer = setTimeout(() => {
-					clickTimer = null;
-					enqueue(object);
-				}, 200);
-			}
+			}, 200);
 		}
 	}
 }
