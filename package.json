@@ -5,8 +5,8 @@
 	"main": "index.js",
 	"scripts": {
 		"debug": "nodemon main.js",
-		"start": "node main.js",
-		"test": "node index.js"
+		"start": "node index.js",
+		"test": "node main.js"
 	},
 	"keywords": [
 		"music",

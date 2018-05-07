@@ -35,7 +35,7 @@ The web-interface only works with browsers that have ES6 support. Almost all (up
 
 This program needs Node-ID3 version 0.0.10 or higher to work with images properly.
 
-Manipulating files (adding/removing tags) requires the side installation of [FFMPEG](https://www.ffmpeg.org/download.html). This is not required however.
+Manipulating files (adding/removing tags) requires the installation of [FFMPEG](https://www.ffmpeg.org/download.html). This is not required however.
 
 Supported browsers with build numbers (I would hope):
 - Edge: 14
@@ -49,16 +49,35 @@ Supported browsers with build numbers (I would hope):
 
 Internet Explorer won't work. (*but why would you use it anyway.*)
 
-**You can still use it on old browsers. On the front page it will ask you to move to the old browsers page. It features a limited interface and the features are very limited.**
+**You can still use it on old browsers. On the main page it will ask you to move to the old browsers page. It features a limited interface and features.**
 
-**Only tested (and used) on Google Chrome Canary and Android Chrome**
+**Only tested (and used) on Google Chrome Canary and Chrome on Android**
 
+### Privacy
+I am a huge fan of privacy, that's why I try to be as specific as I can describing how my programs handle data. All of the data *MusicStream* collects stays on your own device (it also saves me server costs =P).
+Some third party APIs are used:
+- LastFM:
+	- What: artist name and song title
+	- When: every time when a new songs gets started & when adding auto tags
+	- Which: local device
+- YouTube API
+	- What: the YouTube URL
+	- When: YouTube video is downloaded
+	- Which: server
+- makeitpersonal API (lyrics)
+	- What: artist name and song title
+	- When: the request lyrics button is pressed
+	- Which device: local device
+- 404 Page:
+	- What: elevator music from orangefreesounds.com & canvas.js (I created canvas.js)
+	- When: on visit
+	- Which: local device
 
 ## Crashes
 
 It crashes, why?
 
-1. Make sure you've run `npm install`.
+1. Make sure you ran `npm install`.
 2. Make sure that you've installed Node-ID3 version 0.0.10 or higher. You can update it with this command: `npm update node-id3`.
 3. If you are editing tags, make sure that you have [FFMPEG](https://www.ffmpeg.org/download.html) installed.
 
