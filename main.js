@@ -419,6 +419,37 @@ const utils = {
 				} else console.wrn('Found https argument, but couln\'t parse the given value. Starting with default settings...');
 
 				return;
+			} else if (object.indexOf('--https-config=') > -1) {
+				const index = object.trim().match(/(--https-config=)(.+)/);
+
+				if (index) {
+					if (index[2]) {
+						if (index[2].length > 0) {
+							try {
+								if (fs.existsSync(index[2])) {
+									let JSONData = fs.readFileSync(index[2], 'utf-8');
+
+									try {
+										JSONData = JSON.parse(JSONData);
+									} catch (err) {}
+
+									if ((typeof JSONData).toLowerCase() != 'string') {
+										if ('key' in JSONData && 'cert' in JSONData) {
+											if (fs.existsSync(JSONData.key) && fs.existsSync(JSONData.cert)) {
+												utils.colorLog('Found https argument. Starting server in https mode!', 'bgGreen');
+												return JSONData;
+											} else console.wrn('Found https argument, but the given cert or key path(s) don\'t exist. Starting with default settings...');
+										} else console.wrn('Found https argument, but the given JSON value doesn\'t contain one or both of the required arguments (key, cert). Starting with default settings...');
+									} else console.wrn('Found https argument, but couln\'t parse the given JSON value. Starting with default settings...');
+								} else console.wrn('Found https argument, but the specified file doesn\'t exist. Starting with default settings...');
+							} catch (err) {
+								console.wrn('Found https argument, but couln\'t parse the given file. Starting with default settings...');
+							}
+						}
+					}
+				} else console.wrn('Found https argument, but couln\'t parse the given value. Starting with default settings...');
+
+				return;
 			}
 		}
 

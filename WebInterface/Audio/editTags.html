@@ -99,7 +99,7 @@
 
 	function load() {
 		if (location.hash) {
-			const songName = location.hash.replace('#', '');
+			const songName = unescape(location.hash.replace('#', ''));
 
 			fetch('/data/', {credentials: 'same-origin'}).then(response => {
 				response.json().then(json => {
@@ -157,7 +157,7 @@
 
 		div.id = 'songSelect';
 		songs.forEach((object, key) => {
-			div.innerHTML += `<button onclick="songSelected('${object}')">${object}</button>`;
+			div.innerHTML += `<button onclick="songSelected('${object.replace(/\'/g, '\\\'')}')">${object}</button>`;
 		});
 
 		mainElem.innerHTML = '<h2>Select song</h2>';
@@ -259,7 +259,7 @@
 		} else location = location.origin;
 	}
 
-	window.onload = load;
+	document.addEventListener('DOMContentLoaded', load);
 </script>
 
 </head>

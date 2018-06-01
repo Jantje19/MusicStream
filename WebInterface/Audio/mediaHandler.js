@@ -170,6 +170,19 @@ function updateInterface() {
 	}
 }
 
+function setVolume(volumeNum, elem) {
+	audio.volume = volumeNum;
+
+	if (elem) {
+		elem = elem.getElementsByTagName('img')[0];
+
+		if (volumeNum <= 0)
+			elem.src = 'Assets/ic_volume_off_white.svg';
+		else
+			elem.src = 'Assets/ic_volume_up_white.svg';
+	}
+}
+
 function displayLyrics(artist, songName) {
 	let lyricsElem = document.getElementById('lyricsElem');
 
@@ -310,7 +323,9 @@ function mediaSession() {
 			const dataDiv = document.createElement('div');
 
 			dataDiv.id = 'artistInfo';
-			dataDiv.innerHTML += `<p style="font-size: 120%;">Song info:</p> <img id="infoBtn" onclick="displayLyrics('${escapeString(json.artist)}', '${escapeString(json.title)}')" src="Assets/ic_music_note_white.svg"><hr>`;
+			dataDiv.innerHTML += '<p style="font-size: 120%;">Song info:</p>';
+			dataDiv.innerHTML += `<img title="View lyrics" class="infoBtn" onclick="displayLyrics('${escapeString(json.artist)}', '${escapeString(json.title)}')" src="Assets/ic_music_note_white.svg">`;
+			dataDiv.innerHTML += `<img title="Edit tags" class="infoBtn" onclick="window.location = '/editTags.html#${queue[queueIndex]}'" src="Assets/ic_edit_white.svg"> <hr>`
 			dataDiv.innerHTML += `<p><b>Title:</b> ${json.title}</p>`;
 			dataDiv.innerHTML += `<p><b>Artist:</b> ${json.artist}</p>`;
 			dataDiv.innerHTML += `<p><b>Album:</b> ${json.album}</p>`;

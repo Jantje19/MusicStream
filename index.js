@@ -33,6 +33,7 @@ if (foundVal) {
 }
 
 function closeMusicStream() {
+	specialLog('Stopping MusicStream');
 	children.forEach((object, key) => {
 		try {
 			object.exit(1);
@@ -123,7 +124,7 @@ process.stdin.on('data', inp => {
 		closeMusicStream();
 		start();
 	} else if (inp == 'cls' || inp == 'clear') {
-		process.stdout.write("\u001b[2J\u001b[0;0H");
+		console.clear();
 	} else if (inp == 'exit') {
 		closeMusicStream();
 	}

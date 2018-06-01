@@ -381,18 +381,6 @@ module.exports = {
 							else return false;
 						} else return false;
 					} else return false;
-
-					/*if (url.indexOf('youtube.com') > 0) {
-						if (url.match(/https?:\/\/(www\.)?youtube\.com\/watch\?v\=(([A-Z]|[a-z]|[0-9]|\-|\_){11})$/))
-							return true;
-						else return false;
-					} else if (url.indexOf('youtu.be') > 0) {
-						if (url.match(/https?:\/\/(www\.)?youtu\.be\/(([A-Z]|[a-z]|[0-9]|\-|\_){11})$/))
-							return true;
-						else return false;
-					} else {
-						return false;
-					}*/
 				}
 
 				const handleProgress = (chunkLength, downloaded, total) => {
@@ -491,7 +479,7 @@ module.exports = {
 					} else sendError('Tags not found. Expected url, fileName and tags.');
 				} else sendError('No JSON found');
 			});
-});
+		});
 		//
 		app.post('/updateSettings', (request, response) => {
 			let body = '';

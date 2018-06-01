@@ -349,7 +349,6 @@
 									songName: json.fileName,
 									tags: data.tags
 								}
-
 								if (type == 'audio') {
 									videoInputElem.innerHTML = '<b>Setting tags...</b>';
 									fetch('/tags', {method: 'POST', body: JSON.stringify(body), credentials: 'same-origin'}).then(response => {

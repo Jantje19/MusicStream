@@ -518,7 +518,7 @@ function load() {
 	});
 
 	document.getElementById('muteBtn').addEventListener('click', evt => {
-		audio.volume = 0;
+		setVolume(0, document.getElementById('volumeToggle'));
 		document.getElementById('volumeSlider').value = 0;
 		document.getElementById('volumePopUp').style.display = 'none';
 	});
@@ -535,7 +535,7 @@ function load() {
 	});
 
 	document.getElementById('volumeSlider').addEventListener('change', evt => {
-		audio.volume = Number(evt.target.value) / 100;
+		setVolume(Number(evt.target.value) / 100, document.getElementById('volumeToggle'));
 	});
 
 	document.getElementById('saveMenu').addEventListener('click', evt => {

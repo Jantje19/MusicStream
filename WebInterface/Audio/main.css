@@ -432,12 +432,12 @@ main #controls #mainControls #artistInfo p {
 	text-overflow: ellipsis;
 }
 
-main #controls #mainControls #artistInfo #infoBtn {
+main #controls #mainControls #artistInfo .infoBtn {
 	float: right;
 	cursor: pointer;
 	border-radius: 100%;
 	border: white 2px solid;
-	transform: translate(-95%, -95%) scale(0.8);
+	transform: translate(-200%, -95%) scale(0.8);
 }
 
 main #controls #mainControls #artistInfo #thumbnail {
