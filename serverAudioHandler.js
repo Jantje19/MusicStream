@@ -31,6 +31,7 @@ module.exports = {
 						response.send({error: "There was an error with getting the JSON file", info: err});
 					});
 				} else {
+					// If it doesn't have a file extension look for it in the playlists file
 					fs.exists('./playlists.json', exists => {
 						const parsedUrl = URLModule.parse(url);
 						let showFull = false;
@@ -71,9 +72,23 @@ module.exports = {
 					});
 				}
 
+				/*
+				*	Finds the video from the filename
+				*
+				*	@param {Array} playlists
+				*		The fileHandler.getJSON.audio.playlists Array
+				*	@param {String} fileName
+				*		The playlist file name
+				*	@return {Object}
+				*		@param {Boolean} val
+				*			Stores if the playlist was found
+				*		@param {Boolean} index
+				*			The index of the playlist in the array. Less than 0 if not found
+				*/
 				function findPlaylist(playlists, name) {
 					for (let i = 0; i < playlists.length; i++) {
-						if (playlists[i].fileName == name) return {val: true, index: i};
+						if (playlists[i].fileName == name)
+							return {val: true, index: i};
 					}
 
 					return {val: false, index: -1};
@@ -82,6 +97,7 @@ module.exports = {
 				response.send({"error": "No playlist found"});
 			}
 		});
+		//
 
 		app.get('/song/*', (request, response) => {
 			const url = querystring.unescape(request.url);
@@ -102,9 +118,23 @@ module.exports = {
 				response.send({error: "No song found"});
 			}
 
+			/*
+			*	Finds the song from the filename
+			*
+			*	@param {Array} songs
+			*		The fileHandler.getJSON audio.songs Array
+			*	@param {String} fileName
+			*		The song file name
+			*	@return {Object}
+			*		@param {Boolean} val
+			*			Stores if the song was found
+			*		@param {Boolean} index
+			*			The index of the song in the array. Less than 0 if not found
+			*/
 			function findSong(songs, songName) {
 				for (let i = 0; i < songs.length; i++) {
-					if (songs[i].fileName == songName) return {val: true, index: i};
+					if (songs[i].fileName == songName)
+						return {val: true, index: i};
 				}
 
 				return {val: false, index: -1};
@@ -122,6 +152,7 @@ module.exports = {
 
 					if (inArray.val == true) {
 						const song = json.audio.songs[inArray.index];
+
 						fileHandler.getSongInfo(song.path + song.fileName, id3, fs).then(tags => {
 							if (tags.image) {
 								if (tags.image.imageBuffer) {
@@ -141,9 +172,23 @@ module.exports = {
 				response.send({error: "No song found"});
 			}
 
+			/*
+			*	Finds the song from the filename
+			*
+			*	@param {Array} songs
+			*		The fileHandler.getJSON audio.songs Array
+			*	@param {String} fileName
+			*		The song file name
+			*	@return {Object}
+			*		@param {Boolean} val
+			*			Stores if the song was found
+			*		@param {Boolean} index
+			*			The index of the song in the array. Less than 0 if not found
+			*/
 			function findSong(songs, songName) {
 				for (let i = 0; i < songs.length; i++) {
-					if (songs[i].fileName == songName) return {val: true, index: i};
+					if (songs[i].fileName == songName)
+						return {val: true, index: i};
 				}
 
 				return {val: false, index: -1};
@@ -291,6 +336,16 @@ module.exports = {
 					if (json.songName.toLowerCase().endsWith('.mp3')) {
 
 						fileHandler.getJSON(fs, os, utils, settings).then(songs => {
+							/*
+							*	Finds the song from the filename
+							*
+							*	@param {Array} files
+							*		The fileHandler.getJSON audio.songs Array
+							*	@param {String} songName
+							*		The songs name
+							*	@return {Object}
+							*		The song object
+							*/
 							function findSong(array, songName) {
 								for (let i = 0; i < array.length; i++) {
 									if (array[i].fileName == songName)
@@ -298,14 +353,18 @@ module.exports = {
 								}
 							}
 
+							/*
+							*	Fetches the image from url
+							*
+							*	@param {String} url
+							*		The image url
+							*	@return {Promise}
+							*/
 							function getImage(url) {
 								return new Promise((resolve, reject) => {
-									const http = require('http');
 									Stream = require('stream').Transform;
 
-									url = url.replace('https', 'http');
-
-									http.request(url, response => {
+									https.request(url, response => {
 										const data = new Stream();
 
 										response.on('data', chunk => {
@@ -313,17 +372,21 @@ module.exports = {
 										});
 
 										response.on('error', reject);
-
 										response.on('end', function() {
 											const buffer = data.read();
 
-											if (buffer instanceof Buffer) resolve(buffer);
-											else reject('Not a buffer');
+											if (buffer instanceof Buffer)
+												resolve(buffer);
+											else
+												reject('Not a buffer');
 										});
 									}).end();
 								});
 							}
 
+							/*
+							*	Gets calles when downloading is done. Handles response
+							*/
 							function done() {
 								const songLocation = findSong(songs.audio.songs, json.songName);
 

@@ -18,15 +18,30 @@ const hijackRequestPlugins = [];
 
 const loadPlugins = () => {
 	return new Promise((resolve, reject) => {
+		/*
+		*	Loops through the Plugins dir and organizes them for further handling
+		*
+		*	@return {Promise}
+		*/
 		function getPlugins() {
 			return new Promise((resolve, reject) => {
 				const plugins = [];
 				const path = __dirname + '/Plugins/';
 
+				/*
+				*	Gets plugin data
+				*
+				*	@param {String} path
+				*		The plugin path
+				*	@param {String} folderName
+				*		The name of the folder containing the plugin
+				*	@return {Promise}
+				*/
 				function getPlugin(path, folderName) {
 					const indexPath = path + '/index.js';
 
 					return new Promise((resolve, reject) => {
+						// Make sure that there is an index file
 						fs.exists(indexPath, exists => {
 							if (exists) {
 								console.log(`Loading '${folderName}' plugin`);
@@ -69,8 +84,10 @@ const loadPlugins = () => {
 		utils.colorLog('Loading plugins...', 'bgGreen');
 		getPlugins().then(plugins => {
 			if (plugins) {
+				// Loop through every plugin and handle the functions
 				plugins.forEach((object, key) => {
 					if (!object.notfound) {
+						// If it is a function just run it
 						if ((typeof object.module).toLowerCase() == 'function') {
 							const imports = {
 								fs: fs,
@@ -156,25 +173,46 @@ const startServer = () => {
 
 // Usefull functions
 const utils = {
-	logDate: function() {
+	/*
+	*	Returns a formatted string of the time
+	*
+	*	@return {String}
+	*/
+	logDate: () => {
 		const date = new Date();
 
 		function convertToDoubleDigit(num) {
-			if (num.toString().length < 2) return "0" + num;
-			else return num;
+			if (num.toString().length < 2)
+				return "0" + num;
+			else
+				return num;
 		}
 
 		return `${convertToDoubleDigit(date.getHours())}:${convertToDoubleDigit(date.getMinutes())}:${convertToDoubleDigit(date.getSeconds())}`;
 	},
 
-	getFileExtention: function(fileName) {
+	/*
+	*	Gets the file extension
+	*
+	*	@param {String} filename
+	*	@return {String}
+	*/
+	getFileExtention: fileName => {
 		const match = fileName.match(/.+(\.\w+)$/i);
 
-		if (match) return match[1];
-		else return;
+		if (match)
+			return match[1];
+		else
+			return;
 	},
 
-	sortJSON: function(json) {
+	/*
+	*	Sorts json based on key and content
+	*
+	*	@param {Object} json
+	*	@return {Array}
+	*/
+	sortJSON: json => {
 		const newArr = [];
 
 		for (key in json)
@@ -185,8 +223,19 @@ const utils = {
 		return newArr;
 	},
 
-	sendFile: function(fs, path, response) {
-		if (path.endsWith('/')) path = path + 'index.html';
+	/*
+	*	Responsible for sending files and parsing the HTML for the handling plugins
+	*
+	*	@param {Object} fs
+	*		The native NodeJS fs module
+	*	@param {String} path
+	*		The request path
+	*	@param {Object} response
+	*		The express response object
+	*/
+	sendFile: (fs, path, response) => {
+		if (path.endsWith('/'))
+			path = path + 'index.html';
 
 		fs.exists(path, exists => {
 			if (exists) {
@@ -194,9 +243,8 @@ const utils = {
 					fs.readFile(path, 'utf-8', (err, data) => {
 						if (err) response.status(500).send('Error: 500. An error occured: ' + err);
 						else {
-							for (key in settings) {
+							for (key in settings)
 								data = data.replace(new RegExp(`\{\{${key}\}\}`, 'g'), settings[key].val);
-							}
 
 							// Plugins
 							let buttonHTML = '';
@@ -216,8 +264,6 @@ const utils = {
 								buttonHTML = '<hr>' + buttonHTML;
 
 							data = data.replace('[[EXTRABUTTONS]]', buttonHTML);
-							//
-
 							response.status(200).send(data);
 						}
 					});
@@ -226,7 +272,19 @@ const utils = {
 		});
 	},
 
-	fetch: function(url, https, URLModule, headers) {
+	/*
+	*	Fetches data over https
+	*
+	*	@param {String} url
+	*	@param {Object} https
+	*		The native NodeJS https module
+	*	@param {Object} URLModule
+	*		The native NodeJS url module
+	*	@param {Object} (optional) headers
+	*		The request headers
+	*	@return {Promise}
+	*/
+	fetch: (url, https, URLModule, headers) => {
 		return new Promise((resolve, reject) => {
 			const options = URLModule.parse(url);
 
@@ -247,6 +305,7 @@ const utils = {
 
 				res.on('data', chunk => {rawData += chunk;});
 				res.on('end', () => {
+					// If the response is json try to parse
 					if (/^application\/json/.test(contentType)) {
 						try {
 							resolve(JSON.parse(rawData));
@@ -259,7 +318,23 @@ const utils = {
 		});
 	},
 
-	newVersionAvailable: function(version) {
+	/*
+	*	Checks if a new version of MusicStream is available
+	*
+	*	@param {String} version
+	*	@return {Promise}
+	*/
+	newVersionAvailable: version => {
+		/*
+		*	Compares versions (duh)
+		*
+		*	@param {String} version1
+		*	@param {String} version2
+		*	@return {Boolean}
+		*		-1: version1 is smaller than version2
+		*		0: version1 is the same as version2
+		*		1: version1 is greater than version2
+		*/
 		function compareVersions(version1, version2) {
 			version1 = version1.split('.');
 			version2 = version2.split('.');
@@ -307,27 +382,13 @@ const utils = {
 		});
 	},
 
-	humanFileSize: function(bytes, si) {
-		let thresh = si ? 1000 : 1024;
-
-		if(Math.abs(bytes) < thresh)
-			return bytes + ' B';
-
-		let u = -1;
-		const units = si
-		? ['kB','MB','GB','TB','PB','EB','ZB','YB']
-		: ['KiB','MiB','GiB','TiB','PiB','EiB','ZiB','YiB'];
-
-		do {
-			bytes /= thresh;
-			++u;
-		} while(Math.abs(bytes) >= thresh && u < units.length - 1);
-
-		return bytes.toFixed(1) + ' '+ units[u];
-	},
-
-	// I don't want to import modules I can write myself
-	colorLog: function(text, color) {
+	/*
+	*	Prints collored text to the console
+	*
+	*	@param {String} text
+	*	@param {String} color
+	*/
+	colorLog: (text, color) => {
 		const regEx = /\[\[(.+)\,(\s+)?(.+)\]\]/i;
 		const colors = {
 			reset: "\x1b[0m",
@@ -366,7 +427,14 @@ const utils = {
 		} else console.log(text);
 	},
 
-	getLocalIP: function(os) {
+	/*
+	*	Gets current IP-adress(es)
+	*
+	*	@param {Objext} os
+	*		Native NodeJS os module
+	*	@return {Array}
+	*/
+	getLocalIP: os => {
 		const ips = [];
 		const ifaces = os.networkInterfaces();
 
@@ -390,7 +458,10 @@ const utils = {
 		return ips;
 	},
 
-	httpsArgs: function() {
+	/*
+	*	Responsible for checking if https arguments are present
+	*/
+	httpsArgs: () => {
 		for (let i = 0; i < process.argv.length; i++) {
 			const object = process.argv[i];
 
@@ -627,11 +698,11 @@ if (process.argv.includes('check-updates')) {
 utils.colorLog(new Date() + ' [[fgGreen, Starting MusicStream]]');
 if (settings.checkForUpdateOnStart.val == true) {
 	utils.newVersionAvailable(version).then(newVersion => {
-		if (newVersion.greater) {
+		if (newVersion.greater)
 			utils.colorLog(`No update available, running version: ${newVersion.version}. But this version if greater than that on GitHub (${newVersion.version}), Maybe you want to get the newest code from GitHub: [[fgMagenta, ${newVersion.url}]]. Don't forget to update the settings file!`, 'fgOrange');
-		} else if (newVersion.isAvailable == true) {
+		else if (newVersion.isAvailable == true)
 			utils.colorLog(`A new update is available: ${newVersion.version}. Don't forget to update the settings file!`, 'fgGreen');
-		} else {
+		else {
 			utils.colorLog(`No update available, running version: ${newVersion.version}`, 'fgCyan');
 			startServer();
 		}

@@ -1,5 +1,20 @@
 module.exports = {
-	searchSystem: function(fs, os, utils, settings, silent) {
+	/*
+	*	Searches system for media files
+	*
+	*	@param {Object} fs
+	*		Native NodeJS fs module
+	*	@param {Object} os
+	*		Native NodeJS os module
+	*	@param {Object} utils
+	*		Utils object from main.js
+	*	@param {Object} settings
+	*		Settings from settings file
+	*	@param {Boolean} silent
+	*		If it should log errors
+	*	@return {Promise}
+	*/
+	searchSystem: (fs, os, utils, settings, silent) => {
 		let paths = [];
 		const songsArr = [];
 		const videosObj = {};
@@ -57,6 +72,14 @@ module.exports = {
 			});
 		});
 
+		/*
+		*	Responsible for recursive file search in a particular folder
+		*
+		*	@param {String} path
+		*	@param {Object} utils
+		*		The utils object in main.js
+		*	@return {Promise}
+		*/
 		function handleFolders(path, utils) {
 			return new Promise((resolve, reject) => {
 				fs.exists(path, exists => {
@@ -117,7 +140,18 @@ module.exports = {
 		}
 	},
 
-	readPlayList: function(fs, path, songsArr) {
+	/*
+	*	Parses a .m3u file
+	*
+	*	@param {Object} fs
+	*		Native NodeJS fs module
+	*	@param {String} path
+	*		The playlist file path
+	*	@param {Array} songsArr
+	*		Array from fileHandler.getJSON.audio.songs
+	*	@return {Promise}
+	*/
+	readPlayList: (fs, path, songsArr) => {
 		const songs = [];
 
 		return new Promise((resolve, reject) => {
@@ -155,7 +189,7 @@ module.exports = {
 		}
 	},
 
-	updatePlaylist: function(fs, body, mostListenedPlaylistName) {
+	updatePlaylist: (fs, body, mostListenedPlaylistName) => {
 		const jsonPath = 'playlists.json';
 
 		return new Promise((resolve, reject) => {
@@ -205,7 +239,20 @@ module.exports = {
 		});
 	},
 
-	getJSON: function(fs, os, utils, settings) {
+	/*
+	*	Reads the JSON.json file
+	*
+	*	@param {Object} fs
+	*		Native NodeJS fs module
+	*	@param {Object} os
+	*		Native NodeJS os module
+	*	@param {Object}
+	*		Utils object in main.js
+	*	@param {Object} settings
+	*		Settings from settings.js
+	*	@return {Promise}
+	*/
+	getJSON: (fs, os, utils, settings) => {
 		return new Promise((resolve, reject) => {
 			const JSONPath = './JSON.json';
 
@@ -225,7 +272,18 @@ module.exports = {
 		});
 	},
 
-	getSongInfo: function(path, id3, fs) {
+	/*
+	*	Uses id3 module to get song tags
+	*
+	*	@param {String} path
+	*		File location
+	*	@param {Object} id3
+	*		id3 module
+	*	@param {Object} fs
+	*		Native NodeJS fs module
+	*	@return {Promise}
+	*/
+	getSongInfo: (path, id3, fs) => {
 		return new Promise((resolve, reject) => {
 			fs.exists(path, exists => {
 				if (exists) {

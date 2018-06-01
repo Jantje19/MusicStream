@@ -44,6 +44,7 @@ module.exports = {
 			serverURL: ips[0] + ':' + port,
 		}
 
+		// Handles plugins hijack functions
 		if (hijackRequestPlugins.length > 0) {
 			app.use((request, response, next) => {
 				let preventDefaultFuncIndex = -1;
@@ -366,8 +367,13 @@ module.exports = {
 				}
 
 				const sendError = err => {
-					try {sendData({success: false, error: err, jsonUpdated: false})}
-					catch (err) {}
+					try {
+						sendData({
+							success: false,
+							error: err,
+							jsonUpdated: false
+						});
+					} catch (err) {}
 				}
 
 				const urlOk = url => {
@@ -606,6 +612,5 @@ module.exports = {
 				} else utils.colorLog(`${utils.logDate()} Server is running on: [[fgGreen, ${ips[0]}:${port}]]`, 'reset');
 			}
 		});
-
 	}
 }

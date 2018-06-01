@@ -7,34 +7,31 @@ module.exports = {
 			if (!url.endsWith('/')) {
 				fileHandler.getJSON(fs, os, utils, settings).then(json => {
 					const fileName = url.match(/(.+)\/(.+)$/)[2].trim();
-					const inArray = findSong(json.video.videos, fileName);
+					const inArray = findVideo(json.video.videos, fileName);
 
 					if (inArray.val == true) {
 						const video = inArray.video;
 						response.sendFile(video.path + video.fileName);
-
-						/*const filePath = video.path + video.fileName;
-
-						response.writeHead(200, {
-							"Accept-Ranges": "bytes",
-							"Content-Type": "video/mp4"
-						});
-
-						const readStream = fs.createReadStream(filePath);
-						readStream.on('open', () => {
-							readStream.pipe(response);
-						});
-
-						readStream.on('error', err => {
-							response.send(err);
-						});*/
 					} else response.send({error: `The video '${fileName}' was not found`, info: "The cached JSON file had no reference to this file"});
 				}).catch(err => response.send({error: "There was an error with getting the video", info: err}));
 			} else {
 				response.send({error: "No video found"});
 			}
 
-			function findSong(files, fileName) {
+			/*
+			*	Finds the video from the filename
+			*
+			*	@param {Array} files
+			*		The fileHandler.getJSON video.videos Array
+			*	@param {String} fileName
+			*		The video file name
+			*	@return {Object}
+			*		@param {Boolean} val
+			*			Stores if the video was found
+			*		@param (Optional) {Object} video
+			*			The video information
+			*/
+			function findVideo(files, fileName) {
 				const keys = Object.keys(files);
 
 				for (let j = 0; j < keys.length; j++) {
@@ -44,7 +41,7 @@ module.exports = {
 					}
 				}
 
-				return {val: false, index: -1};
+				return {val: false};
 			}
 		});
 
@@ -54,6 +51,7 @@ module.exports = {
 			console.log(utils.logDate() + ' Got a request for ' + url);
 
 			fileHandler.getJSON(fs, os, utils, settings).then(json => {
+				// Get the index of the subtitle object
 				const index = json.video.subtitles.map(val => {return val.fileName}).indexOf(fileName);
 
 				if (index > -1) {
