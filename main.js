@@ -370,11 +370,11 @@ const utils = {
 					const versionSame = compareVersions(version, response.tag_name);
 
 					if (versionSame == 0)
-						resolve({isAvailable: false, version: version});
+						resolve({isAvailable: false, version: version, githubVersion: response.tag_name});
 					else if (versionSame > 0)
-						resolve({isAvailable: false, version: version, greater: true, url: response.html_url});
+						resolve({isAvailable: false, version: version, greater: true, url: response.html_url, githubVersion: response.tag_name});
 					else if (versionSame < 0)
-						resolve({isAvailable: true, version: response.tag_name, url: response.html_url});
+						resolve({isAvailable: true, version: response.tag_name, url: response.html_url, githubVersion: response.tag_name});
 					else
 						reject('Version check went wrong.');
 				} else reject('The response is not json, so it is useless');
@@ -389,7 +389,7 @@ const utils = {
 	*	@param {String} color
 	*/
 	colorLog: (text, color) => {
-		const regEx = /\[\[(.+)\,(\s+)?(.+)\]\]/i;
+		const regEx = /\[\[(.+?)\,(\s+)?(.+?)\]\]/i;
 		const colors = {
 			reset: "\x1b[0m",
 			fgBlack: "\x1b[30m",
@@ -537,11 +537,11 @@ console.wrn = (...args) => console.warn("\x1b[33m", ...args, "\x1b[0m");
 if (process.argv.includes('check-updates')) {
 	utils.newVersionAvailable(version).then(newVersion => {
 		if (newVersion.greater)
-			utils.colorLog(`No update available, running version: ${newVersion.version}. But this version if greater than that on GitHub (${newVersion.version}), Maybe you want to get the newest code from GitHub: [[fgMagenta, ${newVersion.url}]]. Don't forget to update the settings file!`, 'fgOrange');
+			utils.colorLog(`[[fgGreen, No update available.]] Running version: ${newVersion.version}. But this version is greater than the version of latest release on GitHub (${newVersion.githubVersion}), Maybe you want to get the code from GitHub: [[fgYellow, ${newVersion.url}]]. Don't forget to update the settings file!`, 'fgOrange');
 		else if (newVersion.isAvailable == true)
-			utils.colorLog(`A new update is available: ${newVersion.version}. You can download it at: [[fgMagenta, ${newVersion.url}]]. Don't forget to update the settings file!`, 'fgGreen');
+			utils.colorLog(`[[fgGreen, A new update is available:]] ${newVersion.version}. You can download it at: [[fgMagenta, ${newVersion.url}]]. Don't forget to update the settings file!`, 'fgGreen');
 		else
-			utils.colorLog(`No update available, running version: ${newVersion.version}`, 'fgCyan');
+			utils.colorLog(`[[fgGreen, No update available.]] Running version: ${newVersion.version}`, 'fgCyan');
 	}).catch(err => {
 		console.wrn('An error occurred when checking for updates:', err);
 		startServer();
@@ -698,12 +698,13 @@ if (process.argv.includes('check-updates')) {
 utils.colorLog(new Date() + ' [[fgGreen, Starting MusicStream]]');
 if (settings.checkForUpdateOnStart.val == true) {
 	utils.newVersionAvailable(version).then(newVersion => {
-		if (newVersion.greater)
-			utils.colorLog(`No update available, running version: ${newVersion.version}. But this version if greater than that on GitHub (${newVersion.version}), Maybe you want to get the newest code from GitHub: [[fgMagenta, ${newVersion.url}]]. Don't forget to update the settings file!`, 'fgOrange');
-		else if (newVersion.isAvailable == true)
-			utils.colorLog(`A new update is available: ${newVersion.version}. Don't forget to update the settings file!`, 'fgGreen');
-		else {
-			utils.colorLog(`No update available, running version: ${newVersion.version}`, 'fgCyan');
+		if (newVersion.greater) {
+			utils.colorLog(`[[fgGreen, No update available.]] Running version: ${newVersion.version}. But this version if greater than the version of latest release on GitHub (${newVersion.githubVersion}), Maybe you want to get the code from GitHub: [[fgYellow, ${newVersion.url}]]. Don't forget to update the settings file!`, 'fgOrange');
+			startServer();
+		} else if (newVersion.isAvailable == true) {
+			utils.colorLog(`[[fgGreen, A new update is available:]] ${newVersion.version}. Don't forget to update the settings file!`, 'fgGreen');
+		} else {
+			utils.colorLog(`[[fgGreen, No update available.]] Running version: ${newVersion.version}`, 'fgCyan');
 			startServer();
 		}
 	}).catch(err => {
