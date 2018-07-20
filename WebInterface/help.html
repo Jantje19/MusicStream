@@ -489,6 +489,14 @@
 		</div>
 
 		<div>
+			<b>The website says that there are no media files</b>
+			<p>
+				By default <i>MusicStream</i> searches in the <i>Music</i> and <i>Video</i> folders of the home directory (On windows it looks like this: "C:/Users/&lt;USER&gt;/Documents/Music/". On linux it looks like: "/home/&lt;USER&gt;/Music/"). If this directory doesn't exist the console will notify you.<br><br>
+				If the directory doesn't exist or is empty, no files will be found. You can either move all of your media files into those directories, or you can go into settings and untick the "CheckOsHomedirs" checkbox and add a path to the "MediaPaths" input box.
+			</p>
+		</div>
+
+		<div>
 			<b>I get a <i>'No info found for that video id'</i> error when I try to download a YouTube video.</b>
 			<p>
 				Unfortunally YouTube updates its video API rather frequently. This means that the NPM-package responsable for downloading the YouTube video has to be updated frequently. So try running the <code>npm update</code> command. If that doesn't work go to <a href="https://www.npmjs.com/package/ytdl-core">this</a> page and find the latest version number (most of the times it looks something like <i>0.20.1</i>), then run <code>npm install ytdl-core@VERSION-NUMBER</code> (of course replace <i>VERSION-NUMBER</i> with the version number found on <a href="https://www.npmjs.com/package/ytdl-core">this</a> page).

@@ -609,7 +609,7 @@ module.exports = {
 					ips.forEach((object, key) => {
 						utils.colorLog(`${utils.logDate()} Server is running on: [[fgGreen, ${object}:${port}]]`, 'reset');
 					});
-				} else utils.colorLog(`${utils.logDate()} Server is running on: [[fgGreen, ${ips[0]}:${port}]]`, 'reset');
+				} else utils.colorLog(`${utils.logDate()} Server is running on: [[fgGreen, ${ips[0] || 'localhost'}:${port}]]`, 'reset');
 			}
 		});
 	}
