@@ -278,26 +278,33 @@ function playVid(title, notQueueTop) {
 
 function videoEnd(evt) {
 	if (getQueue().length > queueIndex) {
-		let i = 1;
-		const time = Number(settings.autoplayTime) || 10;
+		let i = 0;
+		const time = Number(settings.autoplayTime.val) || 10;
 		const timeElem = document.getElementById('autoplay-time');
 		const textElem = document.getElementById('autoplay').querySelector('span');
-
-		document.getElementById('autoplay').style.display = 'flex';
-
-		int = setInterval(() => {
+		const updateTimeInterface = () => {
 			if (i <= time) {
 				textElem.innerText = `Autoplay in: ${time - i}s`;
 				timeElem.style.transform = `scaleX(${1 - (i / time)})`;
-			} else {
-				nextQueueItem();
-				clearInterval(int);
-				document.getElementById('autoplay').style.display = 'none';
-				timeElem.style.transform = '';
+			}
+
+			if (i >= time) {
+				setTimeout(() => {
+					nextQueueItem();
+					clearInterval(int);
+					document.getElementById('autoplay').style.display = 'none';
+					textElem.innerText = `Autoplay in: ${time}s`;
+					timeElem.style.transform = '';
+					i = 0;
+				}, 1000);
 			}
 
 			i++;
-		}, 1000);
+		}
+
+		document.getElementById('autoplay').style.display = 'flex';
+		int = setInterval(updateTimeInterface, time * 500); // It just feels long
+		updateTimeInterface();
 	}
 }
 
