@@ -310,7 +310,7 @@ main #controls {
 	position: fixed;
 	background-color: #16a085;
 	transition: height .5s ease;
-	box-shadow: 0 0 40px rgba(0, 0, 0, 0.8);
+	box-shadow: 0 0 55px rgba(0, 0, 0, 0.8);
 }
 
 main #controls #seekBar {

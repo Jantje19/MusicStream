@@ -322,6 +322,30 @@ function updateCSS(newValBefore, newValAfter) {
 	}
 }
 
+function reloadSongslist(selectElem) {
+	const val = ('target' in selectElem) ? selectElem.target.value : selectElem.value;
+	const songsElem = document.getElementById('songs');
+	let after = '';
+
+	if (val != "none")
+		after = 'sort=' + val;
+
+	songsElem.innerHTML = '<div class="ball-scale-multiple"><div></div><div></div><div></div></div>';
+
+	get('/data/' + after).then(json => {
+		const songs = json.audio.songs;
+
+		songsElem.innerHTML = '';
+		songs.forEach((object, key) => {
+			songsElem.innerHTML += `<button title="${object}" class="song ${key}" onclick="songClick(event)">${object}</button><hr>`;
+		});
+
+		document.getElementById('songCount').innerText = "Amount: " + songs.length;
+	}).catch( err => {
+		console.error('An error occurred', err);
+	});
+}
+
 function load() {
 	const songsElem = document.getElementById('songs');
 	const seekBarElem = document.getElementById('seekBar');
@@ -481,30 +505,6 @@ function load() {
 		}
 	});
 
-	document.getElementById('sort').addEventListener('change', evt => {
-		const songsElem = document.getElementById('songs');
-		const val = evt.target.value;
-		let after = '';
-
-		if (val != "none")
-			after = 'sort=' + val;
-
-		songsElem.innerHTML = '<div class="ball-scale-multiple"><div></div><div></div><div></div></div>';
-
-		get('/data/' + after).then(json => {
-			const songs = json.audio.songs;
-
-			songsElem.innerHTML = '';
-			songs.forEach((object, key) => {
-				songsElem.innerHTML += `<button title="${object}" class="song ${key}" onclick="songClick(event)">${object}</button><hr>`;
-			});
-
-			document.getElementById('songCount').innerText = "Amount: " + songs.length;
-		}).catch( err => {
-			console.error('An error occurred', err);
-		});
-	});
-
 	document.getElementById('volumeToggle').addEventListener('click', evt => {
 		const popUp = document.getElementById('volumePopUp');
 
@@ -527,8 +527,10 @@ function load() {
 		overflowMenu.style.display = 'none';
 
 		get('/updateJSON/').then(json => {
-			if (json.success) alert('Updated JSON');
-			else alert(json.info);
+			if (json.success) {
+				if (confirm('Updated media list!\nShould the songs list be updated?'))
+					reloadSongslist(document.getElementById('sort'));
+			} else alert(json.info);
 		}).catch(err => {
 			console.error('An error occurred', JSON.parse(err));
 		});
@@ -542,6 +544,8 @@ function load() {
 		if (evt.target == evt.currentTarget)
 			evt.currentTarget.style.display = 'none';
 	});
+
+	document.getElementById('sort').addEventListener('change', reloadSongslist);
 
 	// Shortcuts
 	window.addEventListener('keyup', evt => {

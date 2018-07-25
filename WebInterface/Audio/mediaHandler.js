@@ -34,15 +34,18 @@ function end() {
 }
 
 function next() {
-	if (!(document.getElementById('repeat').getAttribute('activated') == 'true' && document.getElementById('repeat').getAttribute('repeatOne') == 'true')) {
+	const repeatElem = document.getElementById('repeat');
+
+	if (!(repeatElem.getAttribute('activated') == 'true' && repeatElem.hasAttribute('repeatOne'))) {
 		const newIndex = Number(queueIndex) + 1;
 
 		if (queue.length > newIndex)
 			updateQueueIndex(newIndex);
 		else {
-			if (document.getElementById('repeat').getAttribute('activated') == 'true')
+			if (repeatElem.getAttribute('activated') == 'true')
 				updateQueueIndex(0);
-			else return;
+			else
+				return;
 		}
 
 		updateInterface();
