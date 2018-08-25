@@ -43,9 +43,9 @@ function load() {
 							const optionElem = document.createElement('option');
 
 							if (key == 0) {
-								optionElem.setAttribute('hidden');
-								optionElem.setAttribute('disabled');
-								optionElem.setAttribute('selected');
+								optionElem.setAttribute('hidden', true);
+								optionElem.setAttribute('disabled', true);
+								optionElem.setAttribute('selected', true);
 							}
 
 							optionElem.value = object;
@@ -197,6 +197,33 @@ function load() {
 		else if (evt.key == 'Space')
 			togglePlayState();
 	});
+
+	// Toggle controls (very experimental)
+	(function() {
+		const videoWrapperElem = document.getElementById('videoElem');
+		const controlsElem = document.getElementById('controls');
+		const mouseMoveFunc = evt => {
+			clearTimeout(mouseTimer);
+			mouseTimer = setTimeout(() => {
+				if (!mouseOut)
+					controlsElem.style.transform = '';
+			}, 3000);
+		}
+
+		let mouseTimer, mouseOut = true;
+
+		videoWrapperElem.addEventListener('mouseover', evt => {
+			mouseOut = false;
+			controlsElem.style.transform = 'translateY(0px)';
+			window.onmousemove =  mouseMoveFunc;
+		});
+
+		videoWrapperElem.addEventListener('mouseout', evt => {
+			mouseOut = true;
+			controlsElem.style.transform = '';
+			window.onmousemove = null;
+		});
+	})();
 
 	// For plugins
 	try {

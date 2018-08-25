@@ -369,9 +369,10 @@ main #player #videoElem #controls {
 	box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
 }
 
-main #player #videoElem:hover #controls {
-	transform: translateY(0px);
-}
+/* (Old code for toggeling controls) */
+/*main #player #videoElem:hover #controls {
+transform: translateY(0px);
+}*/
 
 main #player #videoElem #controls span {
 	width: auto;
