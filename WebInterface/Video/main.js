@@ -315,7 +315,7 @@ function videoEnd(evt) {
 				timeElem.style.transform = `scaleX(${1 - (i / time)})`;
 			}
 
-			if (i >= time) {
+			if (i > time) {
 				setTimeout(() => {
 					nextQueueItem();
 					clearInterval(int);
@@ -323,7 +323,7 @@ function videoEnd(evt) {
 					textElem.innerText = `Autoplay in: ${time}s`;
 					timeElem.style.transform = '';
 					i = 0;
-				}, 1000);
+				}, 100); //1000?
 			}
 
 			i++;
@@ -440,7 +440,7 @@ function jumpVideoTime(amount, parentElement) {
 
 		elem.animate([
 			{opacity: 0},
-			{opacity: 0},
+			{opacity: 0.5},
 			{opacity: 0.8},
 			{opacity: 0}
 			], {

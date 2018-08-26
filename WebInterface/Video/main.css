@@ -302,7 +302,6 @@ main #player #video-time-jump img {
 	will-change: opacity;
 	transform: translate(-50%, -50%);
 	background-color: rgba(0, 0, 0, 0.6);
-
 }
 
 main #player #video-settings {
