@@ -273,24 +273,6 @@ main #main #queueContainer #queue button[active] {
 	background-color: #12876f;
 }
 
-main #main #queueContainer #queue button.tmpBtn {
-	width: 70%;
-	color: white;
-	margin: auto;
-	margin-top: 10%;
-	max-width: 150px;
-	font-size: 0.7em;
-	padding: 5px 10px;
-	text-align: center;
-	border-radius: 20px;
-	white-space: pre-wrap;
-	background-color: #16a085;
-}
-
-main #main #queueContainer #queue button.tmpBtn:last-child {
-	margin-top: 5%;
-}
-
 main #main #queueContainer #queue button span {
 	overflow: hidden;
 	white-space: nowrap;

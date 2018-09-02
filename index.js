@@ -5,7 +5,6 @@ let maxTries = 10;
 const children = [];
 const minUpime = 1000; // 1 second
 let autoRestart = true;
-const stream = require('stream');
 const {fork} = require('child_process');
 
 String.prototype.split = function(index) {

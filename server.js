@@ -1,3 +1,5 @@
+const tmpQueueSave = {audio: {global: {}}, videos: {}};
+
 module.exports = {
 	start: function(dirname, fileHandler, fs, os, settings, utils, querystring, id3, ytdl, version, https, URLModule, serverPlugins, hijackRequestPlugins) {
 		const compression = require('compression');
@@ -344,6 +346,57 @@ module.exports = {
 			} else response.send({success: false, error: "Parameters missing"});
 		});
 
+		app.get('/getSavedQueue/:type', (request, response) => {
+			if ('params' in request) {
+				if ('type' in request.params) {
+					const paramsType = request.params.type.toLowerCase();
+
+					if (paramsType === 'audio' || paramsType === 'video') {
+						const url = querystring.unescape(request.url);
+						const args = querystring.parse(URLModule.parse(url).query);
+
+						console.log(utils.logDate() + ' Got a request for ' + url);
+
+						const sendData = (data) => {
+							if (data) {
+								if (data.queue)
+									response.send({success: true, data: data})
+								else
+									response.send({success: false, error: 'Nothing saved'})
+							} else response.send({success: false, error: 'Nothing saved'});
+						}
+
+						if (paramsType === 'audio') {
+							if (args) {
+								let objectKey = ('for' in args) ? args.for : request.connection.remoteAddress;
+
+								if (objectKey) {
+									if (objectKey.toLowerCase() == 'global')
+										sendData(tmpQueueSave.audio.global);
+									else {
+										objectKey = request.connection.remoteAddress;
+
+										if (objectKey in tmpQueueSave.audio)
+											sendData(tmpQueueSave.audio[objectKey]);
+										else
+											sendData(null);
+									}
+								} else sendData(tmpQueueSave.audio.global);
+							} else sendData(null);
+						} else if (paramsType === 'video') {
+							sendData(tmpQueueSave.video);
+						} else {
+							sendData(null);
+						}
+
+						return;
+					}
+				}
+			}
+
+			response.send({success: false, error: 'Invalid type'});
+		});
+
 		app.post('/ytdl*', (request, response) => {
 			let body = '';
 
@@ -527,6 +580,66 @@ module.exports = {
 					response.send({success: false, info: err});
 				}
 			});
+		});
+
+		app.post('/saveQueue/:type', (request, response) => {
+			let body = '';
+
+			const sendError = () => {
+				response.send({succss: false, error: 'No type specified'});
+				request.connection.destroy();
+			}
+
+			if ('params' in request) {
+				if ('type' in request.params) {
+					request.on('data', data => {
+						body += data;
+
+						if (body.length > 1e6) {
+							request.send({success: false, error: 'The amount of data is to high', info: 'The connection was destroyed because the amount of data passed is to much'});
+							request.connection.destroy();
+						}
+					});
+
+					request.on('end', () => {
+						const url = querystring.unescape(request.url);
+
+						console.log(utils.logDate() + ' Got a POST request for ' + url);
+
+						try {
+							body = JSON.parse(body);
+						} catch (err) {
+							response.send({success: false, error: 'Unable to parse JSON', info: err});
+							return;
+						}
+
+						if (request.params.type.toLowerCase() === 'audio') {
+							let objectKey = ('for' in body) ? body.for : request.connection.remoteAddress;
+							const queueIndex = ('queueIndex' in body) ? body.queueIndex : 0;
+							const timeStamp = ('timeStamp' in body) ? body.timeStamp : 0;
+							const queue = ('queue' in body) ? body.queue : [];
+
+							if (objectKey.toLowerCase() == 'global') {
+								tmpQueueSave.audio.global = {queueIndex, timeStamp, queue};
+								response.send({success: true});
+							} else {
+								tmpQueueSave.audio[request.connection.remoteAddress] = {queueIndex, timeStamp, queue};
+								response.send({success: true});
+							}
+						} else if (request.params.type.toLowerCase() === 'video') {
+							const queueIndex = ('queueIndex' in body) ? body.queueIndex : 0;
+							const timeStamp = ('timeStamp' in body) ? body.timeStamp : 0;
+							const subtitle = ('subtitle' in body) ? body.subtitle : null;
+							const queue = ('queue' in body) ? body.queue : [];
+
+							tmpQueueSave.video = {queueIndex, timeStamp, queue, subtitle};
+							response.send({success: true});
+						} else {
+							response.send({success: false, error: 'Invalid type'});
+						}
+					});
+				} else sendError();
+			} else sendError();
 		});
 
 		require('./serverVideoHandler.js').start(app, dirname, fileHandler, fs, os, settings, utils, querystring);

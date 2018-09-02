@@ -192,13 +192,16 @@
 			<div id="queueWrapper">
 				<h4>Queue</h4>
 				<div id="queueBtnHolder">
-					<button onclick="clearQueue()" title="Clear queue"><img src="../Assets/ic_clear_all_black.svg"></button>
-					<button onclick="shuffleQueue()" title="Shuffle queue"><img src="../Assets/ic_shuffle_black.svg"></button>
+					<button onclick="clearQueue()" title="Clear queue"><img src="/Assets/ic_clear_all_black.svg"></button>
+					<button onclick="shuffleQueue()" title="Shuffle queue"><img src="/Assets/ic_shuffle_black.svg"></button>
+					<button onclick="saveQueueToTmp()" title="Save queue"><img src="/Assets/ic_save_black.svg"/></button>
 				</div>
 				<div id="queue" ondrop="drop(event)" ondragover="allowDrop(event)">
 					<i>Queue is empty</i>
 					<br>
 					<i style="font-size: 0.7em;">Drag videos from the list to here.</i>
+					<br>
+					<button class="tmpBtn" onclick="getTmpSavedQueue(true)">Get temporary saved queue</button>
 				</div>
 			</div>
 		</div>

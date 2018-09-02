@@ -197,7 +197,7 @@
 			<div id="queueContainer">
 				<h3>Queue</h3>
 				<button title="Empty queue" style="float: right;" onclick="deleteQueue()"><img src="Assets/ic_clear_all_black.svg"/></button>
-				<button title="Save to playlist" style="float: right;" onclick="document.getElementById('saveMenu').style.display = 'block';"><img src="Assets/ic_save_black.svg"/></button>
+				<button title="Save queue" style="float: right;" onclick="document.getElementById('saveMenu').style.display = 'block';"><img src="Assets/ic_save_black.svg"/></button>
 				<button title="Share playlist" style="float: right;" onclick="sharePlaylist()"><img src="Assets/ic_share_black.svg"/></button>
 				<hr style="border-bottom-color: lightgray;">
 				<span id="queueCount">Amount: 0</span>
@@ -229,7 +229,7 @@
 					<p id="songName" style="width: 100%; text-overflow: ellipsis; overflow: hidden; padding: 5px 0"></p>
 				</div>
 				<div id="right">
-					<button title="Show song data" id="showData"><img title="Show Lyrics" src="Assets/ic_keyboard_arrow_up_white.svg"></button>
+					<button title="Show song data" id="showData"><img title="Show song data" src="Assets/ic_keyboard_arrow_up_white.svg"></button>
 					<button title="Repeat song" id="repeat" activated={{repeatDefaultOnAudio}}><img src="Assets/ic_repeat_white.svg"></button>
 					<button title="Shuffle" id="shuffle" activated={{shuffleDefaultOnAudio}}><img src="Assets/ic_shuffle_white.svg"></button>
 				</div>

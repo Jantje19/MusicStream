@@ -159,7 +159,7 @@ function saveQueueToTmp(type) {
 	if (type == 'global')
 		data.for = 'global'
 
-	get('saveQueue', {method: 'post', body: JSON.stringify(data)}).then(data => {
+	get('saveQueue/audio', {method: 'post', body: JSON.stringify(data)}).then(data => {
 		console.log(data);
 	}).catch(err => {
 		console.error(err);
@@ -193,7 +193,7 @@ function saveQueueToPlaylist() {
 function getTmpSavedQueue(type, autoHandleResponse) {
 	const getTmpSaveQueue = type => {
 		return new Promise((resolve, reject) => {
-			get('saveQueue?for=' + type).then(data => {
+			get('getSavedQueue/audio?for=' + type).then(data => {
 				if (data.success) {
 					if (data.data.queue) {
 						if (data.data.queue.length > 0) {
@@ -212,9 +212,14 @@ function getTmpSavedQueue(type, autoHandleResponse) {
 		type = 'ip';
 
 	if (autoHandleResponse) {
-		document.getElementById('queue').innerHTML = '';
+		const tmpBtnArr = Array.from(document.querySelectorAll('.tmpBtn'));
+
+		tmpBtnArr.forEach(btn => {
+			btn.disabled = true;
+		});
 
 		getTmpSaveQueue(type).then(data => {
+			document.getElementById('queue').innerHTML = '';
 			queueIndex = data.queueIndex;
 			enqueue(data.queue);
 			updateInterface();
@@ -222,6 +227,10 @@ function getTmpSavedQueue(type, autoHandleResponse) {
 		}).catch(err => {
 			console.error('Get TMP queue', err);
 			alert('Unable to get temporary saved queue: ' + err);
+
+			tmpBtnArr.forEach(btn => {
+				btn.disabled = false;
+			});
 		});
 	} else return getTmpSaveQueue(type);
 }

@@ -226,15 +226,14 @@ function displayLyrics(artist, songName) {
 	if (previousTrack != songName) {
 		get(`/getLyrics/${artist}/${songName}`).then(json => {
 			if (json.success) {
-				// Split by upper and lower case difference, then adding a break tag
-				// const lyrics = json.lyrics.split(/(?=[A-Z])/).map(val => {return val.trim();}).join('<br>');
-
 				const lyrics = json.lyrics.trim().replace(/\n/g, '<br>');
 
 				previousTrack = songName;
 				lyricsElem.innerHTML = `<h3>Lyrics</h3><p style="line-height: 1.5;">${lyrics}</p>`;
 			} else lyricsElem.innerHTML = `<h3>Error</h3><br><p>${json.error}</p>`;
-		}).catch(err => {console.error(err); lyricsElem.innerHTML = `<h3>Error</h3><br><p>Couldn't fetch lyrics</p>`;});
+		}).catch(err => {
+			console.error(err); lyricsElem.innerHTML = `<h3>Error</h3><br><p>Couldn't fetch lyrics</p><br>` + err.error;
+		});
 	}
 }
 

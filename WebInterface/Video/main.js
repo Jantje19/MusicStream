@@ -452,4 +452,43 @@ function jumpVideoTime(amount, parentElement) {
 	}
 }
 
+function saveQueueToTmp() {
+	const subtitleElem = videoElem.getElementsByTagName('track');
+	const subtitle = (subtitleElem.length > 0) ? subtitleElem[0] : '';
+	const data = {
+		timeStamp: videoElem.currentTime || 0,
+		queueIndex: queueIndex,
+		subtitle: subtitle,
+		queue: getQueue()
+	};
+
+	fetch('/saveQueue/video', {method: 'POST', body: JSON.stringify(data)}).then(data => {
+		data.json().then(json => {
+			if (!json.success)
+				alert('Unable to save: ' + json.error);
+		});
+	}).catch(err => {
+		console.error(err);
+		alert('Unable to save queue');
+	});
+}
+
+function getTmpSavedQueue() {
+	fetch('/getSavedQueue/video').then(response => {
+		response.json().then(json => {
+			if (json.success) {
+				const {data} = json;
+
+				updateQueue(data.queue);
+				queueIndex = data.queueIndex;
+				video.currentTime = data.timeStamp;
+				setSubtitleTrack('/subtitle/' + data.subtitle);
+			} else alert('Request was unsuccessfull: ' + json.error);
+		});
+	}).catch(err => {
+		console.error(err);
+		alert('Unable to load saved queue: ' + err.error);
+	});
+}
+
 document.addEventListener('DOMContentLoaded', load);

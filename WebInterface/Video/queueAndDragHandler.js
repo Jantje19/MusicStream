@@ -42,7 +42,7 @@ function getQueue() {
 function updateQueue(newQueue, startPlaying) {
 	const queueElem = document.getElementById('queue');
 
-	if (newQueue instanceof Array) {
+	if (Array.isArray(newQueue)) {
 		queueElem.innerHTML = '';
 		newQueue.forEach((object, key) => {
 			if (key == queueIndex - 1)

@@ -1,5 +1,3 @@
-const tmpQueueSave = {global: {}};
-
 module.exports = {
 	start: (app, dirname, fileHandler, fs, os, settings, utils, querystring, id3, https, URLModule) => {
 		app.get('/playlist/*', (request, response) => {
@@ -195,29 +193,26 @@ module.exports = {
 			}
 		});
 
-		app.get('/getLyrics/*', (request, response) => {
+		app.get('/getLyrics/:artist/:songName', (request, response) => {
 			const url = querystring.unescape(request.url);
 			console.log(utils.logDate() + ' Got a request for ' + url);
 
-			const urlArr = url.split('/').filter(val => {return val != ''});
-			urlArr.shift();
-
-			const artist = urlArr[0];
-			const songName = urlArr[1];
-
-			if (artist == undefined || artist.trim() == '') {
-				response.send({success: false, error: 'No artist supplied'});
-			} else if (songName == undefined || songName.trim() == '') {
-				response.send({success: false, error: 'No title supplied'});
-			} else {
-				utils.fetch(`https://makeitpersonal.co/lyrics?artist=${artist}&title=${songName}`, https, URLModule).then(text => {
-					if (text == "Sorry, We don't have lyrics for this song yet.")
-						response.send({success: false, error: text + " <a style=\"color: gray\" target=\"_blank\" href=\"https://makeitpersonal.co/songs/new\">Add them yourself.</a>"});
-					else
-						response.send({success: true, lyrics: text});
-				}).catch(err => {
-					response.send({success: false, error: err});
-				});
+			if ('params' in request) {
+				if (!('artist' in request.params)) {
+					response.send({success: false, error: 'No artist supplied'});
+				} else if (!('songName' in request.params)) {
+					response.send({success: false, error: 'No title supplied'});
+				} else {
+					console.log(`${utils.logDate()} Fetching lyrics for '${request.params.songName}' from '${request.params.artist}'`);
+					utils.fetch(`https://makeitpersonal.co/lyrics?artist=${request.params.artist}&title=${request.params.songName}`, https, URLModule).then(text => {
+						if (text == "Sorry, We don't have lyrics for this song yet.")
+							response.send({success: false, error: text + " <a style=\"color: gray\" target=\"_blank\" href=\"https://makeitpersonal.co/songs/new\">Add them yourself.</a>"});
+						else
+							response.send({success: true, lyrics: text});
+					}).catch(err => {
+						response.send({success: false, error: err});
+					});
+				}
 			}
 		});
 
@@ -240,39 +235,6 @@ module.exports = {
 
 				response.send(html);
 			}).catch(err => response.status(404).send('Error: ' + err));
-		});
-
-		app.get('/saveQueue', (request, response) => {
-			const url = querystring.unescape(request.url);
-			const params = querystring.parse(URLModule.parse(url).query);
-
-			console.log(utils.logDate() + ' Got a request for ' + url);
-
-			const sendData = (data) => {
-				if (data) {
-					if (data.queue)
-						response.send({success: true, data: data})
-					else
-						response.send({success: false, error: 'Nothing saved (yet)'})
-				} else response.send({success: false, error: 'Nothing saved (yet)'});
-			}
-
-			if (params) {
-				let objectKey = ('for' in params) ? params.for : request.connection.remoteAddress;
-
-				if (objectKey) {
-					if (objectKey.toLowerCase() == 'global')
-						sendData(tmpQueueSave.global);
-					else {
-						objectKey = request.connection.remoteAddress;
-
-						if (objectKey in tmpQueueSave)
-							sendData(tmpQueueSave[objectKey]);
-						else
-							sendData(null);
-					}
-				} else sendData(tmpQueueSave.global);
-			} else sendData(null);
 		});
 
 		app.post('/updatePlaylist', (request, response) => {
@@ -475,55 +437,6 @@ module.exports = {
 				}).catch(err => {
 					response.send({success: false, data: 'Couldn\'t get songs'});
 				})
-			});
-		});
-
-		app.post('/saveQueue', (request, response) => {
-			let body = '';
-
-			request.on('data', data => {
-				body += data;
-
-				if (body.length > 1e6) {
-					request.send({success: false, error: 'The amount of data is to high', info: 'The connection was destroyed because the amount of data passed is to much'});
-					request.connection.destroy();
-				}
-			});
-
-			request.on('end', () => {
-				const url = querystring.unescape(request.url);
-
-				console.log(utils.logDate() + ' Got a POST request for ' + url);
-
-				try {
-					body = JSON.parse(body);
-				} catch (err) {
-					response.send({success: false, error: 'Unable to parse JSON', info: err});
-					return;
-				}
-
-				let objectKey = ('for' in body) ? body.for : request.connection.remoteAddress;
-				const queueIndex = ('queueIndex' in body) ? body.queueIndex : 0;
-				const timeStamp = ('timeStamp' in body) ? body.timeStamp : 0;
-				const queue = ('queue' in body) ? body.queue : [];
-
-				if (objectKey.toLowerCase() == 'global') {
-					tmpQueueSave.global = {
-						queueIndex: queueIndex,
-						timeStamp: timeStamp,
-						queue: queue
-					}
-
-					response.send({success: true});
-				} else {
-					tmpQueueSave[request.connection.remoteAddress] = {
-						queueIndex: queueIndex,
-						timeStamp: timeStamp,
-						queue: queue
-					}
-
-					response.send({success: true});
-				}
 			});
 		});
 	}
