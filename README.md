@@ -67,7 +67,7 @@ Some third party APIs are used:
 - makeitpersonal API (lyrics)
 	- What: artist name and song title
 	- When: the request lyrics button is pressed
-	- Which device: local device
+	- Which device: server
 - 404 Page:
 	- What: elevator music from orangefreesounds.com & canvas.js (I created canvas.js)
 	- When: on visit
