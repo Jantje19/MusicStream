@@ -1,7 +1,7 @@
 const tmpQueueSave = {audio: {global: {}}, videos: {}};
 
 module.exports = {
-	start: function(dirname, fileHandler, fs, os, settings, utils, querystring, id3, ytdl, version, https, URLModule, serverPlugins, hijackRequestPlugins) {
+	start: function(dirname, fileHandler, fs, os, settings, utils, querystring, id3, ytdl, version, https, URLModule, ffmpeg, serverPlugins, hijackRequestPlugins) {
 		const compression = require('compression');
 		const express = require('express');
 		const app = express();
@@ -321,7 +321,6 @@ module.exports = {
 
 					if (index > -1) {
 						const file = json.audio.songs[index];
-						const ffmpeg = require('fluent-ffmpeg');
 						const ffmpegObj = ffmpeg(file.path + file.fileName);
 
 						if ('end' in params) ffmpegObj.setDuration(params.end);
@@ -517,9 +516,8 @@ module.exports = {
 						json.fileName = json.fileName.replace(/[/\\?%*:|"<>]/g, '');
 
 						const options = {};
-						const ffmpeg = require('fluent-ffmpeg');
-
 						const checkUrl = urlOk(json.url);
+
 						if (urlOk(json.url))
 							json.url = checkUrl;
 						else {
@@ -642,8 +640,8 @@ module.exports = {
 			} else sendError();
 		});
 
-		require('./serverVideoHandler.js').start(app, dirname, fileHandler, fs, os, settings, utils, querystring);
-		require('./serverAudioHandler.js').start(app, dirname, fileHandler, fs, os, settings, utils, querystring, id3, https, URLModule);
+		require('./serverVideoHandler.js').start(app, dirname, fileHandler, fs, os, settings, utils, querystring, ffmpeg);
+		require('./serverAudioHandler.js').start(app, dirname, fileHandler, fs, os, settings, utils, querystring, id3, https, URLModule, ffmpeg);
 
 		// Plugins
 		if (serverPlugins) {

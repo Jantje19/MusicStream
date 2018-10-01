@@ -1,6 +1,6 @@
 module.exports = {
-	start: (app, dirname, fileHandler, fs, os, settings, utils, querystring) => {
-		app.get('/video/*', (request, response) => {
+	start: (app, dirname, fileHandler, fs, os, settings, utils, querystring, ffmpeg) => {
+		app.get('/video/:offset', (request, response) => {
 			const url = querystring.unescape(request.url);
 			console.log(utils.logDate() + ' Got a request for ' + url);
 
@@ -11,9 +11,53 @@ module.exports = {
 
 					if (inArray.val == true) {
 						const video = inArray.video;
-						response.sendFile(video.path + video.fileName);
+						const videoPath = video.path + video.fileName;
+
+						if (settings.autoConvertVideo.val !== true)
+							response.sendFile(videoPath);
+						else {
+							const range = request.headers.range || 'bytes=0-';
+							const positions = range.replace(/bytes=/, '').split('-');
+							const start = parseInt(positions[0], 10);
+							const offset = parseInt(request.params.offset, 10) || 0;
+
+							fs.stat(videoPath, (err, stats) => {
+								if (err) {
+									response.send({success: false, error: 'File read error'});
+									console.err(err);
+								} else {
+									const total = stats.size - offset;
+									const end = positions[1] ? parseInt(positions[1], 10) : total - 1;
+									const contentLength = (end - start) + 1;
+
+									response.status(206);
+									response.set({
+										'Content-Range': 'bytes ' + start + '-' + end + '/' + total,
+										'Accept-Ranges': 'bytes',
+										'Content-Length': contentLength,
+										'Content-Type': 'video/webm'
+									});
+
+									const ffmpegObj = ffmpeg({
+										source: videoPath,
+										start: start + offset,
+										end: end
+									});
+
+									ffmpegObj.format('webm');
+									ffmpegObj.on('error', err => {
+										response.end();
+									});
+
+									ffmpegObj.pipe(response);
+								}
+							});
+						}
 					} else response.send({error: `The video '${fileName}' was not found`, info: "The cached JSON file had no reference to this file"});
-				}).catch(err => response.send({error: "There was an error with getting the video", info: err}));
+				}).catch(err => {
+					console.error(err);
+					response.send({error: "There was an error with getting the video", info: err});
+				});
 			} else {
 				response.send({error: "No video found"});
 			}

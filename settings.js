@@ -45,7 +45,7 @@ module.exports = {
 		"desc": "The paths the server should check for media files. {homedir} is replaced by the os.homedir."
 	},
 	"autoConvertAudio": {
-		"val": true,
+		"val": false,
 		"type": "bool",
 		"desc": "Convert audio files to WebM on the fly. This results in smaller file sizes, but needs more processing and has some other weird quirks."
 	},

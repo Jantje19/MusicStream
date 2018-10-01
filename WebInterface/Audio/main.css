@@ -213,7 +213,7 @@ main #main button {
 	background-color: transparent;
 }
 
-main #main button:before {
+main #main button:not(.tmpBtn):before {
 	opacity: 0;
 	width: 40px;
 	height: 40px;
@@ -255,11 +255,11 @@ main #main div div button {
 	text-overflow: ellipsis;
 }
 
-main #main div div button:before {
+main #main div div button:not(.tmpBtn):before {
 	display: none;
 }
 
-main #main div div button:hover {
+main #main div div button:not(.tmpBtn):hover {
 	background-color: rgba(0, 0, 0, 0.15);
 }
 

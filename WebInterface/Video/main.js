@@ -117,9 +117,12 @@ function load() {
 	video.addEventListener('timeupdate', evt => {
 		seekBarElem.value = (video.currentTime / video.duration) * 100;
 
-		if (video.duration) {
+		if (video.duration && video.duration !== Infinity) {
 			timeStartElem.innerText = convertToReadableTime(Math.floor(video.currentTime));
 			timeEndElem.innerText = `${convertToReadableTime(Math.floor(video.duration - video.currentTime))} - ${convertToReadableTime(Math.floor(video.duration))}`;
+		} else if (video.duration === Infinity) {
+			timeEndElem.innerText = '?s';
+			timeStartElem.innerText = convertToReadableTime(Math.floor(video.currentTime));
 		} else {
 			timeEndElem.innerText = '0s';
 			timeStartElem.innerText = convertToReadableTime(Math.floor(video.currentTime));

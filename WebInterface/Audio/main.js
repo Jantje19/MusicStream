@@ -392,8 +392,10 @@ function load() {
 		listenTime++;
 		seekBarElem.value = (audio.currentTime / audio.duration) * 100;
 
-		if (audio.duration)
+		if (audio.duration && audio.duration !== Infinity)
 			updateCSS(convertToReadableTime(Math.floor(audio.currentTime)), convertToReadableTime(Math.floor(audio.duration - audio.currentTime)));
+		else if (audio.duration === Infinity)
+			updateCSS(convertToReadableTime(Math.floor(audio.currentTime)), '?s');
 		else
 			updateCSS(convertToReadableTime(Math.floor(audio.currentTime)), '0s');
 	});

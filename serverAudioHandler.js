@@ -1,5 +1,5 @@
 module.exports = {
-	start: (app, dirname, fileHandler, fs, os, settings, utils, querystring, id3, https, URLModule) => {
+	start: (app, dirname, fileHandler, fs, os, settings, utils, querystring, id3, https, URLModule, ffmpeg) => {
 		app.get('/playlist/*', (request, response) => {
 			const url = querystring.unescape(request.url);
 
@@ -97,7 +97,7 @@ module.exports = {
 		});
 		//
 
-		app.get('/song/*', (request, response) => {
+		app.get('/song/:offset', (request, response) => {
 			const url = querystring.unescape(request.url);
 
 			console.log(utils.logDate() + ' Got a request for ' + url);
@@ -109,7 +109,48 @@ module.exports = {
 
 					if (inArray.val == true) {
 						const song = json.audio.songs[inArray.index];
-						response.sendFile(song.path + song.fileName);
+						const songPath = song.path + song.fileName;
+
+						if (settings.autoConvertAudio.val !== true)
+							response.sendFile(songPath);
+						else {
+							const range = request.headers.range || 'bytes=0-';
+							const positions = range.replace(/bytes=/, '').split('-');
+							const start = parseInt(positions[0], 10);
+							const offset = parseInt(request.params.offset, 10) || 0;
+
+							fs.stat(songPath, (err, stats) => {
+								if (err) {
+									response.send({success: false, error: 'File read error'});
+									console.err(err);
+								} else {
+									const total = stats.size - offset;
+									const end = positions[1] ? parseInt(positions[1], 10) : total - 1;
+									const contentLength = (end - start) + 1;
+
+									response.status(206);
+									response.set({
+										'Content-Range': 'bytes ' + start + '-' + end + '/' + total,
+										'Accept-Ranges': 'bytes',
+										'Content-Length': contentLength,
+										'Content-Type': 'audio/webm'
+									});
+
+									const ffmpegObj = ffmpeg({
+										source: songPath,
+										start: start + offset,
+										end: end
+									});
+
+									ffmpegObj.format('webm');
+									ffmpegObj.on('error', err => {
+										response.end();
+									});
+
+									ffmpegObj.pipe(response);
+								}
+							});
+						}
 					} else response.send({error: `The song '${songName}' was not found`, info: "The cached JSON file had no reference to this file"});
 				}).catch(err => response.send({error: "There was an error with getting the song", info: err}));
 			} else {
@@ -437,6 +478,22 @@ module.exports = {
 				}).catch(err => {
 					response.send({success: false, data: 'Couldn\'t get songs'});
 				})
+			});
+		});
+
+		/*
+		*	Used for testing if the user has a slow network connection
+		*	Just routes the received body (which would be a Date) back to the client, so it can calculate the request time
+		*/
+		app.post('/SlowConnectionTest/', (request, response) => {
+			let body = '';
+
+			request.on('data', data => {
+				body += data;
+			});
+
+			request.on('end', () => {
+				response.send(body);
 			});
 		});
 	}

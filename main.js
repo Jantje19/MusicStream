@@ -5,6 +5,7 @@ const id3 = require('node-id3');
 const URLModule = require('url');
 const ytdl = require('ytdl-core');
 const server = require('./server.js');
+const ffmpeg = require('fluent-ffmpeg');
 const querystring = require('querystring');
 const fileHandler = require('./fileHandler.js');
 
@@ -158,7 +159,7 @@ const loadPlugins = () => {
 
 const startServer = () => {
 	loadPlugins().then(() => {
-		const startServerModule = () => server.start(__dirname + '/WebInterface/', fileHandler, fs, os, settings, utils, querystring, id3, ytdl, version, https, URLModule, pluginServer, hijackRequestPlugins);
+		const startServerModule = () => server.start(__dirname + '/WebInterface/', fileHandler, fs, os, settings, utils, querystring, id3, ytdl, version, https, URLModule, ffmpeg, pluginServer, hijackRequestPlugins);
 
 		if (settings.updateJsonOnStart.val == true) {
 			fileHandler.searchSystem(fs, os, utils, settings).then(startServerModule).catch(err => {
