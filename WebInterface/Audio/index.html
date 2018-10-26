@@ -180,7 +180,7 @@
 					<option value="none">Default</option>
 					<option value="newest">Newest</option>
 					<option value="oldest">Oldest</option>
-					<script type="text/javascript">/*This is ugly, but it works*/document.getElementById('sort').value = '{{audioDefaultSortType}}';</script>
+					<script type="text/javascript">/*This is ugly, but it works*/ const val = '{{audioDefaultSortType}}'; document.getElementById('sort').value = ((val === 'default') ? 'none' : val);</script>
 				</select>
 				<hr>
 				<div id="songs">
