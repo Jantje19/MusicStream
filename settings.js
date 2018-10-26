@@ -80,7 +80,7 @@ module.exports = {
 		"desc": "The amount of seconds that skip when you press the arrow keys on the videos page."
 	},
 	"audioDefaultSortType": {
-		"val": "newest",
+		"val": "default",
 		"type": "choise",
 		"options": ["default", "newest", "oldest"],
 		"desc": "The default sorting of songs in the audio player."
