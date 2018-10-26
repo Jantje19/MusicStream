@@ -201,6 +201,33 @@ function load() {
 			togglePlayState();
 	});
 
+	/* Handle Picture-in-Picture */
+	(function () {
+		const pipButtonElement = document.getElementById('pip-toggle');
+
+		if ('pictureInPictureEnabled' in document) {
+			if (document.pictureInPictureEnabled) {
+				setPipButton();
+				video.addEventListener('loadedmetadata', setPipButton);
+				video.addEventListener('emptied', setPipButton);
+			}
+		}
+
+		pipButtonElement.addEventListener('click', evt => {
+			if (document.pictureInPictureElement === null)
+				video.requestPictureInPicture().then(console.log).catch(console.error);
+			else
+				document.exitPictureInPicture().then(console.log).catch(console.error);
+		});
+
+		function setPipButton() {
+			pipButtonElement.style.display = 'initial';
+			pipButtonElement.disabled = (video.readyState === 0) ||
+			!document.pictureInPictureEnabled ||
+			video.disablePictureInPicture;
+		}
+	})();
+
 	// Toggle controls (very experimental)
 	(function() {
 		const videoWrapperElem = document.getElementById('videoElem');

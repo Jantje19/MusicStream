@@ -118,8 +118,6 @@ module.exports = {
 				const subtitles = ('subtitles' in json.video) ? json.video.subtitles.map(val => {return val.fileName}) : [];
 
 				const handleVideos = obj => {
-					// REVERSE!!
-
 					for (key in obj)
 						videos[key] = obj[key].map(val => {return val.fileName}).filter(val => {return !(settings.ignoredVideoFiles.val.includes(val))});
 				}

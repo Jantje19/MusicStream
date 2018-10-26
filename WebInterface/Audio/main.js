@@ -23,9 +23,9 @@ function keyPress(evt) {
 	} else playSong(null, true);
 }
 
-function getData() {
+function getData(type) {
 	return new Promise((resolve, reject) => {
-		get('/data/').then(json => {
+		get('/data/' + ((type !== null && type !== undefined) ? `?sort=${type}` : '')).then(json => {
 			if (json.error)
 				reject(json);
 			else
@@ -331,35 +331,51 @@ function updateCSS(newValBefore, newValAfter) {
 	}
 }
 
-function reloadSongslist(selectElem) {
+function reloadSongslist(selectElem, playlistsElem) {
 	const val = ('target' in selectElem) ? selectElem.target.value : selectElem.value;
 	const songsElem = document.getElementById('songs');
-	let after = '';
+	let after;
 
 	if (val != "none")
-		after = 'sort=' + val;
+		after = val;
 
 	songsElem.innerHTML = '<div class="ball-scale-multiple"><div></div><div></div><div></div></div>';
-
-	get('/data/' + after).then(json => {
-		const songs = json.audio.songs;
-
-		songsElem.innerHTML = '';
-		songs.forEach((object, key) => {
-			songsElem.innerHTML += `<button title="${object}" class="song ${key}" onclick="songClick(event)">${object}</button><hr>`;
-		});
-
-		document.getElementById('songCount').innerText = "Amount: " + songs.length;
-	}).catch( err => {
-		console.error('An error occurred', err);
+	getData(after).then(data => {
+		updateSongInterface(data, songsElem, playlistsElem);
+	}).catch(err => {
+		songsElem.innerHTML = `<div style="text-align: center"><h3>Oh no</h3><br><br><p>There was an error: <b>${err}</b></p></div>`;
+		console.error('Something went wrong', err);
 	});
 }
 
+function updateSongInterface(json, songsElem, playlistsElem) {
+	if (json.songs.length > 0) {
+		checkCookies(json.songs);
+		document.getElementById('songCount').innerText = "Amount: " + json.songs.length;
+		songsElem.innerHTML = '';
+		json.songs.forEach((object, key) => {
+			songsElem.innerHTML += `<button title="${object}" class="song ${key}" onclick="songClick(event)">${object}</button><hr>`;
+		});
+
+		updateInterface();
+	} else songsElem.innerHTML = '<i>No songs found</i>';
+
+	if (playlistsElem) {
+		if (json.playlists.length > 0) {
+			document.getElementById('playlistCount').innerText = "Amount: " + json.playlists.length;
+			json.playlists.forEach((object, key) => {
+				playlistsElem.innerHTML += `<button title="${object}" class="listElem ${key}" onclick="handlePlaylist(event, '${object}')">${object}</button><hr>`;
+			});
+		} else playlistsElem.innerHTML = '<i>No playlists found</i>';
+	}
+}
+
 function load() {
-	const songsElem = document.getElementById('songs');
-	const seekBarElem = document.getElementById('seekBar');
-	const playlistsElem = document.getElementById('playlists');
 	const overflowMenu = document.getElementById('overflowMenu');
+	const playlistsElem = document.getElementById('playlists');
+	const seekBarElem = document.getElementById('seekBar');
+	const songsElem = document.getElementById('songs');
+	const sortElem = document.getElementById('sort');
 
 	document.getElementById('toggleBtn').addEventListener('click', evt => {
 		if (queue.length > 0) {
@@ -540,7 +556,7 @@ function load() {
 		get('/updateJSON/').then(json => {
 			if (json.success) {
 				if (confirm('Updated media list!\nShould the songs list be updated?'))
-					reloadSongslist(document.getElementById('sort'));
+					reloadSongslist(sortElem);
 			} else alert(json.info);
 		}).catch(err => {
 			console.error('An error occurred', JSON.parse(err));
@@ -572,31 +588,7 @@ function load() {
 		return true;
 	});
 
-	getData().then(json => {
-		data = json;
-
-		if (json.songs.length > 0) {
-			checkCookies(json.songs);
-			document.getElementById('songCount').innerText = "Amount: " + json.songs.length;
-			songsElem.innerHTML = '';
-			json.songs.forEach((object, key) => {
-				songsElem.innerHTML += `<button title="${object}" class="song ${key}" onclick="songClick(event)">${object}</button><hr>`;
-			});
-
-			updateInterface();
-		} else songsElem.innerHTML = '<i>No songs found</i>';
-
-		if (json.playlists.length > 0) {
-			document.getElementById('playlistCount').innerText = "Amount: " + json.playlists.length;
-			json.playlists.forEach((object, key) => {
-				playlistsElem.innerHTML += `<button title="${object}" class="listElem ${key}" onclick="handlePlaylist(event, '${object}')">${object}</button><hr>`;
-			});
-		} else playlistsElem.innerHTML = '<i>No playlists found</i>';
-	}).catch(err => {
-		songsElem.innerHTML = `<div style="text-align: center"><h3>Oh no</h3><br><br><p>There was an error: <b>${err}</b></p></div>`;
-		console.error('Something went wrong', err);
-	});
-
+	reloadSongslist(sortElem, playlistsElem);
 	// For plugins
 	try {
 		loaded();
@@ -713,5 +705,69 @@ function checkCookies(songsArr) {
 audio.onended = end;
 audio.onplay = updateInterface;
 audio.onpause = updateInterface;
+
+// Service Worker
+// 'serviceWorker' in navigator
+if (false) {
+	const checkConnectionSpeed = () => {
+		const tempdate = Date.now();
+		let doneAlready = false;
+		let tmout;
+
+		const slowNetwork = () => {
+			if (!doneAlready) {
+				doneAlready = true;
+				console.log('Ay. Slow network');
+
+				// More logic
+			}
+		}
+
+		fetch('SlowConnectionTest', {
+			method: 'POST',
+			credentials: 'same-origin',
+			body: tempdate.toString()
+		}).then(response => {
+			response.text().then(dt => {
+				clearTimeout(tmout);
+
+				if (Date.now() - parseInt(dt) > 500) // 0.5 seconds
+					slowNetwork();
+				else
+					console.log('Network in top condition');
+			});
+		}).catch(console.error);
+
+		tmout = setTimeout(slowNetwork, 900);
+	}
+
+	navigator.serviceWorker.register('service-worker.js').then(reg => {
+		const messageChannel = new MessageChannel();
+
+		checkConnectionSpeed();
+		messageChannel.port1.onmessage = evt => {
+			const { type, data } = evt.data;
+
+			/*switch(type) {
+				case 'cacheDeletion':
+
+				break;
+			}*/
+		}
+
+		if (reg.active) {
+			reg.active.postMessage({
+				type: 'messageChannel'
+			}, [messageChannel.port2]);
+
+			reg.active.postMessage({
+				type: 'downloadAudioToCache',
+				data: {
+					fileName: 'bensound-straight.mp3'
+				}
+			});
+		}
+	}).catch(console.error);
+}
 
 document.addEventListener('DOMContentLoaded', load);

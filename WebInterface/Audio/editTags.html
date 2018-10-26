@@ -101,7 +101,7 @@
 		if (location.hash) {
 			const songName = unescape(location.hash.replace('#', ''));
 
-			fetch('/data/', {credentials: 'same-origin'}).then(response => {
+			fetch('/data/?sort=newest', {credentials: 'same-origin'}).then(response => {
 				response.json().then(json => {
 					if (json.audio.songs.includes(songName)) {
 						songSelected(songName);
@@ -143,7 +143,7 @@
 	}
 
 	function showSongSelect() {
-		fetch('/data/', {credentials: 'same-origin'}).then(response => {
+		fetch('/data/?sort=newest', {credentials: 'same-origin'}).then(response => {
 			response.json().then(json => selectSong(json));
 		}).catch( err => {
 			console.error('An error occurred', err);
@@ -242,7 +242,7 @@
 	function getTagsFromLastFm(title, artist) {
 		if (title && artist) {
 			return new Promise((resolve, reject) => {
-				fetch(`https://ws.audioscrobbler.com/2.0/?method=track.getInfo&api_key=f02456f630621a02581b2143a67372f0&artist=${artist}&track=${title}&format=json`).then(response => {
+				fetch(`https://ws.audioscrobbler.com/2.0/?method=track.getInfo&api_key=f02456f630621a02581b2143a67372f0&artist=${escape(artist)}&track=${escape(title)}&format=json`).then(response => {
 					response.json().then(json => {
 						if (json.error) reject(json.message);
 						else resolve(json.track);

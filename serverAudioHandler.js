@@ -111,46 +111,7 @@ module.exports = {
 						const song = json.audio.songs[inArray.index];
 						const songPath = song.path + song.fileName;
 
-						if (settings.autoConvertAudio.val !== true)
-							response.sendFile(songPath);
-						else {
-							const range = request.headers.range || 'bytes=0-';
-							const positions = range.replace(/bytes=/, '').split('-');
-							const start = parseInt(positions[0], 10);
-							const offset = parseInt(request.params.offset, 10) || 0;
-
-							fs.stat(songPath, (err, stats) => {
-								if (err) {
-									response.send({success: false, error: 'File read error'});
-									console.err(err);
-								} else {
-									const total = stats.size - offset;
-									const end = positions[1] ? parseInt(positions[1], 10) : total - 1;
-									const contentLength = (end - start) + 1;
-
-									response.status(206);
-									response.set({
-										'Content-Range': 'bytes ' + start + '-' + end + '/' + total,
-										'Accept-Ranges': 'bytes',
-										'Content-Length': contentLength,
-										'Content-Type': 'audio/webm'
-									});
-
-									const ffmpegObj = ffmpeg({
-										source: songPath,
-										start: start + offset,
-										end: end
-									});
-
-									ffmpegObj.format('webm');
-									ffmpegObj.on('error', err => {
-										response.end();
-									});
-
-									ffmpegObj.pipe(response);
-								}
-							});
-						}
+						response.sendFile(songPath);
 					} else response.send({error: `The song '${songName}' was not found`, info: "The cached JSON file had no reference to this file"});
 				}).catch(err => response.send({error: "There was an error with getting the song", info: err}));
 			} else {

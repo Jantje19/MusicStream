@@ -50,7 +50,7 @@
 <link href="all.css" rel="stylesheet" type="text/css" media="screen"/>
 
 <script type="text/javascript">
-	function typeToHTML(type, title, desc, val) {
+	function typeToHTML(type, title, desc, val, data) {
 		let html = `<h3>${title}</h3><p>${desc}</p>`;
 
 		switch (type) {
@@ -68,6 +68,9 @@
 			break;
 			case 'number':
 			html += `<input caseVal="${type}" id="${title}" type="number" value="${val}" min="0" max="100">`;
+			break;
+			case 'choise':
+			html += `<select caseVal="${type}" id="${title}">${data.options.map(value => `<option ${(value === val) ? 'selected' : ''} value="${value}">${value}</option>`).join('')}</select>`;
 			break;
 		}
 
@@ -89,16 +92,20 @@
 			return elem.value.toString();
 			case 'number':
 			return Number(elem.value);
+			case 'choise':
+			return elem.value;
 		}
 	}
 
 	function save() {
 		const json = {};
-
-		Array.from(document.getElementById('settings').querySelectorAll('input')).forEach((object, key) => {
+		const settingsElem = document.getElementById('settings');
+		const forEachFunc = object => {
 			json[object.id.substr(0, 1).toLowerCase() + object.id.substr(1)] = valToJSON(object, object.getAttribute('caseVal'));
-		});
+		};
 
+		Array.from(settingsElem.querySelectorAll('input')).forEach(forEachFunc);
+		Array.from(settingsElem.querySelectorAll('select')).forEach(forEachFunc);
 		fetch(/updateSettings/, {method: 'POST', body: JSON.stringify(json), credentials: 'same-origin'}).then(response => {
 			response.json().then(json => {
 				if (json.success) {
@@ -137,7 +144,7 @@
 
 				for (key in json) {
 					const data = json[key];
-					newHTML += typeToHTML(data.type, key.substr(0, 1).toUpperCase() + key.substr(1), data.desc, data.val);
+					newHTML += typeToHTML(data.type, key.substr(0, 1).toUpperCase() + key.substr(1), data.desc, data.val, data);
 				}
 
 				document.getElementById('settings').innerHTML = newHTML;
@@ -147,7 +154,9 @@
 		});
 	}
 
-	function change(elem) {document.querySelector(`label[for="${elem.id}"]`).innerText = elem.value + '%';}
+	function change(elem) {
+		document.querySelector(`label[for="${elem.id}"]`).innerText = elem.value + '%';
+	}
 
 	window.onload = load;
 </script>
