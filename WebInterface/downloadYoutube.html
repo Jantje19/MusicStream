@@ -242,6 +242,17 @@
 						document.getElementById('artist').value = artist;
 						document.getElementById('endTime').value = json.length_seconds;
 
+						if (document.getElementById('typeVideo').checked) {
+							const videoInputElem = document.getElementById('videoInput')
+							const videoInputElemBRect = videoInputElem.getBoundingClientRect();
+
+							document.getElementById('title').value = json.title;
+							videoInputElem.style.marginTop = `${videoInputElemBRect.height / 3}px`;
+							Array.from(document.querySelectorAll('[dont-display-for-video]')).forEach(elem => {
+								elem.style.display = 'none';
+							});
+						}
+
 						setTimeout(() => {
 							nodes[3].style.transform = 'translate(-50%, -50%)';
 							nodes[1].style.transform = 'translate(-50%, -110vh)';
@@ -258,13 +269,26 @@
 		if (val instanceof Event) {
 			let parsedUrl;
 			const url = document.getElementById('link').value;
-			const urlOk = parsedUrl => {
-				if (parsedUrl.searchParams.has('v')) {
-					const vidId = parsedUrl.searchParams.get('v');
+			const urlOk = url => {
+				if (url.hostname.startsWith('www.'))
+					url.hostname = url.hostname.replace(/^(www\.)/, '');
+
+				if (url.hostname == 'youtube.com') {
+					if (url.searchParams.has('v')) {
+						const vidId = url.searchParams.get('v');
+
+						if (vidId.length == 11)
+							return vidId;
+						else
+							return false;
+					} else return false;
+				} else if (url.hostname == 'youtu.be') {
+					const vidId = url.pathname.slice(1);
 
 					if (vidId.length == 11)
 						return vidId;
-					else return false;
+					else
+						return false;
 				} else return false;
 			};
 
@@ -277,10 +301,10 @@
 
 			const vidId = urlOk(parsedUrl);
 			parsedUrl.host = parsedUrl.host.replace('www.', '');
-			if ((parsedUrl.host == 'youtube.com' || parsedUrl.host == 'youtu.be') && vidId)
+			if (vidId !== false)
 				fetchData(vidId, val.target);
 			else
-				alert('Link does not match a youtube url')/*Display toast or something..*/;
+				alert('Link does not match a youtube url');
 		} else fetchData(val);
 	}
 
@@ -319,18 +343,23 @@
 				if (Number(endTime) <= 0)
 					endTime = null;
 
+				const title = document.getElementById('title').value;
+				const artist = document.getElementById('artist').value;
 				const data = {
 					type: type,
 					url: document.getElementById('link').value,
-					fileName: document.getElementById('artist').value + ' - ' + document.getElementById('title').value,
+					fileName: artist + ' - ' + title,
 					startTime: document.getElementById('startTime').value,
 					endTime: endTime,
 					tags: {
-						title: document.getElementById('title').value,
 						album: document.getElementById('album').value,
-						artist: document.getElementById('artist').value
+						artist: artist,
+						title: title
 					}
 				}
+
+				if (type === 'video')
+					data.fileName = document.getElementById('title').value;
 
 				if (document.getElementById('uiac').checked)
 					data.tags.image = document.querySelector('img').src;
@@ -349,13 +378,15 @@
 									songName: json.fileName,
 									tags: data.tags
 								}
+
 								if (type == 'audio') {
 									videoInputElem.innerHTML = '<b>Setting tags...</b>';
 									fetch('/tags', {method: 'POST', body: JSON.stringify(body), credentials: 'same-origin'}).then(response => {
 										response.json().then(json => {
 											videoInputElem.innerHTML = '<b>Done!</b>';
 											if (json.success) {
-												if (confirm('Everything went according to plan. Do you want to go to the home page?')) window.location = window.location.origin;
+												if (confirm('Everything went according to plan. Do you want to go to the home page?'))
+													window.location = window.location.origin;
 											} else alert('Error: ' + json.info);
 										});
 									}).catch( err => {
@@ -405,20 +436,20 @@
 			<div id="videoInput">
 				<h2>Video Tags</h2>
 
-				<input type="checkbox" id="use_tags" checked>
-				<label for="uiac">Use tags</label><br>
+				<input type="checkbox" id="use_tags" checked dont-display-for-video>
+				<label for="uiac" dont-display-for-video>Use tags</label><br>
 				<label for="title">Title</label>
 				<input type="text" id="title"><br>
-				<label for="artist">Artist</label>
-				<input type="text" id="artist"><br>
-				<label for="album">Album</label>
-				<input type="text" id="album"><br>
-				<label for="startTime">Start:</label>
-				<input type="number" id="startTime" style="width: 8%" value="0">
-				<label for="endTime">End:</label>
-				<input type="number" id="endTime" style="width: 8%" value="0"><br>
-				<input type="checkbox" id="uiac" checked>
-				<label for="uiac">Use image as cover</label>
+				<label for="artist" dont-display-for-video>Artist</label>
+				<input type="text" id="artist" dont-display-for-video><br>
+				<label for="album" dont-display-for-video>Album</label>
+				<input type="text" id="album" dont-display-for-video><br>
+				<label for="startTime" dont-display-for-video>Start:</label>
+				<input type="number" id="startTime" style="width: 8%" value="0" dont-display-for-video>
+				<label for="endTime" dont-display-for-video>End:</label>
+				<input type="number" id="endTime" style="width: 8%" value="0" dont-display-for-video><br>
+				<input type="checkbox" id="uiac" checked dont-display-for-video>
+				<label for="uiac" dont-display-for-video>Use image as cover</label>
 
 				<button id="save">Save</button>
 			</div>

@@ -27,10 +27,12 @@ function getData(type) {
 	return new Promise((resolve, reject) => {
 		get('/data/' + ((type !== null && type !== undefined) ? `?sort=${type}` : '')).then(json => {
 			if (json.error)
-				reject(json);
-			else
+				reject(json.error);
+			else {
+				data = json.audio;
 				resolve(json.audio);
-		}).catch(err => reject(err));
+			}
+		}).catch(reject);
 	});
 }
 
@@ -66,7 +68,7 @@ function get(url, headers) {
 			else {
 				response.json().then(json => {
 					if (json.error)
-						reject(json.info || json.error);
+						reject(json.error);
 					else
 						resolve(json);
 				});
@@ -705,69 +707,5 @@ function checkCookies(songsArr) {
 audio.onended = end;
 audio.onplay = updateInterface;
 audio.onpause = updateInterface;
-
-// Service Worker
-// 'serviceWorker' in navigator
-if (false) {
-	const checkConnectionSpeed = () => {
-		const tempdate = Date.now();
-		let doneAlready = false;
-		let tmout;
-
-		const slowNetwork = () => {
-			if (!doneAlready) {
-				doneAlready = true;
-				console.log('Ay. Slow network');
-
-				// More logic
-			}
-		}
-
-		fetch('SlowConnectionTest', {
-			method: 'POST',
-			credentials: 'same-origin',
-			body: tempdate.toString()
-		}).then(response => {
-			response.text().then(dt => {
-				clearTimeout(tmout);
-
-				if (Date.now() - parseInt(dt) > 500) // 0.5 seconds
-					slowNetwork();
-				else
-					console.log('Network in top condition');
-			});
-		}).catch(console.error);
-
-		tmout = setTimeout(slowNetwork, 900);
-	}
-
-	navigator.serviceWorker.register('service-worker.js').then(reg => {
-		const messageChannel = new MessageChannel();
-
-		checkConnectionSpeed();
-		messageChannel.port1.onmessage = evt => {
-			const { type, data } = evt.data;
-
-			/*switch(type) {
-				case 'cacheDeletion':
-
-				break;
-			}*/
-		}
-
-		if (reg.active) {
-			reg.active.postMessage({
-				type: 'messageChannel'
-			}, [messageChannel.port2]);
-
-			reg.active.postMessage({
-				type: 'downloadAudioToCache',
-				data: {
-					fileName: 'bensound-straight.mp3'
-				}
-			});
-		}
-	}).catch(console.error);
-}
 
 document.addEventListener('DOMContentLoaded', load);

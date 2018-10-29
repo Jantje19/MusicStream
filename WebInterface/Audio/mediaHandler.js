@@ -232,7 +232,8 @@ function displayLyrics(artist, songName) {
 				lyricsElem.innerHTML = `<h3>Lyrics</h3><p style="line-height: 1.5;">${lyrics}</p>`;
 			} else lyricsElem.innerHTML = `<h3>Error</h3><br><p>${json.error}</p>`;
 		}).catch(err => {
-			console.error(err); lyricsElem.innerHTML = `<h3>Error</h3><br><p>Couldn't fetch lyrics</p><br>` + err.error;
+			console.error(err);
+			lyricsElem.innerHTML = `<h3>Error</h3><br><p>Couldn't fetch lyrics</p><br>` + err;
 		});
 	}
 }
