@@ -1,10 +1,6 @@
 # MusicStream
 A NodeJS server and web client for streaming music (and videos) to your network
 
-![Mock-up](https://testsite-vic.000webhostapp.com/Gallery/Assets/Mockup.png)
-
-[*More Images*](http://testsite-vic.ml/Gallery/)
-
 ## Installation
 ### Installer
 
