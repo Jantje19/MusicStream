@@ -1,6 +1,6 @@
 <!DOCTYPE html>
-<html>
-<head lang="en">
+<html lang="en">
+<head>
 
 	<title>Music Stream</title>
 
@@ -36,96 +36,96 @@
 	<link href="seekbarStyle.css" rel="stylesheet" type="text/css" media="screen"/>
 
 	<style type="text/css">
-	header h1 {
-		float: none;
-	}
+		header h1 {
+			float: none;
+		}
 
-	header > div {
-		height: 100%;
-	}
+		header > div {
+			height: 100%;
+		}
 
-	header > div > div {
-		width: 40px;
-		height: 100%;
-		display: inline-block;
-	}
+		header > div > div {
+			width: 40px;
+			height: 100%;
+			display: inline-block;
+		}
 
-	header > div > div > div {
-		display: none;
-	}
+		header > div > div > div {
+			display: none;
+		}
 
-	header > div > div > button {
-		margin-top: 3px;
-		float: none !important;
-		padding: 0px !important;
-		position: relative !important;
-	}
+		header > div > div > button {
+			margin-top: 3px;
+			float: none !important;
+			padding: 0px !important;
+			position: relative !important;
+		}
 
-	header > div:first-child {
-		float: left;
-	}
+		header > div:first-child {
+			float: left;
+		}
 
-	header #search #searchInp {
-		top: 0;
-		left: 10%;
-		width: 40%;
-		padding: 5px;
-		border: none;
-		display: none;
-		color: #16a085;
-		position: absolute;
-		text-align: center;
-		transform: translate(50%, 70%);
-	}
+		header #search #searchInp {
+			top: 0;
+			left: 10%;
+			width: 40%;
+			padding: 5px;
+			border: none;
+			display: none;
+			color: #16a085;
+			position: absolute;
+			text-align: center;
+			transform: translate(50%, 70%);
+		}
 
-	header #overflowMenuHolder #overflowMenu {
-		top: 50px;
-		right: 1%;
-		width: 150px;
-		display: none;
-		z-index: 100000;
-		position: absolute;
-		background-color: white;
-		box-shadow: 0 0 5px rgba(0, 0 , 0, 0.3);
-	}
+		header #overflowMenuHolder #overflowMenu {
+			top: 50px;
+			right: 1%;
+			width: 150px;
+			display: none;
+			z-index: 100000;
+			position: absolute;
+			background-color: white;
+			box-shadow: 0 0 5px rgba(0, 0 , 0, 0.3);
+		}
 
-	header #overflowMenuHolder #overflowMenu hr {
-		margin: 0;
-	}
+		header #overflowMenuHolder #overflowMenu hr {
+			margin: 0;
+		}
 
-	header #overflowMenuHolder #overflowMenu button {
-		width: 100%;
-		padding: 10px;
-		height: initial;
-		position: initial;
-		transition: background-color .3s ease;
-	}
+		header #overflowMenuHolder #overflowMenu button {
+			width: 100%;
+			padding: 10px;
+			height: initial;
+			position: initial;
+			transition: background-color .3s ease;
+		}
 
-	header #overflowMenuHolder #overflowMenu button:hover {
-		background-color: rgba(0, 0, 0, 0.05);
-	}
+		header #overflowMenuHolder #overflowMenu button:hover {
+			background-color: rgba(0, 0, 0, 0.05);
+		}
 
-	header #overflowMenuHolder #overflowMenu button:before {
-		content: '';
-		display: none;
-	}
+		header #overflowMenuHolder #overflowMenu button:before {
+			content: '';
+			display: none;
+		}
 
-	header > div:last-child {
-		float: right;
-	}
-</style>
+		header > div:last-child {
+			float: right;
+		}
+	</style>
 
-<script type="text/javascript" src="mediaHandler.js"></script>
-<script type="text/javascript" src="main.js"></script>
+	<script type="text/javascript" src="mediaHandler.js"></script>
+	<script type="text/javascript" src="main.js"></script>
 
-<script type="text/javascript">
-	var shouldUpdateMostListened = {{collectMostListened}}
+	<script type="text/javascript">
+		var shouldUpdateMostListened = {{collectMostListened}}
 
-	if (!('fetch' in window)) {
-		if (confirm('Your browser is not supported. Do you want to go to the old browsers page?'))
-			window.location = '/OldBrowsers/'
-	}
-</script>
+		if (!('fetch' in window)) {
+			if (confirm('Your browser is not supported. Do you want to go to the old browsers page?'))
+				window.location = '/OldBrowsers/'
+		}
+	</script>
 
 </head>
 <body>
@@ -205,8 +205,8 @@
 				<hr>
 				<div id="queue">
 					<i>Queue is empty</i>
-					<button class="tmpBtn" onclick="getTmpSavedQueue(true)">Get temporary saved IP-based queue</button>
-					<button class="tmpBtn" onclick="getTmpSavedQueue(true)">Get temporary saved global queue</button>
+					<button class="tmpBtn" onclick="getTmpSavedQueue('ip', true)">Get temporary saved IP-based queue</button>
+					<button class="tmpBtn" onclick="getTmpSavedQueue('global', true)">Get temporary saved global queue</button>
 				</div>
 			</div>
 		</div>
@@ -216,7 +216,7 @@
 			<div id="mainControls">
 				<div id="left">
 					<button title="Play previous song" onclick="previous()"><img src="Assets/ic_skip_previous_white.svg"></button>
-					<button title="Play/pause song" id="toggleBtn"><img src="Assets/ic_play_arrow_white.svg"></button> <!-- onclick="playSong(queue[queueIndex], true)" -->
+					<button title="Play/pause song" id="toggleBtn"><img src="/Assets/ic_play_arrow_white.svg"></button> <!-- onclick="playSong(queue[queueIndex], true)" -->
 					<button title="Play next song" onclick="next()"><img src="Assets/ic_skip_next_white.svg"></button>
 					<div id="volume">
 						<button title="Change volume" id="volumeToggle"><img src="Assets/ic_volume_up_white.svg"></button>

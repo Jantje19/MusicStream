@@ -2,6 +2,7 @@
 	"name": "Music Stream",
 	"short_name": "Music Stream",
 	"description": "Stream your music",
+	"start_url": "[[STARTURL]]",
 	"lang": "en",
 
 	"display": "standalone",

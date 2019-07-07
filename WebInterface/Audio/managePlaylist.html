@@ -38,6 +38,10 @@
 	<script type="text/javascript">
 		let playlist = [];
 
+		function getPlaylistName() {
+			return unescape(location.hash.replace('#', ''));
+		}
+
 		function getData(url) {
 			return new Promise((resolve, reject) => {
 				fetch(url, {credentials: 'same-origin'}).then(response => {
@@ -74,7 +78,7 @@
 		}
 
 		function load() {
-			const playlistName = location.hash.replace('#', '');
+			const playlistName = getPlaylistName();
 
 			if (location.hash == '') {
 				alert('No name supplied');
@@ -85,7 +89,7 @@
 				const songsElem = document.getElementById('songs');
 
 				if (json.playlists.includes(playlistName)) {
-					getData('/playlist/' + location.hash.replace('#', '')).then(data => {
+					getData('/playlist/' + playlistName).then(data => {
 						const playlistElem = document.getElementById('playlist');
 
 						playlist = data.songs;
@@ -106,7 +110,7 @@
 
 				if (innerElems.length > 1) {
 					if (confirm('Are you sure the playlist is okay like this?')) {
-						const jsonData = {name: location.hash.replace('#', ''), songs: innerElems.map(obj => {return obj.innerText})};
+						const jsonData = {name: getPlaylistName(), songs: innerElems.map(obj => {return obj.innerText})};
 
 						fetch('/updatePlaylist/', {method: "POST", body: JSON.stringify(jsonData), credentials: 'same-origin'}).then(response => {
 							response.json().then(json => {
@@ -128,15 +132,16 @@
 			document.getElementById('delete').addEventListener('click', evt => {
 				if (confirm('Are you sure you want to delete this playlist?')) {
 					const data = {
-						delete: true,
-						name: location.hash.replace('#', '')
+						name: getPlaylistName(),
+						delete: true
 					}
 
 					fetch('updatePlaylist/', {method: 'POST', body: JSON.stringify(data), credentials: 'same-origin'}).then(response => {
 						response.json().then(json => {
 							if (json.success == true)
-								window.location = window.location.host;
-							else alert(json.error);
+								window.location = window.location.origin;
+							else
+								alert(json.error);
 						}).catch(err => console.log(err));
 					}).catch( err => {
 						console.error('An error occurred', err);

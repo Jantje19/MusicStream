@@ -23,6 +23,21 @@ module.exports = {
 		const ips = utils.getLocalIP(os);
 
 		app.use(compression());
+		// Needed for the manifest.json
+		app.use((request, response, next) => {
+			if (request.url.endsWith('manifest.json')) {
+				fs.readFile(dirname + request.url, 'utf-8', (err, data) => {
+					if (err)
+						next();
+					else {
+						response.setHeader('Content-Type', 'application/json');
+						response.send(data.replace('[[STARTURL]]', settings.url.val));
+					}
+				});
+			} else {
+				next();
+			}
+		});
 		app.use(express.static(dirname));
 
 		app.get('*favicon.ico*', (request, response) => {
@@ -102,11 +117,7 @@ module.exports = {
 			utils.sendFile(fs, dirname + request.url.replace('videos/', ''), response);
 		});
 
-		app.get('*/favicon.ico', (request, response) => {
-			utils.sendFile(fs, dirname + 'Assets/Icons/favicon.ico', response);
-		});
-
-		app.get('*/data/*', (request, response) => {
+		app.get('/data/*', (request, response) => {
 			let sort = false;
 			const url = request.url;
 			console.log(utils.logDate() + ' Got a request for ' + url);
@@ -118,8 +129,13 @@ module.exports = {
 				const subtitles = ('subtitles' in json.video) ? json.video.subtitles.map(val => {return val.fileName}) : [];
 
 				const handleVideos = obj => {
-					for (key in obj)
-						videos[key] = obj[key].map(val => {return val.fileName}).filter(val => {return !(settings.ignoredVideoFiles.val.includes(val))});
+					for (key in obj) {
+						videos[key] = obj[key].map(val => {
+							return val.fileName;
+						}).filter(val => {
+							return !(settings.ignoredVideoFiles.val.includes(val));
+						});
+					}
 				}
 
 				if (json.audio.songs.length > 0 || Object.keys(json.video.videos).length > 0) {
@@ -427,16 +443,34 @@ module.exports = {
 				}
 
 				const urlOk = url => {
-					const parsedUrl = URLModule.parse(url);
-					const vidId = querystring.parse(parsedUrl.query).v;
+					url = URLModule.parse(url);
 
-					if (parsedUrl.host.replace('www.', '') == 'youtube.com') {
-						if (vidId) {
+					if ('query' in url) {
+						url.searchParams = querystring.parse(url.query);
+
+						if (url.hostname.startsWith('www.'))
+							url.hostname = url.hostname.replace(/^(www\.)/, '');
+
+						if (url.hostname == 'youtube.com') {
+							if ('v' in url.searchParams) {
+								const vidId = url.searchParams['v'];
+
+								if (vidId.length == 11)
+									return vidId;
+								else
+									return false;
+							} else return false;
+						} else if (url.hostname == 'youtu.be') {
+							const vidId = url.pathname.slice(1);
+
 							if (vidId.length == 11)
-								return 'https://youtube.com/watch?v=' + vidId;
-							else return false;
+								return vidId;
+							else
+								return false;
 						} else return false;
-					} else return false;
+					}
+
+					return false;
 				}
 
 				const handleProgress = (chunkLength, downloaded, total) => {
@@ -447,32 +481,39 @@ module.exports = {
 					} catch (err) {}
 				}
 
+				const handleEnd = (path, json) => {
+					process.stdout.write('\n');
+
+					fs.exists(path, exists => {
+						if (exists) {
+							fileHandler.searchSystem(fs, os, utils, settings).then(() => {
+								sendData({success: true, fileName: json.fileName + '.mp3', jsonUpdated: true});
+							}).catch(err => {
+								sendData({success: true, fileName: json.fileName, jsonUpdated: false});
+							});
+						} else sendError("File does not exist. This is a weird problem... You should investigate.");
+					});
+				}
+
 				const handleVideo = (json, ffmpeg) => {
 					const path = os.homedir() + '/Videos/' + json.fileName + '.mp4';
 					const video = ytdl(json.url, { filter: function(format) { return format.container === 'mp4'; } });
 
 					video.pipe(fs.createWriteStream(path));
 					video.on('progress', handleProgress);
+					video.on('error', sendError);
 					video.on('end', () => {
-						process.stdout.write('\n');
-
-						fs.exists(path, exists => {
-							if (exists) {
-								fileHandler.searchSystem(fs, os, utils, settings).then(() => {
-									sendData({success: true, fileName: json.fileName + '.mp4', jsonUpdated: true});
-								}).catch(err => sendData({success: true, fileName: json.fileName, jsonUpdated: false}));
-							} else sendError("File does not exist. This is a weird problem... You should investigate.");
-						});
+						handleEnd(path, json);
 					});
 				}
 
 				const handleAudio = (json, ffmpeg) => {
 					const path = os.homedir() + '/Music/' + json.fileName + '.mp3';
 					const args = {
-						bitrate: 128,
-						format: 'mp3',
+						duration: json.endTime,
 						seek: json.startTime,
-						duration: json.endTime
+						format: 'mp3',
+						bitrate: 128,
 					}
 
 					const reader = ytdl(json.url, {filter: 'audioonly'});
@@ -483,20 +524,12 @@ module.exports = {
 
 					reader.on('progress', handleProgress);
 					reader.on('end', () => {
-						process.stdout.write('\n');
-
-						fs.exists(path, exists => {
-							if (exists) {
-								fileHandler.searchSystem(fs, os, utils, settings).then(() => {
-									sendData({success: true, fileName: json.fileName + '.mp3', jsonUpdated: true});
-								}).catch(err => {
-									sendData({success: true, fileName: json.fileName, jsonUpdated: false});
-								});
-							} else sendError("File does not exist. This is a weird problem... You should investigate.");
+						writer.on('end', () => {
+							handleEnd(path, json);
 						});
 					});
 
-					reader.on('error', err => {sendError(err)});
+					reader.on('error', sendError);
 					writer.output(path).run();
 				}
 
@@ -514,10 +547,10 @@ module.exports = {
 						json.fileName = json.fileName.replace(/[/\\?%*:|"<>]/g, '');
 
 						const options = {};
-						const checkUrl = urlOk(json.url);
+						const vidId = urlOk(json.url);
 
-						if (urlOk(json.url))
-							json.url = checkUrl;
+						if (vidId !== false)
+							json.url = vidId;
 						else {
 							sendError('Invalid url');
 							return;

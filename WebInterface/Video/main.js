@@ -316,7 +316,7 @@ function togglePlayState() {
 	}
 }
 
-function playVid(title, notQueueTop) {
+function playVid(title = '', notQueueTop) {
 	video.src = '/video/' + title;
 	video.play();
 

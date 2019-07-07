@@ -5,7 +5,7 @@ let maxTries = 10;
 const children = [];
 const minUpime = 1000; // 1 second
 let autoRestart = true;
-const {fork} = require('child_process');
+const { fork } = require('child_process');
 
 String.prototype.split = function(index) {
 	return [this.substring(0, index), this.substring(index)];
@@ -89,6 +89,8 @@ function start() {
 					specialLog("\x1b[33mTried too many times to restart. Exiting!\x1b[0m");
 					process.exit(1);
 				}
+			} else {
+				process.exit(0);
 			}
 		}
 	});

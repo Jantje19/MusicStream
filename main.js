@@ -82,9 +82,10 @@ const loadPlugins = () => {
 			});
 		}
 
-		utils.colorLog('Loading plugins...', 'bgGreen');
 		getPlugins().then(plugins => {
 			if (plugins) {
+				utils.colorLog('Loading plugins...', 'bgGreen');
+
 				// Loop through every plugin and handle the functions
 				plugins.forEach((object, key) => {
 					if (!object.notfound) {
@@ -150,7 +151,10 @@ const loadPlugins = () => {
 				});
 
 				resolve();
-			} else resolve();
+			} else {
+				utils.colorLog('No plugins found. Starting server...', 'bgGreen');
+				resolve();
+			}
 		}).catch(err => {
 			reject(err);
 		});
@@ -242,7 +246,8 @@ const utils = {
 			if (exists) {
 				if (utils.getFileExtention(path) == '.html') {
 					fs.readFile(path, 'utf-8', (err, data) => {
-						if (err) response.status(500).send('Error: 500. An error occured: ' + err);
+						if (err)
+							response.status(500).send('Error: 500. An error occured: ' + err);
 						else {
 							for (key in settings)
 								data = data.replace(new RegExp(`\{\{${key}\}\}`, 'g'), settings[key].val);
@@ -535,7 +540,14 @@ console.err = (...args) => console.error("\x1b[31m", ...args, "\x1b[0m");
 console.wrn = (...args) => console.warn("\x1b[33m", ...args, "\x1b[0m");
 
 // Check args
-if (process.argv.includes('check-updates')) {
+if (process.argv.includes('-h') || process.argv.includes('--help') || process.argv.includes('help')) {
+	console.log('Available commands:');
+	console.log('');
+	console.log("'check-updates':\tChecks for updates against GitHub");
+	console.log("'update-json':\t\tUpdate the audio/video library");
+	console.log("'rename-file':\t\t(Not tested well!) Rename a file and all occurences in the MusicStream 'databases'");
+	process.exit(1);
+} else if (process.argv.includes('check-updates')) {
 	utils.newVersionAvailable(version).then(newVersion => {
 		if (newVersion.greater)
 			utils.colorLog(`[[fgGreen, No update available.]] Running version: ${newVersion.version}. But this version is greater than the version of latest release on GitHub (${newVersion.githubVersion}), Maybe you want to get the code from GitHub: [[fgYellow, ${newVersion.url}]]. Don't forget to update the settings file!`, 'fgOrange');
