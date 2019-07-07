@@ -1,7 +1,6 @@
 const queue = [];
 let queueIndex = 0;
 let previousTrack;
-let previousArtist;
 
 function enqueue(...vals) {
 	if (Array.isArray(vals[0]))
@@ -263,58 +262,6 @@ function mediaSession() {
 		artist = match.splice(0, 1)[0].trim();
 		title = match.join('-').trim();
 
-		if (previousArtist != artist) {
-			fetchArtistData(artist).then(json => {
-				if (!tagsLoaded) {
-					previousArtist = artist;
-
-					try {document.getElementById('artistInfo').remove()} catch(err) {}
-
-					const dataDiv = document.createElement('div');
-
-					dataDiv.id = 'artistInfo';
-					dataDiv.innerHTML += `<p style="font-size: 120%;">Artist info:</p><hr>`;
-					dataDiv.innerHTML += `<p><b>Name:</b> <a href="${json.url}">${json.name}</a></p>`;
-					dataDiv.innerHTML += `<p><b>On tour:</b> ${(json.ontour == 1) ? true : false}</p>`;
-					dataDiv.innerHTML += `<p><b>Playcount:</b> ${json.stats.playcount}</p>`;
-					dataDiv.innerHTML += `<p><b>Listeners:</b> ${json.stats.listeners}</p>`;
-					dataDiv.innerHTML += `<p><b>Tags:</b> ${json.tags.tag.map(obj => {return obj.name})}</p>`;
-
-					if (window.innerWidth > 500) {
-						const img = document.createElement('img');
-						img.style.top = '60px';
-						img.style.right = '20px';
-						img.style.position = 'absolute';
-						img.style.border = '2px white solid';
-						img.style.boxShadow = '0 0 10px rgba(0, 0, 0, 0.3)';
-						img.src = json.image[1]['#text'];
-						dataDiv.appendChild(img);
-					}
-
-					document.getElementById('mainControls').appendChild(dataDiv);
-					document.getElementById('showData').setAttribute('activated', true);
-
-					// Edit thumbnail
-					if (json.image && 'mediaSession' in navigator) {
-						navigator.mediaSession.metadata = new MediaMetadata({
-							title: title,
-							artist: artist,
-							artwork: [
-							{ src: json.image[0]['#text'], sizes: '34x32', type: 'image/png' },
-							{ src: json.image[1]['#text'], sizes: '64x64', type: 'image/png' },
-							{ src: json.image[2]['#text'], sizes: '174x174', type: 'image/png' },
-							{ src: json.image[3]['#text'], sizes: '300x300', type: 'image/png' },
-							{ src: json.image[4]['#text'], sizes: '500x498', type: 'image/png' },
-							{ src: json.image[5]['#text'], sizes: '126x126', type: 'image/png' }
-							]
-						});
-					}
-				}
-			}).catch(err => {
-				console.warn(err);
-			});
-		}
-
 		get('/songInfo/' + queue[queueIndex]).then(json => {
 			if (json.error) return;
 			try {document.getElementById('artistInfo').remove()} catch(err) {}
@@ -416,20 +363,6 @@ function mediaSession() {
 		  audio.currentTime = Math.min(audio.currentTime + skipTime, audio.duration);
 		});
 	}
-}
-
-function fetchArtistData(artistName) {
-	artistName = escape(artistName);
-	const url = `https://ws.audioscrobbler.com/2.0/?method=artist.getinfo&artist=${artistName}&api_key=f02456f630621a02581b2143a67372f0&format=json&autocorrect=1`;
-	// const url = `https://ws.audioscrobbler.com/2.0/?method=track.getInfo&api_key=f02456f630621a02581b2143a67372f0&artist=${artistName}&track=${songName}&format=json&autocorrect=1`;
-
-	return new Promise((resolve, reject) => {
-		get(url).then(json => {
-			if (json.artist) resolve(json.artist);
-			else if (json.error) reject(json.message);
-			else reject('Something went wrong with the JSON');
-		}).catch(err => reject(err));
-	});
 }
 
 function deleteCookie() {

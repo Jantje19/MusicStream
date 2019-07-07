@@ -1,10 +1,6 @@
 # MusicStream
 A NodeJS server and web client for streaming music (and videos) to your network
 
-![Mock-up](https://testsite-vic.000webhostapp.com/Gallery/Assets/Mockup.png)
-
-[*More Images*](http://testsite-vic.ml/Gallery/)
-
 ## Installation
 ### Installer
 
@@ -27,7 +23,7 @@ Otherwise move into the folder of your platform and execute one of the files wit
 If both of these methods fail, run `npm start` in the *MusicaStream* directory in a CLI.
 
 ## Updating
-By default MusicStream will check for if there is a new version available (This can be turned off in the settings). It will only notify, not update.
+By default MusicStream will check if there is a new version available (This can be turned off in the settings). It will only notify, not update.
 In future there will be a automated update function included with MusicStream, but in the meantime you can use the [installer](https://github.com/jantje19/MusicStream-Installer/) or update manually.
 
 ### Manual updating

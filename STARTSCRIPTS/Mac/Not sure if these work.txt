@@ -1,1 +1,0 @@
-I can't create and test start scripts on this OS, because I don't have access to a mac
