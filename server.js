@@ -15,6 +15,19 @@ module.exports = {
 			const certificate = fs.readFileSync(httpsSupport.cert);
 			const credentials = {key: privateKey, cert: certificate};
 
+			if ('HSTS' in httpsSupport) {
+				const hstsValue = httpsSupport.HSTS;
+				if (hstsValue !== false) {
+					const maxAge = ((typeof(hstsValue) === typeof(true)) ? 31536000 : hstsValue);
+					const headerValue = `max-age=${maxAge}; includeSubDomains; preload`;
+
+					app.use((request, response, next) => {
+						response.setHeader('Strict-Transport-Security', ((typeof(hstsValue) === typeof('')) ? hstsValue : headerValue));
+						next();
+					});
+				}
+			}
+
 			httpsServer = https.createServer(credentials, app);
 		}
 		//
@@ -23,22 +36,18 @@ module.exports = {
 		const ips = utils.getLocalIP(os);
 
 		app.use(compression());
-		// Needed for the manifest.json
-		app.use((request, response, next) => {
-			if (request.url.endsWith('manifest.json')) {
-				fs.readFile(dirname + request.url, 'utf-8', (err, data) => {
-					if (err)
-						next();
-					else {
-						response.setHeader('Content-Type', 'application/json');
-						response.send(data.replace('[[STARTURL]]', settings.url.val));
-					}
-				});
-			} else {
-				next();
-			}
-		});
 		app.use(express.static(dirname));
+
+		app.get('*manifest.json*', (request, response) => {
+			fs.readFile(dirname + 'Assets/Icons/manifest.json', 'utf-8', (err, data) => {
+				if (err)
+					response.status(500).send('Server error');
+				else {
+					response.setHeader('Content-Type', 'application/json');
+					response.send(data.replace('[[STARTURL]]', settings.url.val));
+				}
+			});
+		});
 
 		app.get('*favicon.ico*', (request, response) => {
 			utils.sendFile(fs, dirname + 'Assets/Icons/favicon.ico', response);
