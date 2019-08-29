@@ -84,5 +84,10 @@ module.exports = {
 		"type": "choise",
 		"options": ["default", "newest", "oldest"],
 		"desc": "The default sorting of songs in the audio player."
+	},
+	"url": {
+		"val": "http://localhost:8000",
+		"type": "string",
+		"desc": "If you have a URL linked to your MusicStream server, fill it in here, so that the manifest.json can be set up correctly. Should be same origin as document (eg. http://localhost:8000)."
 	}
 }
