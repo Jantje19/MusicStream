@@ -14,9 +14,17 @@ function load() {
 		response.json().then(json => {
 			if (!json.error) {
 				const keys = Object.keys(json.video.videos);
-				const addVideosToDiv = (arr, div) => {
+				const addVideosToDiv = (arr, containerElem, section) => {
 					arr.forEach((object, key) => {
-						div.innerHTML += `<button onclick="vidClick(event, '${object.replace(/\'/g, '\\\'')}')" draggable="true" ondragstart="drag(event)" class="video ${key}" id="${key}">${object}</button><hr>`;
+						const buttonElem = document.createElement('button');
+
+						buttonElem.addEventListener('click', evt => vidClick(evt, object));
+						buttonElem.classList.add('video', escape(section), key);
+						buttonElem.addEventListener('dragstart', drag);
+						buttonElem.setAttribute('draggable', true);
+						buttonElem.innerText = object;
+
+						containerElem.appendChild(buttonElem);
 					});
 				}
 
@@ -61,8 +69,8 @@ function load() {
 				videosElem.innerHTML = '';
 				if (keys.length > 1) {
 					keys.forEach((object, key) => {
-						const containerDiv = document.createElement('div');
 						const titleButton = document.createElement('button');
+						const containerDiv = document.createElement('div');
 						const videoDiv = document.createElement('div');
 
 						titleButton.innerHTML = `<span>${object}</span><div><button title="Add all to queue"><img src="/Assets/ic_playlist_add_white.svg"></button><img class="toggleArrow" src="/Assets/ic_keyboard_arrow_up_white.svg"></div>`;
@@ -79,7 +87,7 @@ function load() {
 							}
 						}
 
-						addVideosToDiv(json.video.videos[object], videoDiv);
+						addVideosToDiv(json.video.videos[object], videoDiv, object);
 						containerDiv.appendChild(titleButton);
 						containerDiv.appendChild(videoDiv);
 						videosElem.appendChild(containerDiv);

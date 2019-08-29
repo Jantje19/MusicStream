@@ -20,6 +20,7 @@ module.exports = {
 		const videosObj = {};
 		const subtitlesArr = [];
 		const playlistsArr = [];
+		const foundFileNames = [];
 
 		const audioFileExtensions = settings.audioFileExtensions.val;
 		const videoFileExtensions = settings.videoFileExtensions.val;
@@ -59,7 +60,7 @@ module.exports = {
 						}
 					};
 
-					fs.writeFile(__dirname + '/JSON.json', JSON.stringify(jsonFileArr), err => {
+					fs.writeFile(__dirname + '/JSON.json', JSON.stringify(jsonFileArr, 2), err => {
 						if (err) reject(err);
 						else {
 							utils.colorLog(utils.logDate() + ' [[fgBlue, SEARCHSYSTEM:]] Updated the Json file');
@@ -104,30 +105,40 @@ module.exports = {
 
 								// Loop through all the files
 								files.forEach((object, key) => {
-									if (object.toLowerCase() != 'desktop.ini') {
-										const fileExtention = utils.getFileExtention(object.toLowerCase());
+									if (object.toLowerCase() !== 'desktop.ini') {
+										// Check if file has same name
+										if (!foundFileNames.includes(object)) {
+											const fileExtention = utils.getFileExtention(object.toLowerCase());
 
-										fs.stat(path + object, (err, stats) => {
-											const mtime = new Date(stats.mtime.toString());
+											fs.stat(path + object, (err, stats) => {
+												const mtime = new Date(stats.mtime.toString());
 
-											// Check if the file has a file extension that is in the arrays in index.js or that it is a playlist
-											// If it is a file just execute this function again
-											if (audioFileExtensions.includes(fileExtention))
-												songsArr.push({path: path, fileName: object, lastChanged: mtime});
-											else if (videoFileExtensions.includes(fileExtention))
-												addToVidArr(path, object, mtime);
-											else if (fileExtention == '.m3u')
-												playlistsArr.push({path: path, fileName: object, lastChanged: mtime});
-											else if (fileExtention == '.vtt')
-												subtitlesArr.push({path: path, fileName: object});
-											else if (!fileExtention && fs.lstatSync(path + object).isDirectory())
-												handleFolders(path + object + '/', utils);
-											else if (fileExtention && !silent)
-												console.wrn('File extention not supported', object);
-											else if (fileExtention && silent);
-											else
-												console.wrn('Something is weird...', 'FILENAME:' + object, 'EXTENSION:' + fileExtention);
-										});
+												// Check if the file has a file extension that is in the arrays in index.js or that it is a playlist
+												// If it is a file just execute this function again
+												if (audioFileExtensions.includes(fileExtention)) {
+													songsArr.push({path: path, fileName: object, lastChanged: mtime});
+													foundFileNames.push(object);
+												} else if (videoFileExtensions.includes(fileExtention)) {
+													addToVidArr(path, object, mtime);
+													foundFileNames.push(object)
+												} else if (fileExtention == '.m3u') {
+													playlistsArr.push({path: path, fileName: object, lastChanged: mtime});
+													foundFileNames.push(object);
+												} else if (fileExtention == '.vtt') {
+													subtitlesArr.push({path: path, fileName: object});
+													foundFileNames.push(object);
+												} else if (!fileExtention && fs.lstatSync(path + object).isDirectory()) {
+													handleFolders(path + object + '/', utils);
+												} else if (fileExtention && !silent) {
+													console.wrn('File extention not supported', object);
+												} else if (fileExtention && silent) {
+												} else {
+													console.wrn('Something is weird...', 'FILENAME:' + object, 'EXTENSION:' + fileExtention);
+												}
+											});
+										} else {
+											console.wrn(`There are files with the same name: '${object}'`);
+										}
 									}
 								});
 
@@ -202,8 +213,12 @@ module.exports = {
 							data = JSON.parse(data);
 
 							if (body.delete == true) {
-								delete data[body.name];
-								write(data, true);
+								if (body.name in data) {
+									delete data[body.name];
+									write(data, true);
+								} else {
+									reject({success: false, error: `'${body.name}' not found in 'playlists.json'`})
+								}
 							} else {
 								if (body.name in data) {
 									data[body.name] = body.songs;

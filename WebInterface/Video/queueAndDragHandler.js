@@ -43,13 +43,25 @@ function updateQueue(newQueue, startPlaying) {
 	const queueElem = document.getElementById('queue');
 
 	if (Array.isArray(newQueue)) {
+		const containerElem = queueElem.cloneNode();
+
 		queueElem.innerHTML = '';
 		newQueue.forEach((object, key) => {
-			if (key == queueIndex - 1)
-				queueElem.innerHTML += `<button style="background-color: #12876f; color: white;" onclick="queueClick(event)" draggable="true" ondragstart="drag(event)" class="queueItem ${key}" id="newId-${key}">${object}</button>`;
-			else
-				queueElem.innerHTML += `<button onclick="queueClick(event)" draggable="true" ondragstart="drag(event)" class="queueItem ${key}" id="newId-${key}">${object}</button>`;
+			const buttonElem = document.createElement('button');
+
+			buttonElem.addEventListener('click', queueClick);
+			buttonElem.classList.add('queueItem', key);
+			buttonElem.id = 'newId-' + key;
+			buttonElem.innerText = object;
+
+			if (key == queueIndex - 1) {
+				buttonElem.style.backgroundColor = '#12876f';
+				buttonElem.style.color = 'white';
+			}
+
+			containerElem.appendChild(buttonElem);
 		});
+		queueElem.replaceWith(containerElem);
 	}
 
 	if (startPlaying)
@@ -61,7 +73,7 @@ function allowDrop(evt) {
 }
 
 function drag(evt) {
-	evt.dataTransfer.setData("text", evt.target.id);
+	evt.dataTransfer.setData('classlist', evt.target.classList.toString());
 }
 
 function drop(evt) {
@@ -75,12 +87,18 @@ function drop(evt) {
 		}
 	}
 
-	const data = evt.dataTransfer.getData("text");
-	const nodeCopy = document.getElementById(data).cloneNode(true);
-	nodeCopy.id = "newId-" + data;
-	nodeCopy.onclick = queueClick;
-	nodeCopy.className = nodeCopy.className.replace('video', 'queueItem');
-	target.appendChild(nodeCopy);
+	const dragElemClass = evt.dataTransfer.getData('classlist');
+	const origElem = document.getElementsByClassName(dragElemClass)[0];
+	const newElem = document.createElement('button');
+
+	newElem.className = newElem.className.replace('video', 'queueItem');
+	newElem.id = "newId-" + getQueue().length;
+	newElem.innerText = origElem.innerText;
+	newElem.title = origElem.innerText;
+	newElem.classList.add('queueItem');
+	newElem.onclick = queueClick;
+
+	target.appendChild(newElem);
 }
 
 function queueClick(evt) {

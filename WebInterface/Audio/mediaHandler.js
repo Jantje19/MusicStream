@@ -103,9 +103,14 @@ function playSong(songName, notAddToQueue) {
 
 function startSong() {
 	document.getElementById('toggleBtn').querySelector('img').src = 'Assets/ic_play_arrow_white.svg';
-	try {document.getElementById('songName').innerText = queue[queueIndex].replace(/(\.\w{2,5})$/, '');} catch (err) {}
-	try {document.getElementById('lyricsElem').innerHTML = `<h3>Loading</h3><br><div class="ball-scale-multiple"><div></div><div></div><div></div></div>`;} catch (err) {}
 	document.getElementById('showData').setAttribute('activated', false);
+
+	try {
+		document.getElementById('songName').innerText = queue[queueIndex].replace(/(\.\w{2,5})$/, '');
+	} catch (err) {}
+	try {
+		document.getElementById('lyricsElem').innerHTML = `<h3>Loading</h3><br><div class="ball-scale-multiple"><div></div><div></div><div></div></div>`;
+	} catch (err) {}
 
 	const audioPlayReturnVal = audio.play();
 	if (audioPlayReturnVal) {
@@ -151,24 +156,38 @@ function updateInterface() {
 	const elem = document.getElementById('queue');
 
 	if (queue.length > 0) {
-		elem.innerHTML = '';
 		document.getElementById('queueCount').innerText = "Amount: " + queue.length;
+		elem.innerHTML = '';
+
+		const containerElem = elem.cloneNode();
 		queue.forEach((object, key) => {
-			if (key == queueIndex)
-				elem.innerHTML += `<button title="${object}" onclick="queueClick(event, '${key}')" active><span>${key + 1}</span><span>${object}</button></div><hr>`;
-			else
-				elem.innerHTML += `<button title="${object}" onclick="queueClick(event, '${key}')"><span>${key + 1}</span><span>${object}</button></div><hr>`;
+			const buttonElem = document.createElement('button');
+			const spanElem = document.createElement('span');
+
+			buttonElem.addEventListener('click', evt => queueClick(evt, key));
+			buttonElem.innerText = object;
+
+			spanElem.innerText = key + 1;
+
+			buttonElem.appendChild(spanElem);
+			buttonElem.title = object;
+
+			if (key === queueIndex)
+				buttonElem.setAttribute('active', '');
+
+			containerElem.appendChild(buttonElem);
 		});
+
+		elem.replaceWith(containerElem);
 	} else elem.innerHTML = '<i>Queue is empty</i><button class="tmpBtn" onclick="getTmpSavedQueue(\'ip\', true)">Get temporary saved IP-based queue</button><button class="tmpBtn" onclick="getTmpSavedQueue(\'global\', true)">Get temporary saved global queue</button>';
 
 	if (audio.src != '' && audio.src != undefined) {
-		if (audio.paused == true) {
+		if (audio.paused == true)
 			document.getElementById('toggleBtn').querySelector('img').src = 'Assets/ic_play_arrow_white.svg';
-		} else if (audio.paused == false) {
+		else if (audio.paused == false)
 			document.getElementById('toggleBtn').querySelector('img').src = 'Assets/ic_pause_white.svg';
-		} else {
+		else
 			console.error('WUT?');
-		}
 	}
 }
 
@@ -190,6 +209,7 @@ function displayLyrics(artist, songName) {
 
 	if (!lyricsElem) {
 		lyricsElem = document.createElement('div');
+
 		lyricsElem.id = 'lyricsElem';
 		lyricsElem.innerHTML = `<h3>Loading</h3><br><div class="ball-scale-multiple"><div></div><div></div><div></div></div>`;
 
@@ -347,20 +367,13 @@ function mediaSession() {
 				else pauseSong();
 			} else playSong(null, true);
 		});
-		// navigator.mediaSession.setActionHandler('seekforward', function() {  Code excerpted.  });
-		// navigator.mediaSession.setActionHandler('seekbackward', evt => {playSong(null, true)});
-
-
-		let skipTime = 10; // Time to skip in seconds
 
 		navigator.mediaSession.setActionHandler('seekbackward', function() {
-		  // User clicked "Seek Backward" media notification icon.
-		  audio.currentTime = Math.max(audio.currentTime - skipTime, 0);
+			audio.currentTime -= 5;
 		});
 
 		navigator.mediaSession.setActionHandler('seekforward', function() {
-		  // User clicked "Seek Forward" media notification icon.
-		  audio.currentTime = Math.min(audio.currentTime + skipTime, audio.duration);
+			audio.currentTime += 5;
 		});
 	}
 }

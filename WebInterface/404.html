@@ -2,164 +2,41 @@
 <html>
 <head>
 
-	<title>Error 404</title>
+	<title>MusicStream - 404</title>
 
 	<style type="text/css">
-	body {
-		margin: 0;
-		overflow: hidden;
-		font-family: 'Arial', sans-serif;
-	}
-
-	main {
-		top: 0;
-		left: 0;
-		z-index: 10;
-		width: 100%;
-		height: 100%;
-		position: absolute;
-
-		display: flex;
-		align-items: center;
-		justify-content: center;
-	}
-
-	main > div {
-		width: 40vw;
-		height: auto;
-		padding: 5% 10%;
-		text-align: center;
-		border-radius: 20px;
-		background-color: rgba(255, 255, 255, 0.5);
-	}
-
-	main #stopBtnContainer {
-		top: 10px;
-		left: 15%;
-		width: 70%;
-		padding: 0;
-		display: none;
-		position: absolute;
-	}
-
-	main #stopBtnContainer button {
-		width: 100%;
-		height: 100%;
-		border: none;
-		padding: 5% 10%;
-		cursor: pointer;
-		background-color: transparent;
-	}
-</style>
-
-<script type="text/javascript" src="https://jantje19.github.io/SideProjects/Canvas/canvas.js"></script>
-<script type="text/javascript">
-	let bgCol;
-	const particles = [];
-	const colors = ['#69D2E7', '#A7DBD8', '#F38630', '#FA6900', '#FF4E50', '#F9D423'];
-
-		// Audio
-		const audio = new Audio('http://www.orangefreesounds.com/wp-content/uploads/2016/10/Elevator-music.mp3');
-		audio.loop = true;
-		audio.play();
-
-		function setup() {
-			bgCol = Global.Color.random().opacity(.5).toString();
-
-			canvas = new Canvas(document.getElementsByTagName('canvas')[0], 'auto', 'auto');
-			canvas.background(bgCol);
-
-			// For audio
-			setTimeout(() => {
-				document.getElementById('stopBtnContainer').style.display = 'block';
-
-				document.getElementById('stopBtn').addEventListener('click', evt => {
-					audio.pause();
-					evt.target.parentElement.style.display = 'none';
-				});
-			}, (audio.duration * 2 - 100) * 1000);
-
-			// For plugins
-			try {
-				loaded();
-			} catch (err) {}
+		* {
+			font-family: 'Segoe UI', 'San Francisco', 'Lucida Grande', 'Ubuntu', 'Arial', sans-serif;
 		}
 
-		function draw() {
-			canvas.background(bgCol);
-
-			if (frameCount % 100 == 0) {
-				let range = canvas.width / 5;
-				let spot = pickRandomSpotIn2DSpace(range, range, canvas.width - range, canvas.height - range);
-
-				for (let i = 0; i < 100; i++) {
-					particles.push(new Particle(spot.x, spot.y, colors[Math.floor(Math.random() * colors.length)], Math.random() * 300));
-				}
-			}
-
-			for (let i = 0; i < particles.length; i++) {
-				const object = particles[i];
-
-				if (object.life <= 0) {
-					particles.splice(i, 0);
-					continue;
-				}
-
-				object.update();
-				object.show();
-			}
+		body {
+			top: 0;
+			left: 0;
+			margin: 0;
+			width: 100%;
+			height: 100%;
+			display: flex;
+			position: absolute;
+			align-items: center;
+			justify-content: center;
+			background-color: #16a085;
 		}
 
-		function generateBgCol() {
-			bgCol = Global.Color.random().opacity(.5).toString();
-			return bgCol;
+		main {
+			padding: 20px 40px;
+			background-color: white;
+			box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
 		}
-
-		function pickRandomSpotIn2DSpace(startX, startY, endX, endY) {
-			return {
-				x: Math.randomBetween(startX, endX),
-				y: Math.randomBetween(startY, endY)
-			}
-		}
-
-		class Particle {
-			constructor(x, y, color, life) {
-				this.r = 5;
-				this.life = life;
-				this.color = color;
-				this.pos = new Vector(x, y);
-				this.vel = Global.Vector.random2D().mult(Math.random() * 5);
-			}
-
-			update() {
-				this.life--;
-				this.pos.add(this.vel);
-			}
-
-			show() {
-				canvas.circle(this.pos.x, this.pos.y, this.r, this.color, true);
-			}
-		}
-	</script>
+	</style>
 
 </head>
 <body>
 
-	<canvas></canvas>
-
 	<main>
-		<div>
-			<h1>Error 404. Page not found.</h1>
-			<p>
-				This page doesn't exist (yet) or has been moved...
-				<br>
-				Please enjoy the elevator music and fireworks to pass the time.
-			</p>
-		</div>
-
-		<div id="stopBtnContainer">
-			<button id="stopBtn">Ahh. Please let it stop.</button>
-		</div>
+		<h1>Error 404.<br>Page not found.</h1>
+		<p>
+			This page doesn't exist (yet) or has been moved...
+		</p>
 	</main>
 
 </body>

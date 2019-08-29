@@ -223,6 +223,7 @@ function getTmpSavedQueue(type, autoHandleResponse) {
 		getTmpSaveQueue(type).then(data => {
 			document.getElementById('queue').innerHTML = '';
 			queueIndex = data.queueIndex;
+			audio.src = '/song/' + data.queue[data.queueIndex];
 			enqueue(data.queue);
 			updateInterface();
 			audio.currentTime = data.timeStamp;
@@ -355,9 +356,19 @@ function updateSongInterface(json, songsElem, playlistsElem) {
 		checkCookies(json.songs);
 		document.getElementById('songCount').innerText = "Amount: " + json.songs.length;
 		songsElem.innerHTML = '';
+
+		const containerElem = songsElem.cloneNode();
 		json.songs.forEach((object, key) => {
-			songsElem.innerHTML += `<button title="${object}" class="song ${key}" onclick="songClick(event)">${object}</button><hr>`;
+			const buttonElem = document.createElement('button');
+
+			buttonElem.addEventListener('click', songClick);
+			buttonElem.classList.add('song', key);
+			buttonElem.innerText = object;
+			buttonElem.title = object;
+
+			containerElem.appendChild(buttonElem);
 		});
+		songsElem.replaceWith(containerElem);
 
 		updateInterface();
 	} else songsElem.innerHTML = '<i>No songs found</i>';
@@ -365,9 +376,20 @@ function updateSongInterface(json, songsElem, playlistsElem) {
 	if (playlistsElem) {
 		if (json.playlists.length > 0) {
 			document.getElementById('playlistCount').innerText = "Amount: " + json.playlists.length;
+			const containerElem = playlistsElem.cloneNode();
+
 			json.playlists.forEach((object, key) => {
-				playlistsElem.innerHTML += `<button title="${object}" class="listElem ${key}" onclick="handlePlaylist(event, '${object}')">${object}</button><hr>`;
+				const buttonElem = document.createElement('button');
+
+				buttonElem.addEventListener('click', evt => handlePlaylist(evt, object));
+				buttonElem.classList.add('listElem', key);
+				buttonElem.innerText = object;
+				buttonElem.title = object;
+
+				containerElem.appendChild(buttonElem);
 			});
+
+			playlistsElem.replaceWith(containerElem);
 		} else playlistsElem.innerHTML = '<i>No playlists found</i>';
 	}
 }
@@ -379,16 +401,23 @@ function load() {
 	const songsElem = document.getElementById('songs');
 	const sortElem = document.getElementById('sort');
 
+	if (!navigator.onLine) {
+		const btn = document.querySelector('#overflowMenuHolder > button');
+
+		btn.style.opacity = 0.5;
+		btn.disabled = true;
+	}
+
 	document.getElementById('toggleBtn').addEventListener('click', evt => {
 		if (queue.length > 0) {
 			if (audio.paused == true) {
 				if (audio.src != '' && audio.src != undefined) {
 					if (audio.paused == true) {
 						audio.play();
-						document.getElementById('toggleBtn').querySelector('img').src = 'Assets/ic_play_arrow_white.svg';
+						document.getElementById('toggleBtn').querySelector('img').src = '/Assets/ic_play_arrow_white.svg';
 					} else if (audio.paused == false) {
 						audio.pause();
-						document.getElementById('toggleBtn').querySelector('img').src = 'Assets/ic_pause_white.svg';
+						document.getElementById('toggleBtn').querySelector('img').src = '/Assets/ic_pause_white.svg';
 					} else {
 						console.error('WUT?');
 					}
@@ -497,11 +526,11 @@ function load() {
 		playlistsElem.innerHTML = '';
 
 		songArr.forEach((object, key) => {
-			songsElem.innerHTML += `<button class="song ${key}" onclick="songClick(event)">${object}</button><hr>`;
+			songsElem.innerHTML += `<button class="song ${key}" onclick="songClick(event)">${object}</button>`;
 		});
 
 		playlistArr.forEach((object, key) => {
-			playlistsElem.innerHTML += `<button class="listElem ${key}" onclick="handlePlaylist(event, '${object}')">${object}</button><hr>`;
+			playlistsElem.innerHTML += `<button class="listElem ${key}" onclick="handlePlaylist(event, '${object}')">${object}</button>`;
 		});
 
 		document.getElementById('songCount').innerText = "Amount: " + songArr.length;

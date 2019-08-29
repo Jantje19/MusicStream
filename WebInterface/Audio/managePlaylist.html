@@ -70,11 +70,20 @@
 
 		function updateInterface() {
 			const playlistElem = document.getElementById('playlist');
+			const containerElem = playlistElem.cloneNode();
 
 			playlistElem.innerHTML = '';
 			playlist.forEach((object, key) => {
-				playlistElem.innerHTML += `<button title="${object}" class="listElem ${key}" onclick="handlePlaylist('${key}')">${object}</button><hr>`;
+				const buttonElem = document.createElement('button');
+
+				buttonElem.addEventListener('click', evt => handlePlaylist(key));
+				buttonElem.classList.add('listElem', key);
+				buttonElem.innerText = object;
+				buttonElem.title = object;
+
+				containerElem.appendChild(buttonElem);
 			});
+			playlistElem.replaceWith(containerElem);
 		}
 
 		function load() {
@@ -91,16 +100,35 @@
 				if (json.playlists.includes(playlistName)) {
 					getData('/playlist/' + playlistName).then(data => {
 						const playlistElem = document.getElementById('playlist');
+						const playlistContainerElem = playlistElem.cloneNode();
+						const songsContainerElem = songsElem.cloneNode();
 
 						playlist = data.songs;
 						data.songs.forEach((object, key) => {
-							playlistElem.innerHTML += `<button title="${object}" class="listElem ${key}" onclick="handlePlaylist('${key}')">${object}</button><hr>`;
+							const buttonElem = document.createElement('button');
+
+							buttonElem.addEventListener('click', evt => handlePlaylist(key));
+							buttonElem.classList.add('listElem', key);
+							buttonElem.innerText = object;
+							buttonElem.title = object;
+
+							playlistContainerElem.appendChild(buttonElem);
 						});
 
 						songsElem.innerHTML = '';
 						json.songs.forEach((object, key) => {
-							songsElem.innerHTML += `<button title="${object}" class="song ${key}" onclick="songClick('${escape(object)}')">${object}</button><hr>`;
+							const buttonElem = document.createElement('button');
+
+							buttonElem.addEventListener('click', evt => songClick(object));
+							buttonElem.classList.add('song', key);
+							buttonElem.innerText = object;
+							buttonElem.title = object;
+
+							songsContainerElem.appendChild(buttonElem);
 						});
+
+						playlistElem.replaceWith(playlistContainerElem);
+						songsElem.replaceWith(songsContainerElem);
 					}).catch(err => alert(err));
 				} else alert('Playlist not found');
 			}).catch(err => console.error(err));
@@ -115,7 +143,8 @@
 						fetch('/updatePlaylist/', {method: "POST", body: JSON.stringify(jsonData), credentials: 'same-origin'}).then(response => {
 							response.json().then(json => {
 								if (json.success) {
-									if (json.error) alert('Something on the server went wrong.\n' + json.info);
+									if (json.error)
+										alert('Something on the server went wrong.\n' + json.info);
 									else if (json.data.toLowerCase().startsWith('playlist with the name ')) {
 										alert(json.data);
 										window.location = '/managePlaylist.html#' + playlistName;

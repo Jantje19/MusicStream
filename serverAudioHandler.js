@@ -1,122 +1,126 @@
+/*
+*	Finds the video from the filename
+*
+*	@param {Array} playlists
+*		The fileHandler.getJSON.audio.playlists Array
+*	@param {String} fileName
+*		The playlist file name
+*	@return {Object}
+*		@param {Boolean} val
+*			Stores if the playlist was found
+*		@param {Boolean} index
+*			The index of the playlist in the array. Less than 0 if not found
+*/
+function findPlaylist(playlists, name) {
+	for (let i = 0; i < playlists.length; i++) {
+		if (playlists[i].fileName == name)
+			return {val: true, index: i};
+	}
+
+	return {val: false, index: -1};
+}
+
 module.exports = {
 	start: (app, dirname, fileHandler, fs, os, settings, utils, querystring, id3, https, URLModule, ffmpeg) => {
-		app.get('/playlist/*', (request, response) => {
-			const url = querystring.unescape(request.url);
+		app.get('/playlist/:playlist', (request, response) => {
+			if ('params' in request) {
+				if ('playlist' in request.params) {
+					const playlistName = request.params.playlist.trim();
+					const url = querystring.unescape(request.url);
 
-			console.log(utils.logDate() + ' Got a request for ' + url);
+					console.log(utils.logDate() + ' Got a request for ' + url);
 
-			if (!url.endsWith('/')) {
-				// Check if it has a file extention, otherwise read the playlists.json file
-				if (url.match(/(.+)\.(\w{2,5})/)) {
-					fileHandler.getJSON(fs, os, utils, settings).then(json => {
-						const playlistName = url.match(/(.+)\/(.+)$/)[2].trim();
-						const inArray = findPlaylist(json.audio.playlists, playlistName);
+					// Check if it has a file extention, otherwise read the playlists.json file
+					if (playlistName.match(/(.+)\.(\w{2,5})/)) {
+						fileHandler.getJSON(fs, os, utils, settings).then(json => {
+							const inArray = findPlaylist(json.audio.playlists, playlistName);
 
-						// Check if the playlist actually exists
-						if (inArray.val == true) {
-							const playlist = json.audio.playlists[inArray.index];
+							// Check if the playlist actually exists
+							if (inArray.val == true) {
+								const playlist = json.audio.playlists[inArray.index];
 
-							// Let fileHandler.js handle this
-							fileHandler.readPlayList(fs, playlist.path + playlist.fileName, json.audio.songs).then(songsArr => {
-								response.send({songs: songsArr});
-							}).catch(err => {
-								console.err('There was an error with reading the playlist', err);
-								response.send({error: 'There was an error with reading the playlist', info: err});
-							});
-						} else response.send({error: `The playlist '${playlistName}' was not found`, info: "The cached JSON file had no reference to this file"});
-					}).catch(err => {
-						console.err('There was an error with getting the JSON file', err);
-						response.send({error: "There was an error with getting the JSON file", info: err});
-					});
-				} else {
-					// If it doesn't have a file extension look for it in the playlists file
-					fs.exists('./playlists.json', exists => {
-						const parsedUrl = URLModule.parse(url);
-						let showFull = false;
+								// Let fileHandler.js handle this
+								fileHandler.readPlayList(fs, playlist.path + playlist.fileName, json.audio.songs).then(songsArr => {
+									response.send({songs: songsArr});
+								}).catch(err => {
+									console.err('There was an error with reading the playlist', err);
+									response.send({error: 'There was an error with reading the playlist', info: err});
+								});
+							} else response.send({error: `The playlist '${playlistName}' was not found`, info: "The cached JSON file had no reference to this file"});
+						}).catch(err => {
+							console.err('There was an error with getting the JSON file', err);
+							response.send({error: "There was an error with getting the JSON file", info: err});
+						});
+					} else {
+						// If it doesn't have a file extension look for it in the playlists file
+						fs.exists('./playlists.json', exists => {
+							const parsedUrl = URLModule.parse(url);
+							let showFull = false;
 
-						if (parsedUrl) {
-							if ('pathname' in parsedUrl) {
-								const name = querystring.unescape(parsedUrl.href.match(/(.+)\/(.+)/)[2]);
+							if (parsedUrl) {
+								if ('pathname' in parsedUrl) {
+									if ('query' in parsedUrl) {
+										const queryParameters = querystring.parse(parsedUrl.query);
 
-								if ('query' in parsedUrl) {
-									const queryParameters = querystring.parse(parsedUrl.query);
-
-									if ('full' in queryParameters) {
-										if (Boolean(queryParameters.full))
-											showFull = Boolean(queryParameters.full);
-									}
-								}
-
-								if (exists) {
-									fs.readFile('./playlists.json', 'utf-8', (err, data) => {
-										if (err)
-											response.send({error: 'Cannot read the file', info: err});
-										else {
-											data = JSON.parse(data);
-
-											if (name == settings.mostListenedPlaylistName.val && !showFull && name in data)
-												response.send({songs: utils.sortJSON(data[settings.mostListenedPlaylistName.val]).map(val => {return val[0]})});
-											else if (name == settings.mostListenedPlaylistName.val && showFull && name in data)
-												response.send({songs: utils.sortJSON(data[settings.mostListenedPlaylistName.val])});
-											else if (name in data)
-												response.send({songs: data[name]});
-											else
-												response.send({success: false, error: 'Playlist not found', info: 'The specified playlist wasn\'t found on the server'})
+										if ('full' in queryParameters) {
+											if (Boolean(queryParameters.full))
+												showFull = Boolean(queryParameters.full);
 										}
-									});
-								} else response.send({success: false, error: `The playlist '${name}' was not found`, info: "The 'playlists.json' file had no reference to this file"});
-							} else response.send({success: false, error: 'Non valid URL', info: 'The server couln\'t handle the URL`'})
-						} else response.send({success: false, error: 'Non valid URL', info: 'The server couln\'t handle the URL'})
-					});
-				}
+									}
 
-				/*
-				*	Finds the video from the filename
-				*
-				*	@param {Array} playlists
-				*		The fileHandler.getJSON.audio.playlists Array
-				*	@param {String} fileName
-				*		The playlist file name
-				*	@return {Object}
-				*		@param {Boolean} val
-				*			Stores if the playlist was found
-				*		@param {Boolean} index
-				*			The index of the playlist in the array. Less than 0 if not found
-				*/
-				function findPlaylist(playlists, name) {
-					for (let i = 0; i < playlists.length; i++) {
-						if (playlists[i].fileName == name)
-							return {val: true, index: i};
+									if (exists) {
+										fs.readFile('./playlists.json', 'utf-8', (err, data) => {
+											if (err)
+												response.send({success: false, error: 'Cannot read the file', info: err});
+											else {
+												data = JSON.parse(data);
+
+												if (playlistName == settings.mostListenedPlaylistName.val && !showFull && playlistName in data)
+													response.send({success: true, songs: utils.sortJSON(data[settings.mostListenedPlaylistName.val]).map(val => {return val[0]})});
+												else if (playlistName == settings.mostListenedPlaylistName.val && showFull && playlistName in data)
+													response.send({success: true, songs: utils.sortJSON(data[settings.mostListenedPlaylistName.val])});
+												else if (playlistName in data)
+													response.send({success: true, songs: data[playlistName]});
+												else
+													response.send({success: false, error: 'Playlist not found', info: 'The specified playlist wasn\'t found on the server'})
+											}
+										});
+									} else response.send({success: false, error: `The playlist '${playlistName}' was not found`, info: "The 'playlists.json' file had no reference to this file"});
+								} else response.send({success: false, error: 'Non valid URL', info: 'The server couln\'t handle the URL`'})
+							} else response.send({success: false, error: 'Non valid URL', info: 'The server couln\'t handle the URL'})
+						});
 					}
 
-					return {val: false, index: -1};
+					return;
 				}
-			} else {
-				response.send({"error": "No playlist found"});
 			}
+
+			response.send({
+				error: "No playlist found",
+				success: false,
+			});
 		});
 		//
 
-		app.get('/song/:offset', (request, response) => {
+		app.get('/song/:songName', (request, response) => {
 			const url = querystring.unescape(request.url);
 
 			console.log(utils.logDate() + ' Got a request for ' + url);
 
-			if (!url.endsWith('/')) {
-				fileHandler.getJSON(fs, os, utils, settings).then(json => {
-					const songName = url.match(/(.+)\/(.+)$/)[2].trim();
-					const inArray = findSong(json.audio.songs, songName);
+			fileHandler.getJSON(fs, os, utils, settings).then(json => {
+				const songName = request.params.songName.trim();
+				const inArray = findSong(json.audio.songs, songName);
 
-					if (inArray.val == true) {
-						const song = json.audio.songs[inArray.index];
-						const songPath = song.path + song.fileName;
+				if (inArray.val == true) {
+					const song = json.audio.songs[inArray.index];
+					const songPath = song.path + song.fileName;
 
-						response.sendFile(songPath);
-					} else response.send({error: `The song '${songName}' was not found`, info: "The cached JSON file had no reference to this file"});
-				}).catch(err => response.send({error: "There was an error with getting the song", info: err}));
-			} else {
-				response.send({error: "No song found"});
-			}
+					response.sendFile(songPath);
+				} else response.send({error: `The song '${songName}' was not found`, info: "The cached JSON file had no reference to this file"});
+			}).catch(err => {
+				console.log(err);
+				response.send({error: "There was an error with getting the song", info: err})
+			});
 
 			/*
 			*	Finds the song from the filename
@@ -226,13 +230,10 @@ module.exports = {
 			fileHandler.getJSON(fs, os, utils, settings).then(json => {
 				let html = '';
 				const settings = require('./settings.js');
-				// let html = '<script>function playSong(songName) {var elem = document.getElementById("audio"); elem.src = "/song/" + songName; elem.play()}</script><audio id="audio">YOUR BROWSER DOESN\'T SUPPORT THE AUDIO ELEMENT</audio>';
 
 				json.audio.songs.forEach((object, key) => {
-					// html += `<a onclick="playSong('${object.fileName}')" href="#">${object.fileName}</a><hr>`; // href="/song/${object.fileName}" target="_blank"
-
 					if (!settings.ignoredAudioFiles.val.includes(object.fileName))
-						html += `<a href="/song/${object.fileName}" target="_blank">${object.fileName}</a><hr>`;
+						html += `<a href="/song/${object.fileName}" target="_blank">${object.fileName}</a>`;
 				});
 
 				response.send(html);
@@ -253,20 +254,23 @@ module.exports = {
 
 			request.on('end', () => {
 				const url = querystring.unescape(request.url);
+				let json;
 
 				console.log(utils.logDate() + ' Got a POST request for ' + url);
 
 				try {
-					body = JSON.parse(body);
+					json = JSON.parse(body);
 				} catch (err) {
 					response.send({error: 'Couldn\'t parse to JSON', info: err});
 					return;
 				}
 
-				if (body.name == settings.mostListenedPlaylistName.val)
-					response.send({success: false, error: `Cannot access '${body.name}'`, info: "This file is not editable"});
-				else
-					fileHandler.updatePlaylist(fs, body, settings.mostListenedPlaylistName.val).then(data => response.send(data)).catch(err => response.send(err));
+				if (json) {
+					if (json.name == settings.mostListenedPlaylistName.val)
+						response.send({success: false, error: `Cannot access '${json.name}'`, info: "This file is not editable"});
+					else
+						fileHandler.updatePlaylist(fs, json, settings.mostListenedPlaylistName.val).then(data => response.send(data)).catch(err => response.send(err));
+				}
 			});
 		});
 

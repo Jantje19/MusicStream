@@ -35,232 +35,237 @@
 	<link href="all.css" rel="stylesheet" type="text/css" media="screen"/>
 
 	<style type="text/css">
-	body {
-		overflow-x: hidden;
-	}
+		body {
+			overflow-x: hidden;
+		}
 
-	main #fab {
-		transform: translateY(150%);
-		transition: transform .3s ease;
-	}
+		main #fab {
+			transform: translateY(150%);
+			transition: transform .3s ease;
+		}
 
-	main #main {
-		display: block;
-	}
+		main #main {
+			display: block;
+		}
 
-	main #main #songSelect {
-		width: 100%;
-	}
+		main #main #songSelect {
+			width: 100%;
+		}
 
-	main #main .ball-scale-multiple {
-		width: auto;
-		transform: translate(50%, 20px);
-	}
+		main #main .ball-scale-multiple {
+			width: auto;
+			transform: translate(50%, 20px);
+		}
 
-	main #main #songSelect button {
-		margin: 5px 10px;
-		padding: 5px 10px;
-		border-radius: 5px;
-		display: inline-block;
-		border: 2px solid #16a085;
-		background-color: transparent;
-		transition: background-color .4s ease;
-	}
+		main #main #songSelect button {
+			margin: 5px 10px;
+			padding: 5px 10px;
+			border-radius: 5px;
+			display: inline-block;
+			border: 2px solid #16a085;
+			background-color: transparent;
+			transition: background-color .4s ease;
+		}
 
-	main #main #songSelect button:hover {
-		background-color: rgba(22, 160, 133, 0.3);
-	}
+		main #main #songSelect button:hover {
+			background-color: rgba(22, 160, 133, 0.3);
+		}
 
-	main #main #songSelect button:before {
-		display: none;
-	}
+		main #main #songSelect button:before {
+			display: none;
+		}
 
-	main #main #tagEditor {
-		width: 350px;
-		text-align: left;
-		margin: 30px auto;
-	}
+		main #main #tagEditor {
+			width: 350px;
+			text-align: left;
+			margin: 30px auto;
+		}
 
-	main #main #tagEditor div {
-		margin: 20px 0;
-	}
+		main #main #tagEditor div {
+			margin: 20px 0;
+		}
 
-	main #main #tagEditor div input {
-		float: right;
-	}
+		main #main #tagEditor div input {
+			float: right;
+		}
 
-	main #main #tagEditor div label {
-		margin-right: 20px;
-	}
-</style>
+		main #main #tagEditor div label {
+			margin-right: 20px;
+		}
+	</style>
 
-<script type="text/javascript">
-	const availableTags = ["title", "artist", "album", "year", "bpm", "composer", "genre", "copyright", "date", "playlistDelay", "encodedBy", "textWriter", "fileType", "time", "contentGroup", "subtitle", "initialKey", "language", "length", "mediaType", "originalTitle", "originalFilename", "originalTextwriter", "originalArtist", "originalYear", "fileOwner", "performerInfo", "conductor", "remixArtist", "partOfSet", "publisher", "trackNumber", "recordingDates", "internetRadioName", "internetRadioOwner", "size", "ISRC", "encodingTechnology", "comment"];
+	<script type="text/javascript">
+		const availableTags = ["title", "artist", "album", "year", "bpm", "composer", "genre", "copyright", "date", "playlistDelay", "encodedBy", "textWriter", "fileType", "time", "contentGroup", "subtitle", "initialKey", "language", "length", "mediaType", "originalTitle", "originalFilename", "originalTextwriter", "originalArtist", "originalYear", "fileOwner", "performerInfo", "conductor", "remixArtist", "partOfSet", "publisher", "trackNumber", "recordingDates", "internetRadioName", "internetRadioOwner", "size", "ISRC", "encodingTechnology", "comment"];
 
-	function load() {
-		if (location.hash) {
-			const songName = unescape(location.hash.replace('#', ''));
+		function load() {
+			if (location.hash) {
+				const songName = unescape(location.hash.replace('#', ''));
 
+				fetch('/data/?sort=newest', {credentials: 'same-origin'}).then(response => {
+					response.json().then(json => {
+						if (json.audio.songs.includes(songName))
+							songSelected(songName);
+						else {
+							alert('Song not found. Please select.');
+							selectSong(json);
+						}
+					});
+				}).catch( err => {
+					console.error('An error occurred', err);
+				});
+			} else showSongSelect();
+
+			document.getElementById('fab').addEventListener('click', evt => {
+				const songName = unescape(location.hash.replace('#', ''));
+				const tags = {};
+
+				Array.from(document.getElementById('tagEditor').childNodes).forEach((object, key) => {
+					const input = object.querySelector('input');
+					const type = input.id;
+
+					if (type == 'image') {
+						if (input.value.trim() != "")
+							tags.image = input.value;
+					} else tags[type] = input.value;
+				});
+
+				fetch('/tags/', {method: "POST", body: JSON.stringify({songName: songName, tags: tags}), credentials: 'same-origin'}).then(response => {
+					response.json().then(json => {
+						if (json.success) {
+							if (confirm('Tags updated! Do you want to go to the home page?'))
+								window.location = window.location.origin;
+						} else alert("ERROR: " + json.info);
+					});
+				}).catch( err => {
+					console.error('An error occurred', err);
+				});
+			});
+		}
+
+		function showSongSelect() {
 			fetch('/data/?sort=newest', {credentials: 'same-origin'}).then(response => {
-				response.json().then(json => {
-					if (json.audio.songs.includes(songName)) {
-						songSelected(songName);
-					} else {
-						alert('Song not found. Please select.');
-						selectSong(json);
-					}
-				});
+				response.json().then(json => selectSong(json));
 			}).catch( err => {
-				console.error('An error occurred', err);
-			});
-		} else showSongSelect();
-
-		document.getElementById('fab').addEventListener('click', evt => {
-			const tags = {};
-			const songName = unescape(location.hash.replace('#', ''));
-
-			Array.from(document.getElementById('tagEditor').childNodes).forEach((object, key) => {
-				const input = object.querySelector('input');
-				const type = input.id;
-
-				if (type == 'image') {
-					if (input.value.trim() != "")
-						tags.image = input.value;
-				} else tags[type] = input.value;
-			});
-
-			fetch('/tags/', {method: "POST", body: JSON.stringify({songName: songName, tags: tags}), credentials: 'same-origin'}).then(response => {
-				response.json().then(json => {
-					if (json.success) {
-						if (confirm('Tags updated! Do you want to go to the home page?'))
-							window.location = window.location.origin;
-					} else alert("ERROR: " + json.info);
-				});
-			}).catch( err => {
-				console.error('An error occurred', err);
-			});
-		});
-	}
-
-	function showSongSelect() {
-		fetch('/data/?sort=newest', {credentials: 'same-origin'}).then(response => {
-			response.json().then(json => selectSong(json));
-		}).catch( err => {
-			console.error('An error occurred', err);
-		});
-	}
-
-	function selectSong(json) {
-		const songs = json.audio.songs;
-		const div = document.createElement('div');
-		const mainElem = document.getElementById('main');
-
-		div.id = 'songSelect';
-		songs.forEach((object, key) => {
-			div.innerHTML += `<button onclick="songSelected('${object.replace(/\'/g, '\\\'')}')">${object}</button>`;
-		});
-
-		mainElem.innerHTML = '<h2>Select song</h2>';
-		mainElem.appendChild(div);
-	}
-
-	function songSelected(songName) {
-		const mainElem = document.getElementById('main');
-
-		location.hash = songName;
-		mainElem.innerHTML = '<div class="ball-scale-multiple"><div></div><div></div><div></div></div>';
-		fetch('/songInfo/' + songName, {credentials: 'same-origin'}).then(response => {
-			response.json().then(tags => {
-				const div = document.createElement('div');
-
-				document.getElementById('fab').style.transform = 'translateY(0)';
-				document.querySelector('header').innerHTML += '<button title="Delete all the tags" onclick="deleteTags()" style="left: unset; right: 30px"><img src="Assets/ic_delete_white.svg"></button>';
-				document.querySelector('header').innerHTML += '<button title="Fetch tags from Last.FM" onclick="handleLastFmBtn()" style="left: unset; right: 70px"><img src="Assets/ic_cached_white.svg"></button>';
-
-				div.id = 'tagEditor';
-				mainElem.innerHTML = '<h3>Tag editor</h3>';
-				availableTags.forEach((object, key) => {
-					let songTag = '';
-					const innerDiv = document.createElement('div');
-
-					if (object in tags) songTag = tags[object];
-
-					if (object == 'comment') {
-						if (songTag.text)
-							songTag = songTag.text;
-					}
-
-
-					innerDiv.innerHTML += `<label for="${object}">${object}</label>`;
-					innerDiv.innerHTML += `<input id="${object}" value="${songTag}"><br>`;
-					div.appendChild(innerDiv);
-				});
-				div.innerHTML += `<div><label for="image">image (only url)</label><input id="image" type="url"></div>`;
-
-				mainElem.appendChild(div);
-			});
-		}).catch( err => {
-			console.error('An error occurred', err);
-		});
-	}
-
-	function deleteTags() {
-		const songName = location.hash.replace('#', '');
-
-		if (confirm(`Are you sure you want to delete the tags of '${songName}'`)) {
-			fetch('/tags/', {method: "POST", body: JSON.stringify({songName: songName, tags: {delete: true}}), credentials: 'same-origin'}).then(response => {
-				response.json().then(json => {
-					if (json.success) {
-						if (confirm('Tags removed! Do you want to go to the home page?'))
-							window.location = window.location.origin;
-					} else alert("ERROR: " + json.info);
-				});
-			}).catch(err => {
 				console.error('An error occurred', err);
 			});
 		}
-	}
 
-	function handleLastFmBtn() {
-		const title = document.getElementById('title').value.trim();
-		const artist = document.getElementById('artist').value.trim();
+		function selectSong(json) {
+			const mainElem = document.getElementById('main');
+			const div = document.createElement('div');
+			const songs = json.audio.songs;
 
-		if (title != "" && artist != "") {
-			getTagsFromLastFm(title, artist).then(tags => {
-				try {document.getElementById('title').value = tags.name;} catch (err) {}
-				try {document.getElementById('artist').value = tags.artist.name;} catch (err) {}
-				try {document.getElementById('album').value = tags.album.title;} catch (err) {}
-				try {document.getElementById('length').value = tags.duration;} catch (err) {}
-				try {document.getElementById('image').value = tags.album.image[2]['#text'];} catch (err) {}
-				try {document.getElementById('comment').value = tags.wiki.summary; } catch (err) {}
+			div.id = 'songSelect';
+			songs.forEach((object, key) => {
+				const buttonElem = document.createElement('button');
 
-				try {console.log(tags.album.image[2]['#text']);} catch (err) {}
-			}).catch(err => {console.error(err); alert("Error with finding tags: " + err)});
-		} else alert("Title and artist are required for the Last.FM API.");
-	}
+				buttonElem.addEventListener('click', evt => songSelected(object));
+				buttonElem.innerText = object;
 
-	function getTagsFromLastFm(title, artist) {
-		if (title && artist) {
-			return new Promise((resolve, reject) => {
-				fetch(`https://ws.audioscrobbler.com/2.0/?method=track.getInfo&api_key=f02456f630621a02581b2143a67372f0&artist=${escape(artist)}&track=${escape(title)}&format=json`).then(response => {
-					response.json().then(json => {
-						if (json.error) reject(json.message);
-						else resolve(json.track);
-					}).catch(err => reject(err));
-				}).catch(err => reject(err));
+				div.appendChild(buttonElem);
 			});
-		} else return Promise.reject('Title or artist not supplied');
-	}
 
-	function back() {
-		if (location.hash) {
-			location.hash = '';
-			showSongSelect();
-		} else location = location.origin;
-	}
+			mainElem.innerHTML = '<h2>Select song</h2>';
+			mainElem.appendChild(div);
+		}
 
-	document.addEventListener('DOMContentLoaded', load);
-</script>
+		function songSelected(songName) {
+			const mainElem = document.getElementById('main');
+
+			location.hash = songName;
+			mainElem.innerHTML = '<div class="ball-scale-multiple"><div></div><div></div><div></div></div>';
+			fetch('/songInfo/' + songName, {credentials: 'same-origin'}).then(response => {
+				response.json().then(tags => {
+					const div = document.createElement('div');
+
+					document.getElementById('fab').style.transform = 'translateY(0)';
+					document.querySelector('header').innerHTML += '<button title="Delete all the tags" onclick="deleteTags()" style="left: unset; right: 30px"><img src="Assets/ic_delete_white.svg"></button>';
+					document.querySelector('header').innerHTML += '<button title="Fetch tags from Last.FM" onclick="handleLastFmBtn()" style="left: unset; right: 70px"><img src="Assets/ic_cached_white.svg"></button>';
+
+					div.id = 'tagEditor';
+					mainElem.innerHTML = '<h3>Tag editor</h3>';
+					availableTags.forEach((object, key) => {
+						let songTag = '';
+						const innerDiv = document.createElement('div');
+
+						if (object in tags) songTag = tags[object];
+
+						if (object == 'comment') {
+							if (songTag.text)
+								songTag = songTag.text;
+						}
+
+
+						innerDiv.innerHTML += `<label for="${object}">${object}</label>`;
+						innerDiv.innerHTML += `<input id="${object}" value="${songTag}"><br>`;
+						div.appendChild(innerDiv);
+					});
+					div.innerHTML += `<div><label for="image">image (only url)</label><input id="image" type="url"></div>`;
+
+					mainElem.appendChild(div);
+				});
+			}).catch( err => {
+				console.error('An error occurred', err);
+			});
+		}
+
+		function deleteTags() {
+			const songName = location.hash.replace('#', '');
+
+			if (confirm(`Are you sure you want to delete the tags of '${songName}'`)) {
+				fetch('/tags/', {method: "POST", body: JSON.stringify({songName: songName, tags: {delete: true}}), credentials: 'same-origin'}).then(response => {
+					response.json().then(json => {
+						if (json.success) {
+							if (confirm('Tags removed! Do you want to go to the home page?'))
+								window.location = window.location.origin;
+						} else alert("ERROR: " + json.info);
+					});
+				}).catch(err => {
+					console.error('An error occurred', err);
+				});
+			}
+		}
+
+		function handleLastFmBtn() {
+			const title = document.getElementById('title').value.trim();
+			const artist = document.getElementById('artist').value.trim();
+
+			if (title != "" && artist != "") {
+				getTagsFromLastFm(title, artist).then(tags => {
+					try {document.getElementById('title').value = tags.name;} catch (err) {}
+					try {document.getElementById('artist').value = tags.artist.name;} catch (err) {}
+					try {document.getElementById('album').value = tags.album.title;} catch (err) {}
+					try {document.getElementById('length').value = tags.duration;} catch (err) {}
+					try {document.getElementById('image').value = tags.album.image[2]['#text'];} catch (err) {}
+					try {document.getElementById('comment').value = tags.wiki.summary; } catch (err) {}
+
+					try {console.log(tags.album.image[2]['#text']);} catch (err) {}
+				}).catch(err => {console.error(err); alert("Error with finding tags: " + err)});
+			} else alert("Title and artist are required for the Last.FM API.");
+		}
+
+		function getTagsFromLastFm(title, artist) {
+			if (title && artist) {
+				return new Promise((resolve, reject) => {
+					fetch(`https://ws.audioscrobbler.com/2.0/?method=track.getInfo&api_key=f02456f630621a02581b2143a67372f0&artist=${escape(artist)}&track=${escape(title)}&format=json`).then(response => {
+						response.json().then(json => {
+							if (json.error) reject(json.message);
+							else resolve(json.track);
+						}).catch(err => reject(err));
+					}).catch(err => reject(err));
+				});
+			} else return Promise.reject('Title or artist not supplied');
+		}
+
+		function back() {
+			if (location.hash) {
+				location.hash = '';
+				showSongSelect();
+			} else location = location.origin;
+		}
+
+		document.addEventListener('DOMContentLoaded', load);
+	</script>
 
 </head>
 <body>
@@ -277,7 +282,6 @@
 
 		<button id="fab"><img src="Assets/ic_send_white.svg"></button>
 	</div>
-
 
 </main>
 

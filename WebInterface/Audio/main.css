@@ -248,11 +248,16 @@ main #main div div button {
 	padding: 10px 5px;
 	text-overflow: ellipsis;
 	background-color: transparent;
+	border-bottom: 1px lightgray solid;
 	transition: background-color .3s ease;
 
 	overflow: hidden;
 	white-space: nowrap;
 	text-overflow: ellipsis;
+}
+
+main #main div div button:last-child {
+	border-bottom: none;
 }
 
 main #main div div button:not(.tmpBtn):before {

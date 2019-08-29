@@ -26,8 +26,8 @@ const loadPlugins = () => {
 		*/
 		function getPlugins() {
 			return new Promise((resolve, reject) => {
-				const plugins = [];
 				const path = __dirname + '/Plugins/';
+				const plugins = [];
 
 				/*
 				*	Gets plugin data
@@ -45,10 +45,9 @@ const loadPlugins = () => {
 						// Make sure that there is an index file
 						fs.exists(indexPath, exists => {
 							if (exists) {
-								console.log(`Loading '${folderName}' plugin`);
 								resolve({
+									module: require(indexPath),
 									folder: folderName,
-									module: require(indexPath)
 								});
 							} else {
 								resolve({
@@ -112,16 +111,15 @@ const loadPlugins = () => {
 							object.module(imports, data);
 						} else {
 							if (object.module.clientJS) {
-								const handle = (obj) => {
+								const handle = obj => {
 									obj.pluginFolder = object.folder;
 									pluginDomJs.push(obj);
 								}
 
-								if (Array.isArray(object.module.clientJS)) {
-									object.module.clientJS.forEach((object, key) => {
-										handle(object);
-									});
-								} else handle(object.module.clientJS);
+								if (Array.isArray(object.module.clientJS))
+									object.module.clientJS.forEach(handle);
+								else
+									handle(object.module.clientJS);
 							}
 
 							if (object.module.server) {
@@ -148,6 +146,8 @@ const loadPlugins = () => {
 							}
 						}
 					}
+
+					console.log('Loaded', object.folder);
 				});
 
 				resolve();
@@ -163,6 +163,7 @@ const loadPlugins = () => {
 
 const startServer = () => {
 	loadPlugins().then(() => {
+		utils.colorLog('Plugins loaded', 'bgGreen');
 		const startServerModule = () => server.start(__dirname + '/WebInterface/', fileHandler, fs, os, settings, utils, querystring, id3, ytdl, version, https, URLModule, ffmpeg, pluginServer, hijackRequestPlugins);
 
 		if (settings.updateJsonOnStart.val == true) {
@@ -255,9 +256,15 @@ const utils = {
 							// Plugins
 							let buttonHTML = '';
 							const thisPath = path.replace(__dirname, '').replace('/WebInterface/', '').replace(/\/\//g, '/');
-							pluginDomJs.forEach((object, key) => {
-								if (thisPath == object.filePath.replace(/^\//, ''))
-									data = data.replace('</head>', `<script type="text/javascript" src="/LoadPluginJS/${object.pluginFolder + '/' + object.script}"></script>\n</head>`);
+							pluginDomJs.forEach(object => {
+								if (thisPath == object.filePath.replace(/^\//, '')) {
+									if (object.script.startsWith('http')) {
+										if (object.script.startsWith('http://'))
+											console.warn('A plugin is injecting a resource from a non-https source');
+
+										data = data.replace('</head>', `<script type="text/javascript" src="${object.script}"></script>\n</head>`);
+									} else data = data.replace('</head>', `<script type="text/javascript" src="/LoadPluginJS/${object.pluginFolder + '/' + object.script}"></script>\n</head>`);
+								}
 							});
 
 							if (mainPageMenu.length > 0) {

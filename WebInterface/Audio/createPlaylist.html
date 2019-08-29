@@ -45,11 +45,13 @@
 					else if (response.status !== 200) reject('Looks like there was a problem. Status Code: ' + response.status);
 					else {
 						response.json().then(json => {
-							if (json.error) reject(json.info);
-							else resolve(json.audio);
+							if (json.error)
+								reject(json.info);
+							else
+								resolve(json.audio);
 						});
 					}
-				}).catch(err => reject(err));
+				}).catch(reject);
 			});
 		}
 
@@ -65,11 +67,20 @@
 
 		function updateInterface() {
 			const playlistElem = document.getElementById('playlist');
+			const containerElem = playlistElem.cloneNode();
 
 			playlistElem.innerHTML = '';
 			playlist.forEach((object, key) => {
-				playlistElem.innerHTML += `<button title="${object}" class="listElem ${key}" onclick="handlePlaylist('${key}')">${object}</button><hr>`;
+				const buttonElem = document.createElement('button');
+
+				buttonElem.addEventListener('click', evt => handlePlaylist(key));
+				buttonElem.classList.add('listItem', key);
+				buttonElem.innerText = object;
+				buttonElem.title = object;
+
+				containerElem.appendChild(buttonElem);
 			});
+			playlistElem.replaceWith(containerElem);
 		}
 
 		function load() {
@@ -77,12 +88,21 @@
 
 			getData().then(json => {
 				const songsElem = document.getElementById('songs');
+				const containerElem = songsElem.cloneNode();
 
 				songs = json.songs;
 				songsElem.innerHTML = '';
 				json.songs.forEach((object, key) => {
-					songsElem.innerHTML += `<button title="${object}" class="song ${key}" onclick="songClick('${object.replace(/\'/g, "\\\'")}')">${object}</button><hr>`;
+					const buttonElem = document.createElement('button');
+
+					buttonElem.addEventListener('click', evt => songClick(object));
+					buttonElem.classList.add('song', key);
+					buttonElem.innerText = object;
+					buttonElem.title = object;
+
+					containerElem.appendChild(buttonElem);
 				});
+				songsElem.replaceWith(containerElem);
 			}).catch(err => console.error(err));
 
 			document.getElementById('fab').addEventListener('click', evt => {
@@ -127,21 +147,30 @@
 			});
 
 			document.getElementById('searchInp').addEventListener('keyup', evt => {
-				const string = evt.target.value;
-				const songArr = searchArr(string, songs);
+				const songArr = searchArr(evt.target.value, songs);
 				const songsElem = document.getElementById('songs');
+				const containerElem = songsElem.cloneNode();
 
 				songsElem.innerHTML = '';
 				songArr.forEach((object, key) => {
-					songsElem.innerHTML += `<button title="${object}" class="song ${key}" onclick="songClick('${object.replace(/\'/g, "\\\'")}')">${object}</button><hr>`;
+					const buttonElem = document.createElement('button');
+
+					buttonElem.addEventListener('click', evt => songClick(object));
+					buttonElem.classList.add('song', key);
+					buttonElem.innerText = object;
+					buttonElem.title = object;
+
+					containerElem.appendChild(buttonElem);
 				});
+				songsElem.replaceWith(containerElem);
 
 				function searchArr(query, array) {
 					const outp = [];
 
 					for (let i = 0; i < array.length; i++) {
 						const item = array[i];
-						if (item.toString().toLowerCase().indexOf(query.toString().toLowerCase()) > -1) outp.push(item);
+						if (item.toString().toLowerCase().indexOf(query.toString().toLowerCase()) > -1)
+							outp.push(item);
 					}
 
 					return outp;
@@ -154,7 +183,10 @@
 		}
 
 		function addWholeSongsToQueue() {
-			playlist = Array.from(document.getElementById('songs').querySelectorAll('button')).map(val => {return val.innerText});
+			playlist = Array.from(document.getElementById('songs').querySelectorAll('button')).map(val => {
+				return val.innerText
+			});
+
 			updateInterface();
 		}
 

@@ -126,11 +126,16 @@ main > #videos > div > button, main > #videos .video, main #queue .queueItem {
 	text-align: left;
 	padding: 10px 5px;
 	background-color: transparent;
+	border-bottom: 1px lightgray solid;
 	transition: background-color .3s ease;
 
 	overflow: hidden;
 	white-space: nowrap;
 	text-overflow: ellipsis;
+}
+
+main > #videos > div > button:last-child, main > #videos .video:last-child, main #queue .queueItem:last-child {
+	border-bottom: none;
 }
 
 main > div:last-child button:hover, main #queue .queueItem:hover {
@@ -220,6 +225,7 @@ main #queueWrapper #queue {
 	max-height: 30vh;
 	min-height: 50px;
 	overflow-y: auto;
+	overscroll-behavior: contain;
 }
 
 main #queueWrapper #queue i {

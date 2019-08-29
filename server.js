@@ -38,17 +38,6 @@ module.exports = {
 		app.use(compression());
 		app.use(express.static(dirname));
 
-		app.get('*manifest.json*', (request, response) => {
-			fs.readFile(dirname + 'Assets/Icons/manifest.json', 'utf-8', (err, data) => {
-				if (err)
-					response.status(500).send('Server error');
-				else {
-					response.setHeader('Content-Type', 'application/json');
-					response.send(data.replace('[[STARTURL]]', settings.url.val));
-				}
-			});
-		});
-
 		app.get('*favicon.ico*', (request, response) => {
 			utils.sendFile(fs, dirname + 'Assets/Icons/favicon.ico', response);
 		});
@@ -109,6 +98,17 @@ module.exports = {
 					next();
 			});
 		}
+
+		app.get('*manifest.json*', (request, response) => {
+			fs.readFile(dirname + 'Assets/Icons/manifest.json', 'utf-8', (err, data) => {
+				if (err)
+					response.status(500).send('Server error');
+				else {
+					response.setHeader('Content-Type', 'application/json');
+					response.send(data.replace('[[STARTURL]]', settings.url.val));
+				}
+			});
+		});
 
 		app.get('*/all.js', (request, response) => {
 			utils.sendFile(fs, dirname + 'all.js', response);
