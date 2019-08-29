@@ -20,7 +20,7 @@
 	<link rel="icon" type="image/png" sizes="32x32" href="Assets/Icons/favicon-32x32.png">
 	<link rel="icon" type="image/png" sizes="96x96" href="Assets/Icons/favicon-96x96.png">
 	<link rel="icon" type="image/png" sizes="16x16" href="Assets/Icons/favicon-16x16.png">
-	<link rel="manifest" href="Assets/Icons/manifest.json">
+	<link rel="manifest" href="/manifest.json">
 	<meta name="msapplication-TileImage" content="Assets/Icons/ms-icon-144x144.png">
 
 	<!--Let browser know website is optimized for mobile-->
@@ -35,188 +35,188 @@
 	<link href="/main.css" rel="stylesheet" type="text/css" media="screen"/>
 
 	<style type="text/css">
-	header {
-		z-index: 1000;
-	}
-
-	main {
-		width: 100%;
-		overflow: hidden;
-		position: relative;
-		height: calc(100% - 60px);
-		background-color: rgba(0, 0, 0, 0.1);
-	}
-
-	main > div {
-		top: 50%;
-		left: 50%;
-		width: 100%;
-		position: absolute;
-		will-change: transform;
-		transition: transform 1s ease;
-		transform: translate(-50%, -50%);
-	}
-
-	main div #link {
-		width: 80%;
-		height: 150px;
-		display: block;
-		padding: 0 20px;
-		background: none;
-		max-width: 500px;
-		max-height: 50px;
-		margin: 20px auto;
-		text-align: center;
-		border-radius: 30px;
-		border: 2px solid #16a085;
-		background-color: rgba(255, 255, 255, 0.4);
-
-		font-size: 150%;
-		color: rgba(0, 0, 0, 0.5);
-		box-shadow: 0 0 20px rgba(0, 0, 0, 0.3)
-	}
-
-	main div input[type=radio] {
-		margin-bottom: 20px;
-	}
-
-	main div #searchBtn {
-		width: 60%;
-		border: none;
-		margin: auto;
-		height: 150px;
-		display: block;
-		cursor: pointer;
-		background: none;
-		max-width: 350px;
-		max-height: 50px;
-		text-align: center;
-		border-radius: 30px;
-		will-change: transform;
-		background-color: #16a085;
-		transition: transform .3s ease;
-
-		font-size: 150%;
-		color: rgba(0, 0, 0, 0.5);
-		box-shadow: 0 0 20px rgba(0, 0, 0, 0.3)
-	}
-
-	main div #searchBtn:hover {
-		transform: scale(1.01) translateY(-4%);
-	}
-
-	main #editContent {
-		display: flex;
-		transform: translate(-50%, 110vh);
-	}
-
-	main #editContent > div {
-		flex: 1;
-		margin: 0 2%;
-		text-align: left;
-	}
-
-	main #editContent div h2 {
-		padding: 20px 0;
-	}
-
-	main #editContent div h3 {
-		font-size: 130%;
-		padding: 10px 0;
-	}
-
-	main #editContent div img[alt=thumbnail] {
-		width: 80%;
-		max-width: 300px;
-		border-radius: 20px;
-	}
-
-	main #editContent div img:not([alt=thumbnail]) {
-		width: 30px;
-		height: 30px;
-		margin-right: 20px;
-		border-radius: 100%;
-	}
-
-	main #editContent div span {
-		display: inline-block;
-		transform: translateY(-10px);
-	}
-
-	main #editContent div input {
-		margin: 5px;
-		outline: none;
-		padding: 5px 15px;
-		border-radius: 20px;
-		border: 1px #16a085 solid;
-		background-color: rgba(255, 255, 255, 0.5)
-	}
-
-	main #editContent div input:active {
-		background-color: rgba(255, 255, 255, 0.8);
-	}
-
-	main #editContent div #save {
-		width: 80%;
-		color: white;
-		display: block;
-		cursor: pointer;
-		margin: 10px  auto;
-		padding: 5px 15px;
-		border-radius: 20px;
-		border: 1px #16a085 solid;
-		background-color: #16a085;
-		transition: transform .3s ease;
-	}
-
-	main #editContent div #save:hover {
-		transform: scale(1.01) translateY(-4%);
-	}
-
-	main #editContent div #description {
-		padding: 10px 0;
-		max-height: 25vh;
-		overflow-y: auto;
-	}
-</style>
-
-<script type="text/javascript">
-	let useTags = true;
-
-	function loadVideo(val) {
-		function analyzeDescription(text) {
-			const val = {};
-			const arr = text.split('\n');
-
-			arr.forEach((object, key) => {
-				const match = object.match(/(artist|title|album)\s?\:(.+)/i);
-				if (match) val[match[1].toLowerCase()] = match[2].trim();
-			});
-
-			return val;
+		header {
+			z-index: 1000;
 		}
 
-		function fetchData(vidId, btnElem) {
-			if (!btnElem)
-				btnElem = document.getElementById('searchBtn');
+		main {
+			width: 100%;
+			overflow: hidden;
+			position: relative;
+			height: calc(100% - 60px);
+			background-color: rgba(0, 0, 0, 0.1);
+		}
 
-			btnElem.style.opacity = '0.3';
-			btnElem.style.pointerEvents = 'none';
+		main > div {
+			top: 50%;
+			left: 50%;
+			width: 100%;
+			position: absolute;
+			will-change: transform;
+			transition: transform 1s ease;
+			transform: translate(-50%, -50%);
+		}
 
-			fetch('/youtubeData/' + vidId, {credentials: 'same-origin'}).then(response => {
-				response.json().then(json => {
-					if (json.success) {
-						json = json.info;
+		main div #link {
+			width: 80%;
+			height: 150px;
+			display: block;
+			padding: 0 20px;
+			background: none;
+			max-width: 500px;
+			max-height: 50px;
+			margin: 20px auto;
+			text-align: center;
+			border-radius: 30px;
+			border: 2px solid #16a085;
+			background-color: rgba(255, 255, 255, 0.4);
 
-						const videoInfo = document.getElementById('videoInfo');
-						const nodes = document.querySelector('main').childNodes;
+			font-size: 150%;
+			color: rgba(0, 0, 0, 0.5);
+			box-shadow: 0 0 20px rgba(0, 0, 0, 0.3)
+		}
 
-						videoInfo.innerHTML += `<img alt="thumbnail" src="${json.thumbnail_url}" />`;
-						videoInfo.innerHTML += `<h3>${json.title}</h3>`;
-						videoInfo.innerHTML += `<div><img alt="author" src="${json.author.avatar}"><span>${json.author.name}</span></div>`;
-						videoInfo.innerHTML += `<p><b>View Count:</b> ${json.view_count}</p>`;
-						videoInfo.innerHTML += '<hr>';
-						videoInfo.innerHTML += `<p id="description">${json.description.replace(/\n/g, '<br>')}</p>`;
+		main div input[type=radio] {
+			margin-bottom: 20px;
+		}
+
+		main div #searchBtn {
+			width: 60%;
+			border: none;
+			margin: auto;
+			height: 150px;
+			display: block;
+			cursor: pointer;
+			background: none;
+			max-width: 350px;
+			max-height: 50px;
+			text-align: center;
+			border-radius: 30px;
+			will-change: transform;
+			background-color: #16a085;
+			transition: transform .3s ease;
+
+			font-size: 150%;
+			color: rgba(0, 0, 0, 0.5);
+			box-shadow: 0 0 20px rgba(0, 0, 0, 0.3)
+		}
+
+		main div #searchBtn:hover {
+			transform: scale(1.01) translateY(-4%);
+		}
+
+		main #editContent {
+			display: flex;
+			transform: translate(-50%, 110vh);
+		}
+
+		main #editContent > div {
+			flex: 1;
+			margin: 0 2%;
+			text-align: left;
+		}
+
+		main #editContent div h2 {
+			padding: 20px 0;
+		}
+
+		main #editContent div h3 {
+			font-size: 130%;
+			padding: 10px 0;
+		}
+
+		main #editContent div img[alt=thumbnail] {
+			width: 80%;
+			max-width: 300px;
+			border-radius: 20px;
+		}
+
+		main #editContent div img:not([alt=thumbnail]) {
+			width: 30px;
+			height: 30px;
+			margin-right: 20px;
+			border-radius: 100%;
+		}
+
+		main #editContent div span {
+			display: inline-block;
+			transform: translateY(-10px);
+		}
+
+		main #editContent div input {
+			margin: 5px;
+			outline: none;
+			padding: 5px 15px;
+			border-radius: 20px;
+			border: 1px #16a085 solid;
+			background-color: rgba(255, 255, 255, 0.5)
+		}
+
+		main #editContent div input:active {
+			background-color: rgba(255, 255, 255, 0.8);
+		}
+
+		main #editContent div #save {
+			width: 80%;
+			color: white;
+			display: block;
+			cursor: pointer;
+			margin: 10px  auto;
+			padding: 5px 15px;
+			border-radius: 20px;
+			border: 1px #16a085 solid;
+			background-color: #16a085;
+			transition: transform .3s ease;
+		}
+
+		main #editContent div #save:hover {
+			transform: scale(1.01) translateY(-4%);
+		}
+
+		main #editContent div #description {
+			padding: 10px 0;
+			max-height: 25vh;
+			overflow-y: auto;
+		}
+	</style>
+
+	<script type="text/javascript">
+		let useTags = true;
+
+		function loadVideo(val) {
+			function analyzeDescription(text) {
+				const val = {};
+				const arr = text.split('\n');
+
+				arr.forEach((object, key) => {
+					const match = object.match(/(artist|title|album)\s?\:(.+)/i);
+					if (match) val[match[1].toLowerCase()] = match[2].trim();
+				});
+
+				return val;
+			}
+
+			function fetchData(vidId, btnElem) {
+				if (!btnElem)
+					btnElem = document.getElementById('searchBtn');
+
+				btnElem.style.opacity = '0.3';
+				btnElem.style.pointerEvents = 'none';
+
+				fetch('/youtubeData/' + vidId, {credentials: 'same-origin'}).then(response => {
+					response.json().then(json => {
+						if (json.success) {
+							json = json.info;
+
+							const videoInfo = document.getElementById('videoInfo');
+							const nodes = document.querySelector('main').childNodes;
+
+							videoInfo.innerHTML += `<img alt="thumbnail" src="${json.thumbnail_url}" />`;
+							videoInfo.innerHTML += `<h3>${json.title}</h3>`;
+							videoInfo.innerHTML += `<div><img alt="author" src="${json.author.avatar}"><span>${json.author.name}</span></div>`;
+							videoInfo.innerHTML += `<p><b>View Count:</b> ${json.view_count}</p>`;
+							videoInfo.innerHTML += '<hr>';
+							videoInfo.innerHTML += `<p id="description">${json.description.replace(/\n/g, '<br>')}</p>`;
 
 						// Set values
 						let title = '';
@@ -260,55 +260,55 @@
 						}, 300);
 					} else alert(json.error);
 				});
-			}).catch(err => {
-				console.error(err);
-				alert('Problem with fetching data...');
-			});
-		}
+				}).catch(err => {
+					console.error(err);
+					alert('Problem with fetching data...');
+				});
+			}
 
-		if (val instanceof Event) {
-			let parsedUrl;
-			const url = document.getElementById('link').value;
-			const urlOk = url => {
-				if (url.hostname.startsWith('www.'))
-					url.hostname = url.hostname.replace(/^(www\.)/, '');
+			if (val instanceof Event) {
+				let parsedUrl;
+				const url = document.getElementById('link').value;
+				const urlOk = url => {
+					if (url.hostname.startsWith('www.'))
+						url.hostname = url.hostname.replace(/^(www\.)/, '');
 
-				if (url.hostname == 'youtube.com') {
-					if (url.searchParams.has('v')) {
-						const vidId = url.searchParams.get('v');
+					if (url.hostname == 'youtube.com') {
+						if (url.searchParams.has('v')) {
+							const vidId = url.searchParams.get('v');
+
+							if (vidId.length == 11)
+								return vidId;
+							else
+								return false;
+						} else return false;
+					} else if (url.hostname == 'youtu.be') {
+						const vidId = url.pathname.slice(1);
 
 						if (vidId.length == 11)
 							return vidId;
 						else
 							return false;
 					} else return false;
-				} else if (url.hostname == 'youtu.be') {
-					const vidId = url.pathname.slice(1);
+				};
 
-					if (vidId.length == 11)
-						return vidId;
-					else
-						return false;
-				} else return false;
-			};
+				try {
+					parsedUrl = new URL(url);
+				} catch (err) {
+					alert('Couln\'t parse URL');
+					throw Error('Couln\'t parse URL');
+				}
 
-			try {
-				parsedUrl = new URL(url);
-			} catch (err) {
-				alert('Couln\'t parse URL');
-				throw Error('Couln\'t parse URL');
-			}
+				const vidId = urlOk(parsedUrl);
+				parsedUrl.host = parsedUrl.host.replace('www.', '');
+				if (vidId !== false)
+					fetchData(vidId, val.target);
+				else
+					alert('Link does not match a youtube url');
+			} else fetchData(val);
+		}
 
-			const vidId = urlOk(parsedUrl);
-			parsedUrl.host = parsedUrl.host.replace('www.', '');
-			if (vidId !== false)
-				fetchData(vidId, val.target);
-			else
-				alert('Link does not match a youtube url');
-		} else fetchData(val);
-	}
-
-	function load() {
+		function load() {
 		// Check if passed a YouTube-ID
 		const splitArr = window.location.pathname.trim().split('/').filter(val => {
 			return val.length > 0;

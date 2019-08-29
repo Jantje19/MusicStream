@@ -6,6 +6,17 @@ module.exports = {
 		const express = require('express');
 		const app = express();
 
+		app.get('*manifest.json*', (request, response) => {
+			fs.readFile(dirname + 'Assets/Icons/manifest.json', 'utf-8', (err, data) => {
+				if (err)
+					response.status(500).send('Server error');
+				else {
+					response.setHeader('Content-Type', 'application/json');
+					response.send(data.replace('[[STARTURL]]', settings.url.val));
+				}
+			});
+		});
+
 		// HTTPS Support
 		let httpsServer;
 		const httpsSupport = utils.httpsArgs();
@@ -98,17 +109,6 @@ module.exports = {
 					next();
 			});
 		}
-
-		app.get('*manifest.json*', (request, response) => {
-			fs.readFile(dirname + 'Assets/Icons/manifest.json', 'utf-8', (err, data) => {
-				if (err)
-					response.status(500).send('Server error');
-				else {
-					response.setHeader('Content-Type', 'application/json');
-					response.send(data.replace('[[STARTURL]]', settings.url.val));
-				}
-			});
-		});
 
 		app.get('*/all.js', (request, response) => {
 			utils.sendFile(fs, dirname + 'all.js', response);
