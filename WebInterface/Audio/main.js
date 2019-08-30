@@ -361,8 +361,8 @@ function updateSongInterface(json, songsElem, playlistsElem) {
 		json.songs.forEach((object, key) => {
 			const buttonElem = document.createElement('button');
 
+			buttonElem.classList.add('listElem', 'song', key);
 			buttonElem.addEventListener('click', songClick);
-			buttonElem.classList.add('song', key);
 			buttonElem.innerText = object;
 			buttonElem.title = object;
 

@@ -162,14 +162,11 @@ function updateInterface() {
 		const containerElem = elem.cloneNode();
 		queue.forEach((object, key) => {
 			const buttonElem = document.createElement('button');
-			const spanElem = document.createElement('span');
 
 			buttonElem.addEventListener('click', evt => queueClick(evt, key));
+			buttonElem.setAttribute('index', key + 1);
+			buttonElem.classList.add('listElem');
 			buttonElem.innerText = object;
-
-			spanElem.innerText = key + 1;
-
-			buttonElem.appendChild(spanElem);
 			buttonElem.title = object;
 
 			if (key === queueIndex)

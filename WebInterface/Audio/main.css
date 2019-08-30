@@ -213,7 +213,7 @@ main #main button {
 	background-color: transparent;
 }
 
-main #main button:not(.tmpBtn):before {
+main #main button:not(.tmpBtn):not(.listElem):before {
 	opacity: 0;
 	width: 40px;
 	height: 40px;
@@ -226,7 +226,7 @@ main #main button:not(.tmpBtn):before {
 	transform: translate(-20%, -20%);
 }
 
-main #main button:hover:before {
+main #main button:not(.listElem):hover:before {
 	opacity: 0.15;
 }
 
@@ -268,9 +268,31 @@ main #main div div button:not(.tmpBtn):hover {
 	background-color: rgba(0, 0, 0, 0.15);
 }
 
-main #main #queueContainer #queue button {
+main #main #queueContainer #queue i {
+	display: block;
+	text-align: center;
+}
+
+main #main #queueContainer #queue button.tmpBtn {
 	display: flex;
+}
+
+main #main #queueContainer #queue button:not(.tmpBtn) {
 	overflow: hidden;
+	padding-left: 10%;
+	position: relative;
+	text-overflow: ellipsis;
+}
+
+main #main #queueContainer #queue button:not(.tmpBtn):before {
+	left: 0;
+	right: 0;
+	color: black;
+	display: block;
+	font-size: 1em;
+	margin-left: 4%;
+	position: absolute;
+	content: attr(index);
 }
 
 main #main #queueContainer #queue button[active] {
@@ -278,15 +300,8 @@ main #main #queueContainer #queue button[active] {
 	background-color: #12876f;
 }
 
-main #main #queueContainer #queue button span {
-	overflow: hidden;
-	white-space: nowrap;
-	text-overflow: ellipsis;
-}
-
-main #main #queueContainer #queue button span:first-child {
-	overflow: visible;
-	margin-right: 10%;
+main #main #queueContainer #queue button[active]:before {
+	color: white;
 }
 
 main #controls {
