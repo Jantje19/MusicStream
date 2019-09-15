@@ -10,7 +10,7 @@ const querystring = require('querystring');
 const fileHandler = require('./fileHandler.js');
 
 const settings = require('./settings.js');
-const {version} = require('./package.json');
+const { version } = require('./package.json');
 
 const pluginDomJs = [];
 const pluginServer = [];
@@ -224,7 +224,7 @@ const utils = {
 		for (key in json)
 			newArr.push([key, json[key]]);
 
-		newArr.sort((a, b) => {return a[1] - b[1]});
+		newArr.sort((a, b) => { return a[1] - b[1] });
 		newArr.reverse();
 		return newArr;
 	},
@@ -305,7 +305,7 @@ const utils = {
 			https.get(options, res => {
 				let rawData = '';
 
-				const {statusCode} = res;
+				const { statusCode } = res;
 				const contentType = res.headers['content-type'];
 
 				if (statusCode !== 200) {
@@ -316,13 +316,13 @@ const utils = {
 
 				res.setEncoding('utf8');
 
-				res.on('data', chunk => {rawData += chunk;});
+				res.on('data', chunk => { rawData += chunk; });
 				res.on('end', () => {
 					// If the response is json try to parse
 					if (/^application\/json/.test(contentType)) {
 						try {
 							resolve(JSON.parse(rawData));
-						} catch(err) {
+						} catch (err) {
 							reject(err);
 						}
 					} else resolve(rawData);
@@ -374,7 +374,7 @@ const utils = {
 
 		return new Promise((resolve, reject) => {
 			// Github needs a header to be sent
-			const header = {'User-Agent':'Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0)'};
+			const header = { 'User-Agent': 'Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0)' };
 
 			console.log(utils.logDate(), 'Checking for updates.');
 			console.log(utils.logDate(), 'Connecting to Github...');
@@ -384,11 +384,11 @@ const utils = {
 					const versionSame = compareVersions(version, response.tag_name);
 
 					if (versionSame == 0)
-						resolve({isAvailable: false, version, githubVersion: response.tag_name, body: response.body});
+						resolve({ isAvailable: false, version, githubVersion: response.tag_name, body: response.body });
 					else if (versionSame > 0)
-						resolve({isAvailable: false, version, greater: true, url: response.html_url, githubVersion: response.tag_name, body: response.body});
+						resolve({ isAvailable: false, version, greater: true, url: response.html_url, githubVersion: response.tag_name, body: response.body });
 					else if (versionSame < 0)
-						resolve({isAvailable: true, version: response.tag_name, url: response.html_url, githubVersion: response.tag_name, body: response.body});
+						resolve({ isAvailable: true, version: response.tag_name, url: response.html_url, githubVersion: response.tag_name, body: response.body });
 					else
 						reject('Version check went wrong.');
 				} else reject('The response is not json, so it is useless');
@@ -432,7 +432,7 @@ const utils = {
 				object = object.match(regEx);
 				text = text.replace(object[0], colors[object[1]] + object[3] + colors.reset);
 			});
-		} catch(err) {}
+		} catch (err) { }
 
 		if (color) {
 			if (colors[color])
@@ -450,23 +450,15 @@ const utils = {
 	*	@return {Array}
 	*/
 	getLocalIP: os => {
-		const ips = [];
 		const ifaces = os.networkInterfaces();
+		const ips = [];
 
 		Object.keys(ifaces).forEach(ifname => {
-			let alias = 0;
-
 			ifaces[ifname].forEach(iface => {
-				if ('IPv4' !== iface.family || iface.internal !== false) {
+				if (iface.internal || iface.family === 'IPv6')
 					return;
-				}
 
-				if (alias >= 1)
-					ips.push(ifname + ':' + alias, iface.address);
-				else
-					ips.push(iface.address);
-
-				++alias;
+				ips.push(iface.address);
 			});
 		});
 
@@ -490,7 +482,7 @@ const utils = {
 
 							try {
 								JSONData = JSON.parse(`{${index[2]}}`);
-							} catch (err) {}
+							} catch (err) { }
 
 							if (JSONData) {
 								if ('key' in JSONData && 'cert' in JSONData) {
@@ -517,7 +509,7 @@ const utils = {
 
 									try {
 										JSONData = JSON.parse(JSONData);
-									} catch (err) {}
+									} catch (err) { }
 
 									if ((typeof JSONData).toLowerCase() != 'string') {
 										if ('key' in JSONData && 'cert' in JSONData) {
@@ -555,6 +547,8 @@ if (process.argv.includes('-h') || process.argv.includes('--help') || process.ar
 	console.log("'check-updates':\tChecks for updates against GitHub");
 	console.log("'update-json':\t\tUpdate the audio/video library");
 	console.log("'rename-file':\t\t(Not tested well!) Rename a file and all occurences in the MusicStream 'databases'");
+	console.log('');
+	utils.colorLog("You can also run 'npm run update' to update MusicStream!", 'fgGreen');
 	process.exit(1);
 } else if (process.argv.includes('check-updates')) {
 	utils.newVersionAvailable(version).then(newVersion => {
@@ -592,8 +586,8 @@ if (process.argv.includes('-h') || process.argv.includes('--help') || process.ar
 			fileHandler.getJSON(fs, os, utils, settings).then(val => {
 				console.log('Got all files. Searching...');
 
-				const songsArr = val.audio.songs.map(val => {return val.fileName});
-				const videosArr = val.video.videos.map(val => {return val.fileName});
+				const songsArr = val.audio.songs.map(val => { return val.fileName });
+				const videosArr = val.video.videos.map(val => { return val.fileName });
 
 				if (songsArr.includes(fromFileName))
 					handleFound(songsArr, val.audio.playlists, val.audio.songs, fromFileName, toFileName);

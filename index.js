@@ -33,17 +33,13 @@ if (foundVal) {
 
 function closeMusicStream() {
 	specialLog('Stopping MusicStream');
-	children.forEach((object, key) => {
+	children.forEach(object => {
 		try {
 			object.exit(1);
 		} catch (err) {}
 	});
 
 	removeAllChildren();
-}
-
-function processLine(line) {
-	console.log(line + '!')
 }
 
 function triedTooManyTimes() {
