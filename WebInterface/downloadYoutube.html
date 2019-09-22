@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html>
+
 <head lang="en">
 
 	<title>MusicStream - Download YouTube</title>
 
-	<link rel="shortcut icon" href="Assets/Icons/favicon.ico"/>
-	<link rel="shortcut icon" href="Assets/Icons/favicon.ico" type="image/vnd.microsoft.icon"/>
+	<link rel="shortcut icon" href="Assets/Icons/favicon.ico" />
+	<link rel="shortcut icon" href="Assets/Icons/favicon.ico" type="image/vnd.microsoft.icon" />
 
 	<link rel="apple-touch-icon" sizes="57x57" href="Assets/Icons/apple-icon-57x57.png">
 	<link rel="apple-touch-icon" sizes="60x60" href="Assets/Icons/apple-icon-60x60.png">
@@ -16,7 +17,7 @@
 	<link rel="apple-touch-icon" sizes="144x144" href="Assets/Icons/apple-icon-144x144.png">
 	<link rel="apple-touch-icon" sizes="152x152" href="Assets/Icons/apple-icon-152x152.png">
 	<link rel="apple-touch-icon" sizes="180x180" href="Assets/Icons/apple-icon-180x180.png">
-	<link rel="icon" type="image/png" sizes="192x192"  href="Assets/Icons/android-icon-192x192.png">
+	<link rel="icon" type="image/png" sizes="192x192" href="Assets/Icons/android-icon-192x192.png">
 	<link rel="icon" type="image/png" sizes="32x32" href="Assets/Icons/favicon-32x32.png">
 	<link rel="icon" type="image/png" sizes="96x96" href="Assets/Icons/favicon-96x96.png">
 	<link rel="icon" type="image/png" sizes="16x16" href="Assets/Icons/favicon-16x16.png">
@@ -26,13 +27,13 @@
 	<!--Let browser know website is optimized for mobile-->
 	<!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"/> -->
 	<!-- <meta name="mobile-web-app-capable" content="yes"/> -->
-	<meta name="theme-color" content="#16a085"/>
+	<meta name="theme-color" content="#16a085" />
 	<meta name="msapplication-TileColor" content="#16a085">
-	<meta name="msapplication-navbutton-color" content="#16a085"/>
-	<meta name="apple-mobile-web-app-status-bar-style" content="#16a085"/>
+	<meta name="msapplication-navbutton-color" content="#16a085" />
+	<meta name="apple-mobile-web-app-status-bar-style" content="#16a085" />
 
-	<link href="/all.css" rel="stylesheet" type="text/css" media="screen"/>
-	<link href="/main.css" rel="stylesheet" type="text/css" media="screen"/>
+	<link href="/all.css" rel="stylesheet" type="text/css" media="screen" />
+	<link href="/main.css" rel="stylesheet" type="text/css" media="screen" />
 
 	<style type="text/css">
 		header {
@@ -47,7 +48,7 @@
 			background-color: rgba(0, 0, 0, 0.1);
 		}
 
-		main > div {
+		main>div {
 			top: 50%;
 			left: 50%;
 			width: 100%;
@@ -110,7 +111,7 @@
 			transform: translate(-50%, 110vh);
 		}
 
-		main #editContent > div {
+		main #editContent>div {
 			flex: 1;
 			margin: 0 2%;
 			text-align: left;
@@ -123,6 +124,15 @@
 		main #editContent div h3 {
 			font-size: 130%;
 			padding: 10px 0;
+		}
+
+		main #editContent div a {
+			color: black;
+		}
+
+		main #editContent div a:hover span {
+			color: black;
+			text-decoration: underline;
 		}
 
 		main #editContent div img[alt=thumbnail] {
@@ -161,7 +171,7 @@
 			color: white;
 			display: block;
 			cursor: pointer;
-			margin: 10px  auto;
+			margin: 10px auto;
 			padding: 5px 15px;
 			border-radius: 20px;
 			border: 1px #16a085 solid;
@@ -185,12 +195,14 @@
 
 		function loadVideo(val) {
 			function analyzeDescription(text) {
-				const val = {};
 				const arr = text.split('\n');
+				const val = {};
 
 				arr.forEach((object, key) => {
 					const match = object.match(/(artist|title|album)\s?\:(.+)/i);
-					if (match) val[match[1].toLowerCase()] = match[2].trim();
+
+					if (match)
+						val[match[1].toLowerCase()] = match[2].trim();
 				});
 
 				return val;
@@ -203,70 +215,84 @@
 				btnElem.style.opacity = '0.3';
 				btnElem.style.pointerEvents = 'none';
 
-				fetch('/youtubeData/' + vidId, {credentials: 'same-origin'}).then(response => {
+				fetch('/youtubeData/' + vidId, { credentials: 'same-origin' }).then(response => {
 					response.json().then(json => {
 						if (json.success) {
 							json = json.info;
+							const { videoDetails } = json.player_response;
+
+							if (!videoDetails.title)
+								videoDetails.title = 'unknown - unknown';
 
 							const videoInfo = document.getElementById('videoInfo');
 							const nodes = document.querySelector('main').childNodes;
 
-							videoInfo.innerHTML += `<img alt="thumbnail" src="${json.thumbnail_url}" />`;
-							videoInfo.innerHTML += `<h3>${json.title}</h3>`;
-							videoInfo.innerHTML += `<div><img alt="author" src="${json.author.avatar}"><span>${json.author.name}</span></div>`;
-							videoInfo.innerHTML += `<p><b>View Count:</b> ${json.view_count}</p>`;
+							if (videoDetails.thumbnail.thumbnails.length > 0)
+								videoInfo.innerHTML += `<img alt="thumbnail" src="${videoDetails.thumbnail.thumbnails[videoDetails.thumbnail.thumbnails.length - 1].url}" />`;
+
+							videoInfo.innerHTML += `<h3>${videoDetails.title}</h3>`;
+							videoInfo.innerHTML += `<div><a href="${json.author.channel_url}"><img alt="author" src="${json.author.avatar}"><span>${json.author.name}</span></a></div>`;
+							videoInfo.innerHTML += `<p><b>View Count:</b> ${videoDetails.viewCount}</p>`;
 							videoInfo.innerHTML += '<hr>';
 							videoInfo.innerHTML += `<p id="description">${json.description.replace(/\n/g, '<br>')}</p>`;
 
-						// Set values
-						let title = '';
-						let album = '';
-						let artist = '';
+							// Set values
+							let title = '';
+							let album = '';
+							let artist = '';
 
-						const vals = analyzeDescription(json.description);
+							const vals = analyzeDescription(json.description);
 
-						if (vals.title) title = vals.title;
-						if (vals.album) album = vals.album;
-						if (vals.artist) artist = vals.artist;
+							if (vals.title) title = vals.title;
+							if (vals.album) album = vals.album;
+							if (vals.artist) artist = vals.artist;
 
-						if (!title || !artist) {
-							const match = json.title.split(/(\-|\–)/).filter(val => {return (val.length > 1 && val.indexOf(/(\-|\–)/) < 0)});;
-							const val = match.splice(0, 1)[0].trim();
+							if (!title || !artist) {
+								const match = videoDetails.title.split(/(\-|\–)/).filter(val => {
+									return (val.length > 1 && val.indexOf(/(\-|\–)/) < 0)
+								});
+								const val = match.splice(0, 1)[0].trim();
 
-							if (!artist) artist = val;
-							if (!title) title = match.join('-').trim();
-						}
+								console.log(val);
+								if (!artist) artist = val;
+								if (!title) title = match.join('-').trim();
+							}
 
-						document.getElementById('title').value = title;
-						document.getElementById('album').value = album;
-						document.getElementById('artist').value = artist;
-						document.getElementById('endTime').value = json.length_seconds;
+							if (videoDetails.title === 'unknown - unknown')
+								artist = json.author.name;
 
-						if (document.getElementById('typeVideo').checked) {
-							const videoInputElem = document.getElementById('videoInput')
-							const videoInputElemBRect = videoInputElem.getBoundingClientRect();
+							document.getElementById('title').value = title;
+							document.getElementById('album').value = album;
+							document.getElementById('artist').value = artist;
 
-							document.getElementById('title').value = json.title;
-							videoInputElem.style.marginTop = `${videoInputElemBRect.height / 3}px`;
-							Array.from(document.querySelectorAll('[dont-display-for-video]')).forEach(elem => {
-								elem.style.display = 'none';
-							});
-						}
+							if (json.length_seconds)
+								document.getElementById('endTime').value = json.length_seconds;
 
-						setTimeout(() => {
-							nodes[3].style.transform = 'translate(-50%, -50%)';
-							nodes[1].style.transform = 'translate(-50%, -110vh)';
-							nodes[3].style.display = 'flex';
-						}, 300);
-					} else alert(json.error);
-				});
+							if (document.getElementById('typeVideo').checked) {
+								const videoInputElem = document.getElementById('videoInput')
+								const videoInputElemBRect = videoInputElem.getBoundingClientRect();
+
+								document.getElementById('title').value = json.title;
+								videoInputElem.style.marginTop = `${videoInputElemBRect.height / 3}px`;
+								Array.from(document.querySelectorAll('[dont-display-for-video]')).forEach(elem => {
+									elem.style.display = 'none';
+								});
+							}
+
+							setTimeout(() => {
+								nodes[3].style.transform = 'translate(-50%, -50%)';
+								nodes[1].style.transform = 'translate(-50%, -110vh)';
+								nodes[3].style.display = 'flex';
+							}, 300);
+						} else alert(json.error);
+					});
 				}).catch(err => {
 					console.error(err);
 					alert('Problem with fetching data...');
 				});
 			}
 
-			if (val instanceof Event) {
+			if (!val || val instanceof Event) {
 				let parsedUrl;
 				const url = document.getElementById('link').value;
 				const urlOk = url => {
@@ -300,127 +326,135 @@
 				}
 
 				const vidId = urlOk(parsedUrl);
-				parsedUrl.host = parsedUrl.host.replace('www.', '');
 				if (vidId !== false)
-					fetchData(vidId, val.target);
+					fetchData(vidId, val ? val.target : null);
 				else
 					alert('Link does not match a youtube url');
 			} else fetchData(val);
 		}
 
 		function load() {
-		// Check if passed a YouTube-ID
-		const splitArr = window.location.pathname.trim().split('/').filter(val => {
-			return val.length > 0;
-		});
-
-		if (splitArr.length > 1) {
-			const youtubeId = splitArr.find(val => {
-				return val.length == 11;
+			// Check if passed a YouTube-ID
+			const splitArr = window.location.pathname.trim().split('/').filter(val => {
+				return val.length > 0;
 			});
 
-			if (youtubeId)
-				loadVideo(youtubeId);
-		} else {
-			document.getElementById('searchBtn').addEventListener('click', loadVideo);
-			document.getElementById('save').addEventListener('click', evt => {
-				useTags = Boolean(document.getElementById('use_tags').checked);
-
-				evt.target.style.opacity = '0.3';
-				evt.target.style.pointerEvents = 'none';
-
-				let type;
-
-				if (document.getElementById('typeAudio').checked)
-					type = 'audio';
-				else if (document.getElementById('typeVideo').checked)
-					type = 'video';
-				else
-					alert('No type selected somehow...\nYou should refresh the page.');
-
-				let endTime = document.getElementById('endTime').value;
-
-				if (Number(endTime) <= 0)
-					endTime = null;
-
-				const title = document.getElementById('title').value;
-				const artist = document.getElementById('artist').value;
-				const data = {
-					type: type,
-					url: document.getElementById('link').value,
-					fileName: artist + ' - ' + title,
-					startTime: document.getElementById('startTime').value,
-					endTime: endTime,
-					tags: {
-						album: document.getElementById('album').value,
-						artist: artist,
-						title: title
-					}
-				}
-
-				if (type === 'video')
-					data.fileName = document.getElementById('title').value;
-
-				if (document.getElementById('uiac').checked)
-					data.tags.image = document.querySelector('img').src;
-
-				const videoInputElem = document.getElementById('videoInput');
-
-				videoInputElem.style.display = 'flex';
-				videoInputElem.style.alignItems = 'center';
-				videoInputElem.style.justifyContent = 'center';
-				videoInputElem.innerHTML = '<b>Downloading... This may take a while.</b>';
-				fetch('/ytdl', {method: "POST", credentials: 'same-origin', body: JSON.stringify(data)}).then(response => {
-					response.json().then(json => {
-						if (json.success) {
-							if (useTags && type == 'audio') {
-								const body = {
-									songName: json.fileName,
-									tags: data.tags
-								}
-
-								if (type == 'audio') {
-									videoInputElem.innerHTML = '<b>Setting tags...</b>';
-									fetch('/tags', {method: 'POST', body: JSON.stringify(body), credentials: 'same-origin'}).then(response => {
-										response.json().then(json => {
-											videoInputElem.innerHTML = '<b>Done!</b>';
-											if (json.success) {
-												if (confirm('Everything went according to plan. Do you want to go to the home page?'))
-													window.location = window.location.origin;
-											} else alert('Error: ' + json.info);
-										});
-									}).catch( err => {
-										console.error('An error occurred', err);
-									});
-								}
-							} else if (confirm('Everything went according to plan. Do you want to go to the home page?')) window.location = window.location.origin;
-						} else alert('Error: ' + json.error)/*Display toast or something..*/;
-					});
-				}).catch( err => {
-					console.error('An error occurred', err);
+			if (splitArr.length > 1) {
+				const youtubeId = splitArr.find(val => {
+					return val.length == 11;
 				});
-			});
+
+				if (youtubeId)
+					loadVideo(youtubeId);
+			} else {
+				document.getElementById('searchBtn').addEventListener('click', loadVideo);
+				document.getElementById('link').addEventListener('keyup', evt => {
+					if (evt.key === "Enter" && evt.currentTarget.value.trim().length > 0) {
+						evt.currentTarget.setAttribute('disabled', true);
+						loadVideo();
+					}
+				});
+				document.getElementById('save').addEventListener('click', evt => {
+					useTags = Boolean(document.getElementById('use_tags').checked);
+
+					evt.target.style.opacity = '0.3';
+					evt.target.style.pointerEvents = 'none';
+
+					let type;
+
+					if (document.getElementById('typeAudio').checked)
+						type = 'audio';
+					else if (document.getElementById('typeVideo').checked)
+						type = 'video';
+					else
+						alert('No type selected somehow...\nYou should refresh the page.');
+
+					let endTime = document.getElementById('endTime').value;
+
+					if (Number(endTime) <= 0)
+						endTime = null;
+
+					const title = document.getElementById('title').value;
+					const artist = document.getElementById('artist').value;
+					const data = {
+						type: type,
+						url: document.getElementById('link').value,
+						fileName: artist + ' - ' + title,
+						startTime: document.getElementById('startTime').value,
+						endTime: endTime,
+						tags: {
+							album: document.getElementById('album').value,
+							artist: artist,
+							title: title
+						}
+					}
+
+					if (type === 'video')
+						data.fileName = document.getElementById('title').value;
+
+					if (document.getElementById('uiac').checked)
+						data.tags.image = document.querySelector('img').src;
+
+					const videoInputElem = document.getElementById('videoInput');
+
+					videoInputElem.style.display = 'flex';
+					videoInputElem.style.alignItems = 'center';
+					videoInputElem.style.justifyContent = 'center';
+					videoInputElem.innerHTML = '<b>Downloading... This may take a while.</b>';
+					fetch('/ytdl', { method: "POST", credentials: 'same-origin', body: JSON.stringify(data) }).then(response => {
+						response.json().then(json => {
+							if (json.success) {
+								if (useTags && type == 'audio') {
+									const body = {
+										songName: json.fileName,
+										tags: data.tags
+									}
+
+									if (type == 'audio') {
+										videoInputElem.innerHTML = '<b>Setting tags...</b>';
+										fetch('/tags', { method: 'POST', body: JSON.stringify(body), credentials: 'same-origin' }).then(response => {
+											response.json().then(json => {
+												videoInputElem.innerHTML = '<b>Done!</b>';
+												if (json.success) {
+													if (confirm('Everything went according to plan. Do you want to go to the home page?'))
+														window.location = window.location.origin;
+												} else alert('Error: ' + json.info);
+											});
+										}).catch(err => {
+											console.error('An error occurred', err);
+										});
+									}
+								} else if (confirm('Everything went according to plan. Do you want to go to the home page?')) window.location = window.location.origin;
+							} else alert('Error: ' + json.error)/*Display toast or something..*/;
+						});
+					}).catch(err => {
+						console.error('An error occurred', err);
+					});
+				});
+			}
+
+			// For plugins
+			try {
+				loaded();
+			} catch (err) { }
 		}
 
-		// For plugins
-		try {
-			loaded();
-		} catch (err) {}
-	}
-
-	document.addEventListener('DOMContentLoaded', load);
-</script>
+		document.addEventListener('DOMContentLoaded', load);
+	</script>
 
 </head>
+
 <body>
 
 	<header>
-		<div><h1>Download YouTube</h1></div>
+		<div>
+			<h1>Download YouTube</h1>
+		</div>
 	</header>
 
 	<main>
 		<div>
-			<input type="url" id="link" placeholder="https://www.youtube.com/watch?v=gLmcGkvJ-e0" autofocus="true">
+			<input type="url" id="link" placeholder="https://www.youtube.com/watch?v=dQw4w9WgXcQ" autofocus="true">
 			<input type="radio" name="type" id="typeAudio" value="Audio" checked>
 			<label for="typeAudio">Audio</label>
 			<input type="radio" name="type" id="typeVideo" value="Video">
@@ -457,4 +491,5 @@
 	</main>
 
 </body>
+
 </html>

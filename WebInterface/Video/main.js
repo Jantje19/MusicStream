@@ -10,7 +10,7 @@ function load() {
 	const videoTimeJumpElem = document.getElementById('video-time-jump');
 
 	videoSettingsElem = document.getElementById('video-settings');
-	fetch('/data/', {credentials: 'same-origin'}).then(response => {
+	fetch('/data/', { credentials: 'same-origin' }).then(response => {
 		response.json().then(json => {
 			if (!json.error) {
 				const keys = Object.keys(json.video.videos);
@@ -231,13 +231,13 @@ function load() {
 		function setPipButton() {
 			pipButtonElement.style.display = 'initial';
 			pipButtonElement.disabled = (video.readyState === 0) ||
-			!document.pictureInPictureEnabled ||
-			video.disablePictureInPicture;
+				!document.pictureInPictureEnabled ||
+				video.disablePictureInPicture;
 		}
 	})();
 
 	// Toggle controls (very experimental)
-	(function() {
+	(function () {
 		const videoWrapperElem = document.getElementById('videoElem');
 		const controlsElem = document.getElementById('controls');
 		const mouseMoveFunc = evt => {
@@ -253,7 +253,7 @@ function load() {
 		videoWrapperElem.addEventListener('mouseover', evt => {
 			mouseOut = false;
 			controlsElem.style.transform = 'translateY(0px)';
-			window.onmousemove =  mouseMoveFunc;
+			window.onmousemove = mouseMoveFunc;
 		});
 
 		videoWrapperElem.addEventListener('mouseout', evt => {
@@ -266,7 +266,7 @@ function load() {
 	// For plugins
 	try {
 		loaded();
-	} catch (err) {}
+	} catch (err) { }
 }
 
 function vidClick(evt, title) {
@@ -310,12 +310,52 @@ function isFullScreen() {
 		(document.webkitIsFullScreen !== undefined && !document.webkitIsFullScreen));
 }
 
+function setVideoPlay(title) {
+	const videoPlayReturnVal = video.play();
+	const mediaSession = () => {
+		if ('mediaSession' in navigator && title) {
+			navigator.mediaSession.metadata = new MediaMetadata({
+				artist: "MusicStream",
+				title,
+				artwork: [
+					{ src: '/Assets/Icons/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+					{ src: '/Assets/Icons/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+					{ src: '/Assets/Icons/favicon-96x96.png', sizes: '96x96', type: 'image/png' },
+					{ src: '/Assets/Icons/icon-128.png', sizes: '128x128', type: 'image/png' },
+					{ src: '/Assets/Icons/icon-256.png', sizes: '256x256', type: 'image/png' },
+					{ src: '/Assets/Icons/icon-512.png', sizes: '512x512', type: 'image/png' },
+				]
+			});
+
+			const skipVal = Number(settings.skipAmount.val) || 5;
+
+			navigator.mediaSession.setActionHandler('play', video.play);
+			navigator.mediaSession.setActionHandler('pause', video.pause);
+			navigator.mediaSession.setActionHandler('seekbackward', () => jumpVideoTime(-skipVal));
+			navigator.mediaSession.setActionHandler('seekforward', () => jumpVideoTime(skipVal));
+			navigator.mediaSession.setActionHandler('nexttrack', nextQueueItem);
+		}
+	}
+
+	if (videoPlayReturnVal) {
+		videoPlayReturnVal.then(mediaSession).catch(err => {
+			console.error(err);
+		});
+	} else {
+		try {
+			mediaSession();
+		} catch (err) {
+			console.error('MediaSession Error', err);
+		}
+	}
+}
+
 function togglePlayState() {
 	if (video.src != '') {
 		const stateBtn = document.getElementById('playPause');
 
 		if (video.paused == true) {
-			video.play();
+			setVideoPlay();
 			stateBtn.childNodes[0].src = 'Assets/ic_pause_white.svg';
 		} else if (video.paused == false) {
 			video.pause();
@@ -326,7 +366,7 @@ function togglePlayState() {
 
 function playVid(title = '', notQueueTop) {
 	video.src = '/video/' + title;
-	video.play();
+	setVideoPlay(title);
 
 	console.log(title);
 
@@ -353,44 +393,46 @@ function videoEnd(evt) {
 				timeElem.style.transform = `scaleX(${1 - (i / time)})`;
 			}
 
-			if (i > time) {
-				setTimeout(() => {
+			if (i >= time) {
+				clearInterval(int);
+				timeElem.addEventListener('transitionend', () => {
 					nextQueueItem();
-					clearInterval(int);
 					document.getElementById('autoplay').style.display = 'none';
 					textElem.innerText = `Autoplay in: ${time}s`;
 					timeElem.style.transform = '';
 					i = 0;
-				}, 100); //1000?
+				}, { once: true });
 			}
 
 			i++;
 		}
 
 		document.getElementById('autoplay').style.display = 'flex';
-		int = setInterval(updateTimeInterface, time * 500); // It just feels long
+		int = setInterval(updateTimeInterface, 1000);
 		updateTimeInterface();
 	}
 }
 
 function updateInterface() {
-	if (video.paused == true)
+	if (video.paused == true) {
 		document.getElementById('playPause').querySelector('img').src = 'Assets/ic_play_arrow_white.svg';
-	else if (video.paused == false)
+		navigator.mediaSession.playbackState = "paused";
+	} else if (video.paused == false) {
 		document.getElementById('playPause').querySelector('img').src = 'Assets/ic_pause_white.svg';
-	else
+		navigator.mediaSession.playbackState = "playing";
+	} else
 		console.error('WUT?');
 }
 
 function convertToReadableTime(int) {
 	let outp = '';
-	let hours   = Math.floor(int / 3600);
+	let hours = Math.floor(int / 3600);
 	let minutes = Math.floor((int - (hours * 3600)) / 60);
 	let seconds = int - (hours * 3600) - (minutes * 60);
 
-	if (hours < 10) hours = "0"+hours;
-	if (minutes < 10) minutes = "0"+minutes;
-	if (seconds < 10) seconds = "0"+seconds;
+	if (hours < 10) hours = "0" + hours;
+	if (minutes < 10) minutes = "0" + minutes;
+	if (seconds < 10) seconds = "0" + seconds;
 	if (hours > 0) outp += hours + ':';
 
 	outp += minutes + ':';
@@ -430,7 +472,7 @@ function addSubtitleTrack(url, videoElem) {
 }
 
 function toggleCollapseAll() {
-	Array.prototype.most = function(val, greaterOrEqual) {
+	Array.prototype.most = function (val, greaterOrEqual) {
 		const trueArr = [];
 		const falseArr = [];
 
@@ -469,22 +511,21 @@ function toggleVideoSettingsWindow() {
 	}
 }
 
-function jumpVideoTime(amount, parentElement) {
-	amount = amount || 5;
+function jumpVideoTime(amount = 5, parentElement) {
 	parentElement = parentElement || document.getElementById('videoTimeJumpElem');
 
 	if (amount <= video.duration) {
 		const elem = (amount > 0) ? parentElement.children[0] : parentElement.children[1];
 
 		elem.animate([
-			{opacity: 0},
-			{opacity: 0.5},
-			{opacity: 0.8},
-			{opacity: 0}
-			], {
-				duration: 700,
-				easing: 'ease-out'
-			})
+			{ opacity: 0 },
+			{ opacity: 0.5 },
+			{ opacity: 0.8 },
+			{ opacity: 0 }
+		], {
+			duration: 700,
+			easing: 'ease-out'
+		})
 
 		return video.currentTime = video.currentTime + amount;
 	}
@@ -500,7 +541,7 @@ function saveQueueToTmp() {
 		queue: getQueue()
 	};
 
-	fetch('/saveQueue/video', {method: 'POST', body: JSON.stringify(data)}).then(data => {
+	fetch('/saveQueue/video', { method: 'POST', body: JSON.stringify(data) }).then(data => {
 		data.json().then(json => {
 			if (!json.success)
 				alert('Unable to save: ' + json.error);
@@ -515,7 +556,7 @@ function getTmpSavedQueue() {
 	fetch('/getSavedQueue/video').then(response => {
 		response.json().then(json => {
 			if (json.success) {
-				const {data} = json;
+				const { data } = json;
 
 				updateQueue(data.queue);
 				queueIndex = data.queueIndex;

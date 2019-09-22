@@ -1,7 +1,7 @@
-const tmpQueueSave = {audio: {global: {}}, videos: {}};
+const tmpQueueSave = { audio: { global: {} }, videos: {} };
 
 module.exports = {
-	start: function(dirname, fileHandler, fs, os, settings, utils, querystring, id3, ytdl, version, https, URLModule, ffmpeg, serverPlugins, hijackRequestPlugins) {
+	start: function (dirname, fileHandler, fs, os, settings, utils, querystring, id3, ytdl, version, https, URLModule, ffmpeg, serverPlugins, hijackRequestPlugins) {
 		const compression = require('compression');
 		const express = require('express');
 		const app = express();
@@ -24,16 +24,16 @@ module.exports = {
 		if (httpsSupport) {
 			const privateKey = fs.readFileSync(httpsSupport.key);
 			const certificate = fs.readFileSync(httpsSupport.cert);
-			const credentials = {key: privateKey, cert: certificate};
+			const credentials = { key: privateKey, cert: certificate };
 
 			if ('HSTS' in httpsSupport) {
 				const hstsValue = httpsSupport.HSTS;
 				if (hstsValue !== false) {
-					const maxAge = ((typeof(hstsValue) === typeof(true)) ? 31536000 : hstsValue);
+					const maxAge = ((typeof (hstsValue) === typeof (true)) ? 31536000 : hstsValue);
 					const headerValue = `max-age=${maxAge}; includeSubDomains; preload`;
 
 					app.use((request, response, next) => {
-						response.setHeader('Strict-Transport-Security', ((typeof(hstsValue) === typeof('')) ? hstsValue : headerValue));
+						response.setHeader('Strict-Transport-Security', ((typeof (hstsValue) === typeof ('')) ? hstsValue : headerValue));
 						next();
 					});
 				}
@@ -135,7 +135,7 @@ module.exports = {
 			fileHandler.getJSON(fs, os, utils, settings).then(json => {
 				const songs = [];
 				const videos = {};
-				const subtitles = ('subtitles' in json.video) ? json.video.subtitles.map(val => {return val.fileName}) : [];
+				const subtitles = ('subtitles' in json.video) ? json.video.subtitles.map(val => { return val.fileName }) : [];
 
 				const handleVideos = obj => {
 					for (key in obj) {
@@ -231,12 +231,12 @@ module.exports = {
 						});
 					}).catch(err => {
 						console.err(err);
-						response.send({error: "Something went wrong", info: "Either getting the songs or getting the playlists or both went wrong"})
+						response.send({ error: "Something went wrong", info: "Either getting the songs or getting the playlists or both went wrong" })
 					});
-				} else response.send({error: "Not found", info: "There are no media files found on this device."});
+				} else response.send({ error: "Not found", info: "There are no media files found on this device." });
 			}).catch(err => {
 				console.err('There was an error with getting the info', err);
-				response.send({error: "There was an error with getting the info", info: err});
+				response.send({ error: "There was an error with getting the info", info: err });
 			});
 
 			const sortFunc = (a, b) => {
@@ -250,18 +250,18 @@ module.exports = {
 			console.log(utils.logDate() + ' Got a request for ' + request.url);
 
 			utils.newVersionAvailable(version).then(newVersion => {
-				response.send({success: true, data: newVersion});
-			}).catch(err => response.send({success: false, error: err}));
+				response.send({ success: true, data: newVersion });
+			}).catch(err => response.send({ success: false, error: err }));
 		});
 
 		app.get('/updateJSON/', (request, response) => {
 			console.log(utils.logDate() + ' Got a request for ' + request.url);
 
 			fileHandler.searchSystem(fs, os, utils, settings).then(json => {
-				response.send({success: true});
+				response.send({ success: true });
 			}).catch(err => {
 				console.err(err);
-				response.send({success: false, error: "There was an error with updating the JSON", info: err});
+				response.send({ success: false, error: "There was an error with updating the JSON", info: err });
 			});
 		});
 
@@ -298,38 +298,21 @@ module.exports = {
 			utils.sendFile(fs, __dirname + '/Plugins/' + filePath, response);
 		});
 
-		app.get('/youtubeData/*', (request, response) => {
+		app.get('/youtubeData/:id', (request, response) => {
 			const url = querystring.unescape(request.url);
-			const arr = url.split('/');
-			const id = arr[arr.length - 1];
-			console.log(utils.logDate() + ' Got a request for ' + url);
+			const id = request.params.id;
 
-			if (id.length == 11) {
+			console.log(utils.logDate() + ' Got a request for ' + url);
+			if (ytdl.validateID(id)) {
 				try {
 					ytdl.getInfo(id, (err, info) => {
 						if (err)
-							response.send({success: false, error: 'No info found for that video id', info: err});
-						else {
-							info = JSON.parse(JSON.stringify(info));
-							const allowed = ['keywords', 'view_count', 'author', 'title', 'thubnail_url', 'description', 'thumbnail_url', 'length_seconds'];
-
-							Object.prototype.filter = function(arr) {
-								if (this.constructor === {}.constructor) {
-									const newObj = {};
-									for (key in this) {
-										if (arr.includes(key))
-											newObj[key] = this[key];
-									}
-
-									return newObj;
-								} else this;
-							}
-
-							response.send({success: true, info: info.filter(allowed)});
-						}
+							response.send({ success: false, error: 'No info found for that video id', info: err });
+						else
+							response.send({ success: true, info });
 					});
-				} catch (err) {response.send({success: false, error: 'Something went wrong', info: err})};
-			} else response.send({success: false, error: 'No valid video id', info: 'The video id supplied cannot be from a youtube video'});
+				} catch (err) { response.send({ success: false, error: 'Something went wrong', info: err }) };
+			} else response.send({ success: false, error: 'Invalid ID', info: 'The provided ID is not a valid YouTube id' });
 		});
 
 		app.get('/cutFile*', (request, response) => {
@@ -352,20 +335,20 @@ module.exports = {
 						ffmpegObj.output(file.path + file.fileName);
 						ffmpegObj.on('end', err => {
 							if (err)
-								response.send({success: false, error: JSON.parse(err)});
+								response.send({ success: false, error: JSON.parse(err) });
 							else
-								response.send({success: true});
+								response.send({ success: true });
 						});
 
 						ffmpegObj.on('error', err => {
 							console.log("FFMPEG Error", err);
-							response.send({success: false, error: JSON.parse(err)});
+							response.send({ success: false, error: JSON.parse(err) });
 						});
 
 						ffmpegObj.run();
-					} else response.send({success: false, error: "File not found"});
+					} else response.send({ success: false, error: "File not found" });
 				});
-			} else response.send({success: false, error: "Parameters missing"});
+			} else response.send({ success: false, error: "Parameters missing" });
 		});
 
 		app.get('/getSavedQueue/:type', (request, response) => {
@@ -382,10 +365,10 @@ module.exports = {
 						const sendData = (data) => {
 							if (data) {
 								if (data.queue)
-									response.send({success: true, data: data})
+									response.send({ success: true, data: data })
 								else
-									response.send({success: false, error: 'Nothing saved'})
-							} else response.send({success: false, error: 'Nothing saved'});
+									response.send({ success: false, error: 'Nothing saved' })
+							} else response.send({ success: false, error: 'Nothing saved' });
 						}
 
 						if (paramsType === 'audio') {
@@ -416,7 +399,7 @@ module.exports = {
 				}
 			}
 
-			response.send({success: false, error: 'Invalid type'});
+			response.send({ success: false, error: 'Invalid type' });
 		});
 
 		app.post('/ytdl*', (request, response) => {
@@ -429,7 +412,7 @@ module.exports = {
 				body += data;
 
 				if (body.length > 1e6) {
-					response.send({success: false, err: 'The amount of data is too much', info: 'The connection was destroyed because the amount of data passed is too much'});
+					response.send({ success: false, err: 'The amount of data is too much', info: 'The connection was destroyed because the amount of data passed is too much' });
 					request.connection.destroy();
 				}
 			});
@@ -438,48 +421,20 @@ module.exports = {
 				let json;
 
 				const sendData = data => {
-					response.send(data);
+					if (!response.headersSent)
+						response.send(data);
 				}
 
 				const sendError = err => {
+					console.error(err);
+
 					try {
 						sendData({
+							error: err.toString(),
+							jsonUpdated: false,
 							success: false,
-							error: err,
-							jsonUpdated: false
 						});
-					} catch (err) {}
-				}
-
-				const urlOk = url => {
-					url = URLModule.parse(url);
-
-					if ('query' in url) {
-						url.searchParams = querystring.parse(url.query);
-
-						if (url.hostname.startsWith('www.'))
-							url.hostname = url.hostname.replace(/^(www\.)/, '');
-
-						if (url.hostname == 'youtube.com') {
-							if ('v' in url.searchParams) {
-								const vidId = url.searchParams['v'];
-
-								if (vidId.length == 11)
-									return vidId;
-								else
-									return false;
-							} else return false;
-						} else if (url.hostname == 'youtu.be') {
-							const vidId = url.pathname.slice(1);
-
-							if (vidId.length == 11)
-								return vidId;
-							else
-								return false;
-						} else return false;
-					}
-
-					return false;
+					} catch (err) { }
 				}
 
 				const handleProgress = (chunkLength, downloaded, total) => {
@@ -487,7 +442,7 @@ module.exports = {
 						process.stdout.cursorTo(0);
 						process.stdout.clearLine(1);
 						process.stdout.write("DOWNLOADING: " + (downloaded / total * 100).toFixed(2) + '% ');
-					} catch (err) {}
+					} catch (err) { }
 				}
 
 				const handleEnd = (path, json) => {
@@ -496,9 +451,9 @@ module.exports = {
 					fs.exists(path, exists => {
 						if (exists) {
 							fileHandler.searchSystem(fs, os, utils, settings).then(() => {
-								sendData({success: true, fileName: json.fileName + '.mp3', jsonUpdated: true});
+								sendData({ success: true, fileName: json.fileName + '.mp3', jsonUpdated: true });
 							}).catch(err => {
-								sendData({success: true, fileName: json.fileName, jsonUpdated: false});
+								sendData({ success: true, fileName: json.fileName, jsonUpdated: false });
 							});
 						} else sendError("File does not exist. This is a weird problem... You should investigate.");
 					});
@@ -506,7 +461,7 @@ module.exports = {
 
 				const handleVideo = (json, ffmpeg) => {
 					const path = os.homedir() + '/Videos/' + json.fileName + '.mp4';
-					const video = ytdl(json.url, { filter: function(format) { return format.container === 'mp4'; } });
+					const video = ytdl(json.url, { filter: function (format) { return format.container === 'mp4'; } });
 
 					video.pipe(fs.createWriteStream(path));
 					video.on('progress', handleProgress);
@@ -519,18 +474,22 @@ module.exports = {
 				const handleAudio = (json, ffmpeg) => {
 					const path = os.homedir() + '/Music/' + json.fileName + '.mp3';
 					const args = {
-						duration: json.endTime,
-						seek: json.startTime,
 						format: 'mp3',
-						bitrate: 128,
+						bitrate: 128
 					}
 
-					const reader = ytdl(json.url, {filter: 'audioonly'});
+					if (json.startTime > -1)
+						args.seek = json.startTime;
+					if (json.endTime > 1)
+						args.duration = json.endTime;
+
+					const reader = ytdl('https://youtube.com/watch?v=' + (new URL(json.url)).searchParams.get('v'), { filter: 'audioonly' });
 					const writer = ffmpeg(reader).format(args.format).audioBitrate(args.bitrate);
 
 					if (args.seek) writer.seekInput(args.seek);
 					if (args.duration) writer.duration(args.duration);
 
+					writer.on('error', sendError);
 					reader.on('progress', handleProgress);
 					reader.on('end', () => {
 						writer.on('end', () => {
@@ -555,18 +514,27 @@ module.exports = {
 						json.fileName = json.fileName.replace('\/', '\\');
 						json.fileName = json.fileName.replace(/[/\\?%*:|"<>]/g, '');
 
-						const options = {};
-						const vidId = urlOk(json.url);
-
-						if (vidId !== false)
-							json.url = vidId;
-						else {
+						if (!ytdl.validateURL(json.url)) {
 							sendError('Invalid url');
 							return;
 						}
 
-						if (json.beginTime) options.begin = json.beginTime;
-						if (json.endTime) options.end = json.endTime;
+						if (json.startTime) {
+							const parsedVal = parseInt(json.startTime, 10);
+
+							if (!Number.isNaN(parsedVal))
+								json.startTime = parsedVal;
+							else
+								json.startTime = -1;
+						}
+						if (json.endTime) {
+							const parsedVal = parseInt(json.endTime, 10);
+
+							if (!Number.isNaN(parsedVal))
+								json.endTime = parsedVal;
+							else
+								json.endTime = -1;
+						}
 
 						if (json.type == 'video')
 							handleVideo(json, ffmpeg);
@@ -585,7 +553,7 @@ module.exports = {
 				body += data;
 
 				if (body.length > 1e6) {
-					response.send({success: false, err: 'The amount of data is to much', info: 'The connection was destroyed because the amount of data passed is to much'});
+					response.send({ success: false, err: 'The amount of data is to much', info: 'The connection was destroyed because the amount of data passed is to much' });
 					request.connection.destroy();
 				}
 			});
@@ -607,15 +575,15 @@ module.exports = {
 
 					fs.writeFile(jsonPath, 'module.exports = ' + JSON.stringify(data), err => {
 						if (err)
-							response.send({success: false, info: err});
+							response.send({ success: false, info: err });
 						else {
-							response.send({success: true});
+							response.send({ success: true });
 							console.wrn('MusicStream restarting because the settings updated!');
 							process.exit(131);
 						}
 					});
 				} catch (err) {
-					response.send({success: false, info: err});
+					response.send({ success: false, info: err });
 				}
 			});
 		});
@@ -624,7 +592,7 @@ module.exports = {
 			let body = '';
 
 			const sendError = () => {
-				response.send({succss: false, error: 'No type specified'});
+				response.send({ succss: false, error: 'No type specified' });
 				request.connection.destroy();
 			}
 
@@ -634,7 +602,7 @@ module.exports = {
 						body += data;
 
 						if (body.length > 1e6) {
-							request.send({success: false, error: 'The amount of data is to high', info: 'The connection was destroyed because the amount of data passed is to much'});
+							request.send({ success: false, error: 'The amount of data is to high', info: 'The connection was destroyed because the amount of data passed is to much' });
 							request.connection.destroy();
 						}
 					});
@@ -647,7 +615,7 @@ module.exports = {
 						try {
 							body = JSON.parse(body);
 						} catch (err) {
-							response.send({success: false, error: 'Unable to parse JSON', info: err});
+							response.send({ success: false, error: 'Unable to parse JSON', info: err });
 							return;
 						}
 
@@ -658,11 +626,11 @@ module.exports = {
 							const queue = ('queue' in body) ? body.queue : [];
 
 							if (objectKey.toLowerCase() == 'global') {
-								tmpQueueSave.audio.global = {queueIndex, timeStamp, queue};
-								response.send({success: true});
+								tmpQueueSave.audio.global = { queueIndex, timeStamp, queue };
+								response.send({ success: true });
 							} else {
-								tmpQueueSave.audio[request.connection.remoteAddress] = {queueIndex, timeStamp, queue};
-								response.send({success: true});
+								tmpQueueSave.audio[request.connection.remoteAddress] = { queueIndex, timeStamp, queue };
+								response.send({ success: true });
 							}
 						} else if (request.params.type.toLowerCase() === 'video') {
 							const queueIndex = ('queueIndex' in body) ? body.queueIndex : 0;
@@ -670,10 +638,10 @@ module.exports = {
 							const subtitle = ('subtitle' in body) ? body.subtitle : null;
 							const queue = ('queue' in body) ? body.queue : [];
 
-							tmpQueueSave.video = {queueIndex, timeStamp, queue, subtitle};
-							response.send({success: true});
+							tmpQueueSave.video = { queueIndex, timeStamp, queue, subtitle };
+							response.send({ success: true });
 						} else {
-							response.send({success: false, error: 'Invalid type'});
+							response.send({ success: false, error: 'Invalid type' });
 						}
 					});
 				} else sendError();
@@ -756,11 +724,9 @@ module.exports = {
 			if (err)
 				throw err;
 			else {
-				if (ips.length > 1) {
-					ips.forEach((object, key) => {
-						utils.colorLog(`${utils.logDate()} Server is running on: [[fgGreen, ${object}:${port}]]`, 'reset');
-					});
-				} else utils.colorLog(`${utils.logDate()} Server is running on: [[fgGreen, ${ips[0] || 'localhost'}:${port}]]`, 'reset');
+				ips.forEach((object, key) => {
+					utils.colorLog(`${utils.logDate()} Server is running on: [[fgGreen, ${object}:${port}]]`, 'reset');
+				});
 			}
 		});
 	}

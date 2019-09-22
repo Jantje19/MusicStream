@@ -103,6 +103,41 @@ a:hover {
 }
 
 /* Identifiers */
+#overflow-menu {
+	top: 50px;
+	right: 1%;
+	width: 150px;
+	display: none;
+	z-index: 100000;
+	position: absolute;
+	background-color: white;
+	box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+}
+
+#overflow-menu button {
+	width: 100%;
+	border: none;
+	padding: 10px;
+	height: initial;
+	cursor: pointer;
+	position: initial;
+	background-color: transparent;
+	transition: background-color .3s ease;
+}
+
+header > div:last-child {
+	right: 0;
+	padding: 0;
+	margin: 0 20px;
+	position: absolute;
+}
+
+header > div:last-child > button {
+	left: unset;
+	margin-left: 10px;
+	position: relative;
+}
+
 main {
 	display: flex;
 }
@@ -115,7 +150,41 @@ main > div:first-child {
 	height: 90vh;
 	flex-grow: 1.5;
 	max-width: 60%;
-	/*overflow-y: hidden;*/
+}
+
+main #queueWrapper > div#queueBtnHolder {
+	width: 40px;
+	float: left;
+	transform: translateY(-40%);
+}
+
+main #queueWrapper > div#queueBtnHolder>button {
+	width: 40px;
+	height: 40px;
+	border: none;
+	cursor: pointer;
+	position: relative;
+	border-radius: 100%;
+	background-color: transparent;
+}
+
+main #queueWrapper > div#queueBtnHolder > button:before {
+	top: 0;
+	left: 0;
+	opacity: 0;
+	width: 100%;
+	height: 100%;
+	content: ' ';
+	display: block;
+	position: absolute;
+	border-radius: 100%;
+	will-change: opacity;
+	transition: opacity 0.3s ease;
+	background-color: rgba(0, 0, 0, 0.3);
+}
+
+main #queueWrapper > div#queueBtnHolder > button:hover:before {
+	opacity: 1;
 }
 
 main > #videos > div > button, main > #videos .video, main #queue .queueItem {
@@ -286,7 +355,7 @@ main #player #autoplay #autoplay-time {
 	border-radius: 20px;
 	will-change: transform;
 	background-color: #16a085;
-	transition: transform 1s linear;
+	transition: transform .5s linear;
 }
 
 main #player #video-time-jump {
@@ -363,49 +432,63 @@ main #player #videoElem video {
 }
 
 main #player #videoElem #controls {
+	--height: 40px;
+
 	left: 0px;
 	width: 100%;
 	bottom: 0px;
-	height: 40px;
+	display: grid;
 	position: absolute;
+	height: var(--height);
+	will-change: transform;
 	background-color: #16a085;
 	transform: translateY(105%);
 	transition: transform .3s ease;
 	box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
-}
 
-/* (Old code for toggeling controls) */
-/*main #player #videoElem:hover #controls {
-transform: translateY(0px);
-}*/
+	grid-template-rows: var(--height);
+	grid-template-columns: var(--height) auto calc(var(--height) * 3);
+}
 
 main #player #videoElem #controls span {
 	width: auto;
 	color: white;
-	height: 100%;
-	display: inline-block;
-	transform: translateY(-3px);
+	padding: 0 5px;
+	white-space: nowrap;
 }
 
-main #player #videoElem #controls button {
-	height: 110%;
+main #player #videoElem #controls > div {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+main #player #videoElem #controls > div > button {
+	margin: 0;
+	padding: 0;
+	width: 40px;
+	height: 40px;
 	border: none;
+	display: flex;
 	cursor: pointer;
 	position: relative;
+    align-items: center;
+	justify-content: center;
 	background-color: transparent;
 }
 
 main #player #videoElem #controls button:before {
+	top: 0;
+	left: 0;
 	opacity: 0;
-	width: 40px;
-	height: 40px;
+	width: 100%;
+	height: 100%;
 	content: ' ';
 	display: block;
 	position: absolute;
 	border-radius: 100%;
 	background-color: black;
 	transition: opacity .5s ease;
-	transform: translate(-20%, -20%);
 }
 
 main #player #videoElem #controls button:hover:before {
@@ -456,9 +539,7 @@ video:-webkit-full-screen {
 
 
 main #controls #seekBar[type=range] {
-	width: 65%;
-	margin: 10px 0;
-	position: relative;
+	width: 80%;
 	border-radius: 20px;
 }
 
