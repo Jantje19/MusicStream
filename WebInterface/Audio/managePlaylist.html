@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html>
+
 <head lang="en">
 
 	<title>Music Stream - Manage Playlist</title>
 
-	<link rel="shortcut icon" href="Assets/Icons/favicon.ico"/>
-	<link rel="shortcut icon" href="Assets/Icons/favicon.ico" type="image/vnd.microsoft.icon"/>
+	<link rel="shortcut icon" href="Assets/Icons/favicon.ico" />
+	<link rel="shortcut icon" href="Assets/Icons/favicon.ico" type="image/vnd.microsoft.icon" />
 
 	<link rel="apple-touch-icon" sizes="57x57" href="Assets/Icons/apple-icon-57x57.png">
 	<link rel="apple-touch-icon" sizes="60x60" href="Assets/Icons/apple-icon-60x60.png">
@@ -16,7 +17,7 @@
 	<link rel="apple-touch-icon" sizes="144x144" href="Assets/Icons/apple-icon-144x144.png">
 	<link rel="apple-touch-icon" sizes="152x152" href="Assets/Icons/apple-icon-152x152.png">
 	<link rel="apple-touch-icon" sizes="180x180" href="Assets/Icons/apple-icon-180x180.png">
-	<link rel="icon" type="image/png" sizes="192x192"  href="Assets/Icons/android-icon-192x192.png">
+	<link rel="icon" type="image/png" sizes="192x192" href="Assets/Icons/android-icon-192x192.png">
 	<link rel="icon" type="image/png" sizes="32x32" href="Assets/Icons/favicon-32x32.png">
 	<link rel="icon" type="image/png" sizes="96x96" href="Assets/Icons/favicon-96x96.png">
 	<link rel="icon" type="image/png" sizes="16x16" href="Assets/Icons/favicon-16x16.png">
@@ -26,25 +27,25 @@
 	<!--Let browser know website is optimized for mobile-->
 	<!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"/> -->
 	<!-- <meta name="mobile-web-app-capable" content="yes"/> -->
-	<meta name="theme-color" content="#16a085"/>
+	<meta name="theme-color" content="#16a085" />
 	<meta name="msapplication-TileColor" content="#16a085">
-	<meta name="msapplication-navbutton-color" content="#16a085"/>
-	<meta name="apple-mobile-web-app-status-bar-style" content="#16a085"/>
+	<meta name="msapplication-navbutton-color" content="#16a085" />
+	<meta name="apple-mobile-web-app-status-bar-style" content="#16a085" />
 
-	<link href="all.css" rel="stylesheet" type="text/css" media="screen"/>
-	<link href="main.css" rel="stylesheet" type="text/css" media="screen"/>
-	<link href="seekbarStyle.css" rel="stylesheet" type="text/css" media="screen"/>
+	<link href="all.css" rel="stylesheet" type="text/css" media="screen" />
+	<link href="main.css" rel="stylesheet" type="text/css" media="screen" />
+	<link href="seekbarStyle.css" rel="stylesheet" type="text/css" media="screen" />
 
 	<script type="text/javascript">
 		let playlist = [];
 
 		function getPlaylistName() {
-			return unescape(location.hash.replace('#', ''));
+			return decodeURIComponent(location.hash.replace('#', ''));
 		}
 
 		function getData(url) {
 			return new Promise((resolve, reject) => {
-				fetch(url, {credentials: 'same-origin'}).then(response => {
+				fetch(url, { credentials: 'same-origin' }).then(response => {
 					if (response.type === 'opaque') reject('Received a response, but it\'s opaque so can\'t examine it');
 					else if (response.status !== 200) reject('Looks like there was a problem. Status Code: ' + response.status);
 					else {
@@ -138,9 +139,9 @@
 
 				if (innerElems.length > 1) {
 					if (confirm('Are you sure the playlist is okay like this?')) {
-						const jsonData = {name: getPlaylistName(), songs: innerElems.map(obj => {return obj.innerText})};
+						const jsonData = { name: getPlaylistName(), songs: innerElems.map(obj => { return obj.innerText }) };
 
-						fetch('/updatePlaylist/', {method: "POST", body: JSON.stringify(jsonData), credentials: 'same-origin'}).then(response => {
+						fetch('/updatePlaylist/', { method: "POST", body: JSON.stringify(jsonData), credentials: 'same-origin' }).then(response => {
 							response.json().then(json => {
 								if (json.success) {
 									if (json.error)
@@ -151,7 +152,7 @@
 									} else alert('Something went wrong', json.data);
 								} else alert(json.info);
 							});
-						}).catch( err => {
+						}).catch(err => {
 							console.error('An error occurred', err);
 						});
 					}
@@ -165,14 +166,14 @@
 						delete: true
 					}
 
-					fetch('updatePlaylist/', {method: 'POST', body: JSON.stringify(data), credentials: 'same-origin'}).then(response => {
+					fetch('updatePlaylist/', { method: 'POST', body: JSON.stringify(data), credentials: 'same-origin' }).then(response => {
 						response.json().then(json => {
 							if (json.success == true)
 								window.location = window.location.origin;
 							else
 								alert(json.error);
 						}).catch(err => console.log(err));
-					}).catch( err => {
+					}).catch(err => {
 						console.error('An error occurred', err);
 					});
 				}
@@ -187,11 +188,14 @@
 	</script>
 
 </head>
+
 <body>
 
 	<header>
 		<button id="back"><img src="Assets/ic_arrow_back_white.svg"></button>
-		<div style="padding-top: 5px"><h1>Manage Playlist</h1></div>
+		<div style="padding-top: 5px">
+			<h1>Manage Playlist</h1>
+		</div>
 		<button id="delete" style="right: 30px; left: unset;"><img src="Assets/ic_delete_white.svg"></button>
 	</header>
 
@@ -201,7 +205,11 @@
 				<h3>Songs</h3>
 				<hr>
 				<div id="songs">
-					<div class="ball-scale-multiple"><div></div><div></div><div></div></div>
+					<div class="ball-scale-multiple">
+						<div></div>
+						<div></div>
+						<div></div>
+					</div>
 				</div>
 			</div>
 			<div id="playlistsContainer">
@@ -212,10 +220,11 @@
 		</div>
 
 		<button id="fab"><img src="Assets/ic_send_white.svg"></button>
-	</div>
+		</div>
 
 
-</main>
+	</main>
 
 </body>
+
 </html>
