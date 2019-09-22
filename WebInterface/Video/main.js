@@ -329,11 +329,11 @@ function setVideoPlay(title) {
 
 			const skipVal = Number(settings.skipAmount.val) || 5;
 
-			navigator.mediaSession.setActionHandler('play', video.play);
-			navigator.mediaSession.setActionHandler('pause', video.pause);
+			navigator.mediaSession.setActionHandler('play', () => video.play());
+			navigator.mediaSession.setActionHandler('pause', () => video.pause());
 			navigator.mediaSession.setActionHandler('seekbackward', () => jumpVideoTime(-skipVal));
 			navigator.mediaSession.setActionHandler('seekforward', () => jumpVideoTime(skipVal));
-			navigator.mediaSession.setActionHandler('nexttrack', nextQueueItem);
+			navigator.mediaSession.setActionHandler('nexttrack', () => nextQueueItem());
 		}
 	}
 
@@ -396,10 +396,10 @@ function videoEnd(evt) {
 			if (i >= time) {
 				clearInterval(int);
 				timeElem.addEventListener('transitionend', () => {
-					nextQueueItem();
 					document.getElementById('autoplay').style.display = 'none';
 					textElem.innerText = `Autoplay in: ${time}s`;
 					timeElem.style.transform = '';
+					nextQueueItem();
 					i = 0;
 				}, { once: true });
 			}

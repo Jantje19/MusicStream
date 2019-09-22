@@ -266,11 +266,14 @@ main #videos > div.closed > button .toggleArrow {
 main #videos #loaderWrapper {
 	width: 100%;
 	height: 100%;
+	display: flex;
 	overflow: hidden;
+	justify-content: center;
 }
 
 main #videos #loaderWrapper > div {
-	transform: translate(50%, 20px);
+	overflow: unset;
+	transform: translate(0px, 30px);
 }
 
 main #player {

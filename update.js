@@ -18,7 +18,7 @@ if (process.argv[2] === 'spawned') {
 	}
 
 	access(__filename, constants.F_OK | constants.W_OK | constants.R_OK).then(() => {
-		console.log(`Installing MusicStream in '${process.argv[3]}'. Do not close this window!`);
+		console.log(`Installing MusicStream in '${process.argv[3]}'.\nDo not close this window!`);
 		msi.updateMusicstream(process.argv[3], (...args) => {
 			if (args[0] === 'download') {
 				process.stdout.cursorTo(0);
@@ -53,16 +53,26 @@ if (process.argv[2] === 'spawned') {
 			end();
 		}, (...args) => {
 			console.error('Error:', ...args);
+		}, {
+			latestCommit: process.argv.includes('latestCommit')
 		});
 	}).catch(err => {
 		console.log('Can\'t write', err);
 		end();
 	});
 } else {
+	const latestCommit = process.argv.includes('--latest-commit');
 	const { spawn } = require('child_process');
 
+	if (process.argv.includes('--help') || process.argv.includes('-h') || process.argv.includes('help')) {
+		console.log(
+			'Available arguments:\n\t--latest-commit:\tInstalles the latest commit instead of the latest release'
+		);
+		process.exit();
+	}
+
 	console.log('Starting in new console...');
-	const subprocess = spawn(`"${process.argv[0]}"`, [__filename, 'spawned', __dirname], {
+	const subprocess = spawn(`"${process.argv[0]}"`, [__filename, 'spawned', __dirname, (latestCommit === true) ? 'latestCommit' : ''], {
 		detached: true,
 		stdio: 'ignore',
 		shell: true,
