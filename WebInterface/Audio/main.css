@@ -213,7 +213,7 @@ main #main button {
 	background-color: transparent;
 }
 
-main #main button:not(.tmpBtn):not(.listElem):before {
+main #main button:not(.tmpBtn):not(.listElem):not(.song):before {
 	opacity: 0;
 	width: 40px;
 	height: 40px;
@@ -227,7 +227,7 @@ main #main button:not(.tmpBtn):not(.listElem):before {
 }
 
 main #main button:not(.listElem):hover:before {
-	opacity: 0.15;
+	opacity: 0.15 !important;
 }
 
 main #main > div > hr {
