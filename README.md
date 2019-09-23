@@ -2,13 +2,6 @@
 A NodeJS server and web client for streaming music (and videos) to your network
 
 ## Installation
-### Installer
-
-You can try the [(buggy) GUI installer](https://github.com/jantje19/MusicStream-Installer/) based on Electron.
-
-### Windows install video
-
-[![Installation video](https://i.ytimg.com/vi/Laqh05oIK4g/maxresdefault.jpg)](http://www.youtube.com/watch?v=UOG_lOcmQlo)
 
 ### Manual Installation Steps
 1. Install [Node.js](https://nodejs.org/en/download/package-manager/)
