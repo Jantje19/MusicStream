@@ -11,9 +11,7 @@ A NodeJS server and web client for streaming music (and videos) to your network
 5. In your browser go to: http://localhost:8000
 
 ### Running
-Try the *universal_python_executer.py* if you have python installed.
-Otherwise move into the folder of your platform and execute one of the files within that folder.
-If both of these methods fail, run `npm start` in the *MusicaStream* directory in a CLI.
+Run `npm start` in the *MusicaStream* directory in a CLI.
 
 ## Updating
 By default MusicStream will check if there is a new version available (This can be turned off in the settings). It will only notify, not update.
