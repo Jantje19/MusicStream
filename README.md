@@ -15,7 +15,8 @@ Run `npm start` in the *MusicaStream* directory in a CLI.
 
 ## Updating
 By default MusicStream will check if there is a new version available (This can be turned off in the settings). It will only notify, not update.
-In future there will be a automated update function included with MusicStream, but in the meantime you can use the [installer](https://github.com/jantje19/MusicStream-Installer/) or update manually.
+As of MusicStream version v0.2.5, you can run `npm run update` or `node update.js` for an automated update process.
+If you're running an older version, you can follow the [instructions below](#manual-updating).
 
 ### Manual updating
 Updating MusicStream isn't very difficult, but it is a bit tedious.
