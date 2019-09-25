@@ -555,7 +555,7 @@ if (process.argv.includes('-h') || process.argv.includes('--help') || process.ar
 		if (newVersion.greater)
 			utils.colorLog(`[[reset, ${utils.logDate()}]] [[fgGreen, No update available.]]\nRunning version: [[fgBlue, ${newVersion.version}]].\nBut this version is greater than the version of latest release on GitHub ([[fgBlue, ${newVersion.githubVersion}]]), maybe you want to get the code from GitHub: [[fgYellow, ${newVersion.url}]].\nDon't forget to update the settings file!\n`, 'fgOrange');
 		else if (newVersion.isAvailable == true)
-			utils.colorLog(`[[reset, ${utils.logDate()}]] [[fgGreen, A new update is available:]] [[fgBlue, ${newVersion.version}]].\nYou can download it at: [[fgMagenta, ${newVersion.url}]].\nDon't forget to update the settings file!\n`, 'fgGreen');
+			utils.colorLog(`[[reset, ${utils.logDate()}]] [[fgGreen, A new update is available:]] [[fgBlue, ${newVersion.version}]].\nYou can download it at: [[fgMagenta, ${newVersion.url}]].\nRun 'node update.js' to upgrade to the latest version\n`, 'fgGreen');
 		else {
 			utils.colorLog(`[[reset, ${utils.logDate()}]] [[fgGreen, No update available.]] Running version: [[fgBlue, ${newVersion.version}]]\n`, 'fgCyan');
 			utils.colorLog('[[bgCyan, Changelog]]', 'underscore');
@@ -721,7 +721,7 @@ if (settings.checkForUpdateOnStart.val == true) {
 			utils.colorLog(`[[reset, ${utils.logDate()}]] [[fgGreen, No update available.]]\nRunning version: [[fgBlue, ${newVersion.version}]].\nBut this version is greater than the version of latest release on GitHub ([[fgBlue, ${newVersion.githubVersion}]]), maybe you want to get the code from GitHub: [[fgYellow, ${newVersion.url}]].\nDon't forget to update the settings file!\n`, 'fgOrange');
 			startServer();
 		} else if (newVersion.isAvailable == true) {
-			utils.colorLog(`[[reset, ${utils.logDate()}]] [[fgGreen, A new update is available:]] [[fgBlue, ${newVersion.version}]].\nYou can download it at: [[fgMagenta, ${newVersion.url}]].\nDon't forget to update the settings file!\n`, 'fgGreen');
+			utils.colorLog(`[[reset, ${utils.logDate()}]] [[fgGreen, A new update is available:]] [[fgBlue, ${newVersion.version}]].\nYou can download it at: [[fgMagenta, ${newVersion.url}]].\nRun 'node update.js' to upgrade to the latest version\n`, 'fgGreen');
 		} else {
 			utils.colorLog(`[[reset, ${utils.logDate()}]] [[fgGreen, No update available.]] Running version: [[fgBlue, ${newVersion.version}]]\n`, 'fgCyan');
 			utils.colorLog('[[bgCyan, Changelog]]', 'underscore');
