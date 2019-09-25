@@ -42,16 +42,6 @@ This program needs Node-ID3 version 0.0.10 or higher to work with images properl
 
 Manipulating files (adding/removing tags) requires the installation of [FFMPEG](https://www.ffmpeg.org/download.html). This is not required however.
 
-Supported browsers with build numbers (I would hope):
-- Edge: 14
-- Chrome: 49
-- Firefox: 52
-- Safari: 10
-- Opera: 44
-- IOS (Safari): 9.3
-- Android (Chrome): 57
-- Android browser (WebView): 56
-
 Internet Explorer won't work. (*but why would you use it anyway.*)
 
 **You can still use it on old browsers. On the main page it will ask you to move to the old browsers page. It features a limited interface and features.**
