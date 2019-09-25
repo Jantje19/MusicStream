@@ -1,187 +1,190 @@
 <!DOCTYPE html>
 <html>
+
 <head lang="en">
 
 	<title>MusicStream - Help / Shortcuts</title>
 
 	<style type="text/css">
-	* {
-		font-family: -apple-system, BlinkMacSystemFont,
-		"Segoe UI", "Roboto", "Oxygen",
-		"Ubuntu", "Cantarell", "Fira Sans",
-		"Droid Sans", "Helvetica Neue", sans-serif;
-	}
+		* {
+			font-family: -apple-system, BlinkMacSystemFont,
+				"Segoe UI", "Roboto", "Oxygen",
+				"Ubuntu", "Cantarell", "Fira Sans",
+				"Droid Sans", "Helvetica Neue", sans-serif;
+		}
 
-	body {
-		margin: 0;
-	}
+		body {
+			margin: 0;
+		}
 
-	header {
-		margin: 0 10px;
-		text-align: center;
-	}
+		header {
+			margin: 0 10px;
+			text-align: center;
+		}
 
-	main {
-		margin: 30px 10px;
-		margin-bottom: 50px;
-	}
+		main {
+			margin: 30px 10px;
+			margin-bottom: 50px;
+		}
 
-	main > div {
-		width: 80%;
-		margin: auto;
-		background-color: #16a085;
-	}
+		main>div {
+			width: 80%;
+			margin: auto;
+			background-color: #16a085;
+		}
 
-	main div div h2 {
-		color: white;
-		margin: 5px 0;
-		display: inline-block;
-	}
+		main div div h2 {
+			color: white;
+			margin: 5px 0;
+			display: inline-block;
+		}
 
-	main div div button {
-		z-index: 1;
-		float: right;
-		border: none;
-		cursor: pointer;
-		margin-top: 10px;
-		position: relative;
-		transform: rotate(180deg);
-		background-color: transparent;
-		transition: transform .3s ease;
-	}
+		main div div button {
+			z-index: 1;
+			float: right;
+			border: none;
+			cursor: pointer;
+			margin-top: 10px;
+			position: relative;
+			transform: rotate(180deg);
+			background-color: transparent;
+			transition: transform .3s ease;
+		}
 
-	main div div button:after {
-		top: 0;
-		left: 0;
-		opacity: 0;
-		z-index: -1;
-		width: 40px;
-		height: 40px;
-		content: ' ';
-		display: block;
-		position: absolute;
-		border-radius: 100%;
-		background-color: white;
-		transition: opacity .3s ease;
-		transform: translate(-5%, -15%);
-	}
+		main div div button:after {
+			top: 0;
+			left: 0;
+			opacity: 0;
+			z-index: -1;
+			width: 40px;
+			height: 40px;
+			content: ' ';
+			display: block;
+			position: absolute;
+			border-radius: 100%;
+			background-color: white;
+			transition: opacity .3s ease;
+			transform: translate(-5%, -15%);
+		}
 
-	main div div button:hover:after {
-		opacity: 0.3;
-	}
+		main div div button:hover:after {
+			opacity: 0.3;
+		}
 
-	main > div > div {
-		padding: 10px;
-	}
+		main>div>div {
+			padding: 10px;
+		}
 
-	main > div > div hr {
-		border: none;
-		border-bottom: 1px solid lightgray;
-	}
+		main>div>div hr {
+			border: none;
+			border-bottom: 1px solid lightgray;
+		}
 
-	main > div > div code {
-		padding: 10px;
-		display: block;
-		font-family: monospace;
-		background-color: lightgray;
-	}
+		main>div>div code {
+			padding: 10px;
+			display: block;
+			font-family: monospace;
+			background-color: lightgray;
+		}
 
-	main > div > div:last-child {
-		height: auto;
-		max-height: 0px;
-		padding: 0 10px;
-		overflow: hidden;
-		background-color: #EEEEEE;
-		/*transition: max-height .5s ease;*/
-	}
+		main>div>div:last-child {
+			height: auto;
+			max-height: 0px;
+			padding: 0 10px;
+			overflow: hidden;
+			background-color: #EEEEEE;
+			/*transition: max-height .5s ease;*/
+		}
 
-	main #WAQ {
-		margin: 40px auto;
-		background-color: transparent;
-	}
+		main #WAQ {
+			margin: 40px auto;
+			background-color: transparent;
+		}
 
-	main #WAQ > div {
-		padding: 0;
-		max-height: initial;
-	}
+		main #WAQ>div {
+			padding: 0;
+			max-height: initial;
+		}
 
-	main #WAQ > div b {
-		width: 100%;
-		color: white;
-		padding: 10px;
-		display: block;
-		background-color: #16a085;
-	}
+		main #WAQ>div b {
+			width: 100%;
+			color: white;
+			padding: 10px;
+			display: block;
+			background-color: #16a085;
+		}
 
-	main #WAQ > div p {
-		margin-left: 15px;
-	}
+		main #WAQ>div p {
+			margin-left: 15px;
+		}
 
-	main #WAQ > div:last-child {
-		background-color: white;
-	}
+		main #WAQ>div:last-child {
+			background-color: white;
+		}
 
-	footer {
-		left: 0;
-		bottom: 0;
-		width: 100%;
-		z-index: 1000;
-		position: fixed;
-		text-align: center;
-		background-color: #222222;
-	}
+		footer {
+			left: 0;
+			bottom: 0;
+			width: 100%;
+			z-index: 1000;
+			position: fixed;
+			text-align: center;
+			background-color: #222222;
+		}
 
-	footer p {
-		margin: 0;
-		color: white;
-		padding: 5px;
-	}
-</style>
+		footer p {
+			margin: 0;
+			color: white;
+			padding: 5px;
+		}
+	</style>
 
-<script type="text/javascript">
-	function load() {
-		const buttons = Array.from(document.querySelectorAll('main div div button'));
+	<script type="text/javascript">
+		function load() {
+			const buttons = Array.from(document.querySelectorAll('main div div button'));
 
-		buttons.forEach((object, key) => {
-			object.addEventListener('click', evt => {
-				let btn, elem;
+			buttons.forEach((object, key) => {
+				object.addEventListener('click', evt => {
+					let btn, elem;
 
-				if (evt.target == evt.currentTarget) {
-					btn = evt.target;
-					elem = evt.target.parentElement.parentElement.querySelectorAll('div')[1];
-				} else {
-					btn = evt.target.parentElement;
-					elem = evt.target.parentElement.parentElement.parentElement.querySelectorAll('div')[1];
-				}
+					if (evt.target == evt.currentTarget) {
+						btn = evt.target;
+						elem = evt.target.parentElement.parentElement.querySelectorAll('div')[1];
+					} else {
+						btn = evt.target.parentElement;
+						elem = evt.target.parentElement.parentElement.parentElement.querySelectorAll('div')[1];
+					}
 
-				if (elem.style.maxHeight == elem.getAttribute('maxHeight') + 'px') {
-					elem.style.maxHeight = '0px';
-					btn.style.transform = 'rotate(180deg)';
-				} else {
-					// elem.style.maxHeight = elem.getAttribute('maxHeight') + 'px';
-					elem.style.maxHeight = '100%';
-					btn.style.transform = 'rotate(0deg)';
-				}
+					if (elem.style.maxHeight == elem.getAttribute('maxHeight') + 'px') {
+						elem.style.maxHeight = '0px';
+						btn.style.transform = 'rotate(180deg)';
+					} else {
+						// elem.style.maxHeight = elem.getAttribute('maxHeight') + 'px';
+						elem.style.maxHeight = '100%';
+						btn.style.transform = 'rotate(0deg)';
+					}
+				});
 			});
-		});
 
-		// For plugins
-		try {
-			loaded();
-		} catch (err) {}
-	}
+			// For plugins
+			try {
+				loaded();
+			} catch (err) { }
+		}
 
-	window.onload = load;
-</script>
+		window.onload = load;
+	</script>
 
 </head>
+
 <body>
 
 	<header>
 		<h1>Help / Shortcuts / Code Documentation</h1>
 
 		<p>
-			If you cannot find what you are looking for or you have found a bug, don't hesitate to ask: <a href="mailto:vic@testsite-vic.ml">Mail</a> / <a href="https://github.com/jantje19/MusicStream/issues">Github</a>
+			If you cannot find what you are looking for or you have found a bug, don't hesitate to ask: <a
+				href="https://github.com/jantje19/MusicStream/issues">Github</a>
 		</p>
 	</header>
 
@@ -211,7 +214,9 @@
 				<h3>Supported extensions</h3>
 
 				<p>
-					By default the supported file extensions are: <i>'mp3'</i>, <i>'m3a'</i> and <i>'wav'</i>. But you can add or remove extensions on the <a href="/settings/">settings page</a>. Take into account that not every browser supports the same file extensions.
+					By default the supported file extensions are: <i>'mp3'</i>, <i>'m3a'</i> and <i>'wav'</i>. But you
+					can add or remove extensions on the <a href="/settings/">settings page</a>. Take into account that
+					not every browser supports the same file extensions.
 				</p>
 
 				<hr>
@@ -219,7 +224,9 @@
 				<h3>Most Listened Playlist</h3>
 
 				<p>
-					This playlist will be updated when a song ends. The name is editable on the <a href="/settings/">settings page</a>. Take into account that after initialization of the playlist name you have to update the <i>playlists.json</i> too.
+					This playlist will be updated when a song ends. The name is editable on the <a
+						href="/settings/">settings page</a>. Take into account that after initialization of the playlist
+					name you have to update the <i>playlists.json</i> too.
 				</p>
 
 				<hr>
@@ -227,7 +234,8 @@
 				<h3>Song Info</h3>
 
 				<p>
-					When a song is played, it first queries the <i>Last.fm service</i> for the artist. Then it queries the local server for the song tags. If found, it replaces the artist info.<br>
+					When a song is played, it first queries the <i>Last.fm service</i> for the artist. Then it queries
+					the local server for the song tags. If found, it replaces the artist info.<br>
 					The web MediaSession API also gets initialized.
 				</p>
 
@@ -236,7 +244,8 @@
 				<h3>Buttons</h3>
 
 				<p>
-					The interface consists of various buttons. The purpose of every button is explained as a title that will appear when you hover over it.
+					The interface consists of various buttons. The purpose of every button is explained as a title that
+					will appear when you hover over it.
 				</p>
 
 				<hr>
@@ -244,7 +253,8 @@
 				<h3>Mobile phone support</h3>
 
 				<p>
-					The interface is not (yet) designed for small screens. However, it still can be used on mobile phones.<br>
+					The interface is not (yet) designed for small screens. However, it still can be used on mobile
+					phones.<br>
 					As of right now the web MediaSession API only works on mobile phones.<br>
 					The web interface has a manifest for adding it to the home screen.
 				</p>
@@ -254,7 +264,9 @@
 				<h3>Old Browsers</h3>
 
 				<p>
-					When an old browser is detected, the page asks if you want to switch to a page with limited functionality, so that you can still use it on old browsers. Note: only the home page checks for old browsers.
+					When an old browser is detected, the page asks if you want to switch to a page with limited
+					functionality, so that you can still use it on old browsers. Note: only the home page checks for old
+					browsers.
 				</p>
 			</div>
 		</div>
@@ -269,7 +281,8 @@
 				<h3>Features</h3>
 
 				<p>
-					The video page shows a basic video player. You can drag videos from the right hand side menu to the queue or use CTRL+Click.
+					The video page shows a basic video player. You can drag videos from the right hand side menu to the
+					queue or use CTRL+Click.
 				</p>
 
 				<hr>
@@ -277,7 +290,9 @@
 				<h3>Supported extensions</h3>
 
 				<p>
-					By default the supported file extension is <i>'mp4'</i>. But you can add or remove extensions on the <a href="/settings/">settings page</a>. Take into account that not every browser supports the same file extensions.
+					By default the supported file extension is <i>'mp4'</i>. But you can add or remove extensions on the
+					<a href="/settings/">settings page</a>. Take into account that not every browser supports the same
+					file extensions.
 				</p>
 
 				<hr>
@@ -285,7 +300,8 @@
 				<h3>Buttons</h3>
 
 				<p>
-					The interface consists of various buttons. The purpose of every button is explained as a title that will appear when you hover over it.
+					The interface consists of various buttons. The purpose of every button is explained as a title that
+					will appear when you hover over it.
 				</p>
 
 				<hr>
@@ -293,7 +309,8 @@
 				<h3>Mobile phone support</h3>
 
 				<p>
-					The interface is not (yet) designed for small screens. However, it still can be used on mobile phones.<br>
+					The interface is not (yet) designed for small screens. However, it still can be used on mobile
+					phones.<br>
 					The web interface has a manifest for adding it to the home screen.
 				</p>
 			</div>
@@ -307,9 +324,11 @@
 
 			<div maxHeight="200">
 				<p>
-					This feature is used for downloading youtube videos. Simply paste the youtube url into the input box, select the type and hit <i>Search</i>, the page and the server will handle the rest.
+					This feature is used for downloading youtube videos. Simply paste the youtube url into the input
+					box, select the type and hit <i>Search</i>, the page and the server will handle the rest.
 					You can monitor the progress in the servers terminal window.<br>
-					The tag functionality can act a big wonky sometimes and I don't know how to fix it, but you can add the tags yourself (or auto-add them) on the <a href="/editTags.html">edit tags page</a>.<br>
+					The tag functionality can act a big wonky sometimes and I don't know how to fix it, but you can add
+					the tags yourself (or auto-add them) on the <a href="/editTags.html">edit tags page</a>.<br>
 					You can use this to download audio and video. It'll automaticly add it to the right folder.
 				</p>
 			</div>
@@ -326,7 +345,8 @@
 					<h3>Index.js Arguments</h3>
 
 					<p>
-						The <i>index.js</i> file can accept a couple of arguments. You can either type: <code>npm start **argument**</code> or <code>node index.js **argument**</code>
+						The <i>index.js</i> file can accept a couple of arguments. You can either type:
+						<code>npm start **argument**</code> or <code>node index.js **argument**</code>
 					</p>
 
 					<h4>Arguments are:</h4>
@@ -342,7 +362,8 @@
 						</li>
 						<li>
 							<b>rename-file:</b>
-							<span>Renames a file in all indexes found by this app. It will change the file name and update playlists.</span>
+							<span>Renames a file in all indexes found by this app. It will change the file name and
+								update playlists.</span>
 						</li>
 					</ul>
 				</p>
@@ -350,12 +371,14 @@
 				<hr>
 
 				<p>
-					There is a <a href="/settings/">settings page</a> where you can edit basic settings. You will have to restart the server after you save!
+					There is a <a href="/settings/">settings page</a> where you can edit basic settings. You will have
+					to restart the server after you save!
 				</p>
 
 				<hr>
 
-				<p>The audio player can accept a <i>query</i> search parameter, you can give it song titles and it will play them. If the song title contains an ampersand, replace it with <i>[AMP]</i>.</p>
+				<p>The audio player can accept a <i>query</i> search parameter, you can give it song titles and it will
+					play them. If the song title contains an ampersand, replace it with <i>[AMP]</i>.</p>
 
 				<hr>
 
@@ -364,7 +387,8 @@
 				<h4 style="font-size: 0.8em;"><a href="/data/">Data</a></h4>
 
 				<p>
-					Displays all the songs, videos and playlists. By default the songs are sorted in alphabetical order.<br><br>
+					Displays all the songs, videos and playlists. By default the songs are sorted in alphabetical
+					order.<br><br>
 					<b style="font-size: 0.7em">Arguments</b>
 					<ul>
 						<li><a href="/data/"><b>NONE:</b></a> Sorts by alphabet</li>
@@ -389,7 +413,8 @@
 
 				<p>
 					Fetches lyrics from <a href="https://makeitpersonal.co"><i>makeitpersonal.co</i></a>.<br>
-					A valid request looks like this: <a href="/getLyrics/Michael Jackson/Thriller">/getLyrics/Michael Jackson/Thriller</a>
+					A valid request looks like this: <a href="/getLyrics/Michael Jackson/Thriller">/getLyrics/Michael
+						Jackson/Thriller</a>
 				</p>
 
 				<h4 style="font-size: 0.8em;"><a href="/updatePlaylist">Update Playlist</a></h4>
@@ -400,7 +425,8 @@
 					<code>{name: **PLAYLIST NAME**, songs: **SONGS ARRAY**}</code>
 				</p>
 
-				<h4 style="font-size: 0.8em;"><a href="/updateMostListenedPlaylist">Update Most Listened Playlist</a></h4>
+				<h4 style="font-size: 0.8em;"><a href="/updateMostListenedPlaylist">Update Most Listened Playlist</a>
+				</h4>
 
 				<p>
 					A post request. Updates value in Most Listened playlist. The body requires the song name.
@@ -466,69 +492,69 @@
 				</p>
 			</div>
 		</div>
-	</div>
-
-
-	<div id="WAQ">
-		<h3>WAQ</h3>
-
-		<div>
-			<b>How do I set this up?</b>
-			<p>
-				You can download an installer <a href="https://github.com/jantje19/MusicStream-Installer/releases/latest">here</a>. Keep in mind that it can be buggy.
-				<br>
-				<a href="https://www.youtube.com/watch?v=UOG_lOcmQlo">You can watch this video</a> or follow these four steps:
-
-				<ol>
-					<li>Install <a href="https://nodejs.org/en/download/package-manager/">node.js</a></li>
-					<li>Download the <a href="https://github.com/jantje19/MusicStream/releases/latest">latest release</a> from the GitHub repo (zip file can be found at the bottom)</li>
-					<li>Within the directory run: <code>npm install &amp;&amp; npm start</code> in a CLI</li>
-					<li>Go to <a href="http://localhost:8000">http://localhost:8000</a></li>
-				</ol>
-			</p>
 		</div>
 
-		<div>
-			<b>The website says that there are no media files</b>
-			<p>
-				By default <i>MusicStream</i> searches in the <i>Music</i> and <i>Video</i> folders of the home directory (On windows it looks like this: "C:/Users/&lt;USER&gt;/Documents/Music/". On linux it looks like: "/home/&lt;USER&gt;/Music/"). If this directory doesn't exist the console will notify you.<br><br>
-				If the directory doesn't exist or is empty, no files will be found. You can either move all of your media files into those directories, or you can go into settings and untick the "CheckOsHomedirs" checkbox and add a path to the "MediaPaths" input box.
-			</p>
-		</div>
 
-		<div>
-			<b>I get a <i>'No info found for that video id'</i> error when I try to download a YouTube video.</b>
-			<p>
-				Unfortunally YouTube updates its video API rather frequently. This means that the NPM-package responsable for downloading the YouTube video has to be updated frequently. So try running the <code>npm update</code> command. If that doesn't work go to <a href="https://www.npmjs.com/package/ytdl-core">this</a> page and find the latest version number (most of the times it looks something like <i>0.20.1</i>), then run <code>npm install ytdl-core@VERSION-NUMBER</code> (of course replace <i>VERSION-NUMBER</i> with the version number found on <a href="https://www.npmjs.com/package/ytdl-core">this</a> page).
-			</p>
-		</div>
+		<div id="WAQ">
+			<h3>WAQ</h3>
 
-		<div>
-			<b>I have found a bug, what do I do?</b>
-			<p>
-				Bugs can be reported on the <a href="https://github.com/Jantje19/MusicStream/issues/new/">Github issue tracker</a> with the <i style="background-color: red">bug</i> label. Please be so thoughtful to try to recreate the bug and submit an as detailed as possible explaination. Screenshots are always appreciated.
-			</p>
-		</div>
+			<div>
+				<b>The website says that there are no media files</b>
+				<p>
+					By default <i>MusicStream</i> searches in the <i>Music</i> and <i>Video</i> folders of the home
+					directory (On windows it looks like this: "C:/Users/&lt;USER&gt;/Documents/Music/". On linux it
+					looks like: "/home/&lt;USER&gt;/Music/"). If this directory doesn't exist the console will notify
+					you.<br><br>
+					If the directory doesn't exist or is empty, no files will be found. You can either move all of your
+					media files into those directories, or you can go into settings and untick the "CheckOsHomedirs"
+					checkbox and add a path to the "MediaPaths" input box.
+				</p>
+			</div>
 
-		<div>
-			<b>I have an amazing idea for this program</b>
-			<p>
-				Ideas are always welcome. You can add an <a href="https://github.com/Jantje19/MusicStream/issues/new/">issue on Github</a> with the <i style="background-color: yellow">idea</i> tag.
-			</p>
-		</div>
+			<div>
+				<b>I get a <i>'No info found for that video id'</i> error when I try to download a YouTube video.</b>
+				<p>
+					Unfortunally YouTube updates its video API rather frequently. This means that the NPM-package
+					responsable for downloading the YouTube video has to be updated frequently. So try running the
+					<code>npm update</code> command. If that doesn't work go to <a
+						href="https://www.npmjs.com/package/ytdl-core">this</a> page and find the latest version number
+					(most of the times it looks something like <i>0.20.1</i>), then run
+					<code>npm install ytdl-core@VERSION-NUMBER</code> (of course replace <i>VERSION-NUMBER</i> with the
+					version number found on <a href="https://www.npmjs.com/package/ytdl-core">this</a> page).
+				</p>
+			</div>
 
-		<div>
-			<b>Can I help the development?</b>
-			<p>
-				You sure can. All the support is greatly appreciated. I am currently maintaining this project on my own. Every designer, product developer, software engenierer or other help is always helpfull. Even pointing out spelling mistakes is super useful. You can fork this project on <a href="https://github.com/jantje19/MusicStream/">Github</a>.
-			</p>
-		</div>
-	</div>
-</main>
+			<div>
+				<b>I have found a bug, what do I do?</b>
+				<p>
+					Bugs can be reported on the <a href="https://github.com/Jantje19/MusicStream/issues/new/">Github
+						issue tracker</a> with the <i style="background-color: red">bug</i> label. Please be so
+					thoughtful to try to recreate the bug and submit an as detailed as possible explaination.
+					Screenshots are always appreciated.
+				</p>
+			</div>
 
-<footer>
-	<p>&copy; Vic</p>
-</footer>
+			<div>
+				<b>I have an amazing idea for this program</b>
+				<p>
+					Ideas are always welcome. You can add an <a
+						href="https://github.com/Jantje19/MusicStream/issues/new/">issue on Github</a> with the <i
+						style="background-color: yellow">idea</i> tag.
+				</p>
+			</div>
+
+			<div>
+				<b>Can I help the development?</b>
+				<p>
+					You sure can. All the support is greatly appreciated. I am currently maintaining this project on my
+					own. Every designer, product developer, software engenierer or other help is always helpfull. Even
+					pointing out spelling mistakes is super useful. You can fork this project on <a
+						href="https://github.com/jantje19/MusicStream/">Github</a>.
+				</p>
+			</div>
+		</div>
+	</main>
 
 </body>
+
 </html>

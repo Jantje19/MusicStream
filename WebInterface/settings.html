@@ -1,167 +1,176 @@
 <!DOCTYPE html>
 <html>
+
 <head lang="en">
 
 	<title>Settings</title>
 
 	<style type="text/css">
-	* {
-		font-family: -apple-system, BlinkMacSystemFont,
-		"Segoe UI", "Roboto", "Oxygen",
-		"Ubuntu", "Cantarell", "Fira Sans",
-		"Droid Sans", "Helvetica Neue", sans-serif;
-	}
-
-	body {
-		top: 0;
-		left: 0;
-		margin: 0;
-		width: 100%;
-		height: 100%;
-		position: absolute;
-		overflow-x: hidden;
-	}
-
-	header h1 {
-		margin: 0;
-		margin-left: 10px;
-	}
-
-	main div#settings {
-		width: 80%;
-		margin: auto;
-	}
-
-	main button {
-		color: white;
-		border: none;
-		display: block;
-		cursor: pointer;
-		margin: 50px 10%;
-		padding: 10px 20px;
-		background-color: #16a085;
-	}
-
-	main button#checkUpdate {
-		background-color: lightgray;
-	}
-</style>
-
-<link href="all.css" rel="stylesheet" type="text/css" media="screen"/>
-
-<script type="text/javascript">
-	function typeToHTML(type, title, desc, val, data) {
-		let html = `<h3>${title}</h3><p>${desc}</p>`;
-
-		switch (type) {
-			case 'mult':
-			html += `<input caseVal="${type}" id="${title}" type="text" value="${val.toString().replace(/\,/g, '; ')}">`;
-			break;
-			case 'bool':
-			html += `<input caseVal="${type}" id="${title}" type="checkbox" ${(val == true) ? 'checked' : ''}>`;
-			break;
-			case 'range':
-			html += `<input caseVal="${type}" id="${title}" onchange="change(this)" type="range" value="${val}"><label for="${title}">${val}</label>`;
-			break;
-			case 'string':
-			html += `<input caseVal="${type}" id="${title}" type="text" value="${val}">`;
-			break;
-			case 'number':
-			html += `<input caseVal="${type}" id="${title}" type="number" value="${val}" min="0" max="100">`;
-			break;
-			case 'choise':
-			html += `<select caseVal="${type}" id="${title}">${data.options.map(value => `<option ${(value === val) ? 'selected' : ''} value="${value}">${value}</option>`).join('')}</select>`;
-			break;
+		* {
+			font-family: -apple-system, BlinkMacSystemFont,
+				"Segoe UI", "Roboto", "Oxygen",
+				"Ubuntu", "Cantarell", "Fira Sans",
+				"Droid Sans", "Helvetica Neue", sans-serif;
 		}
 
-		return html;
-	}
+		body {
+			top: 0;
+			left: 0;
+			margin: 0;
+			width: 100%;
+			height: 100%;
+			position: absolute;
+			overflow-x: hidden;
+		}
 
-	function valToJSON(elem, type) {
-		switch (type) {
-			case 'mult':
-			if (elem.value.trim().length > 0)
-				return (elem.value.trim().replace(/(\s+)?\;(\s+)?/g, ',')).split(',');
+		header h1 {
+			margin: 0;
+			margin-left: 10px;
+			font-weight: unset;
+		}
+
+		main div#settings {
+			width: 80%;
+			margin: auto;
+		}
+
+		main button {
+			color: white;
+			border: none;
+			display: block;
+			cursor: pointer;
+			margin: 50px 10%;
+			padding: 10px 20px;
+			background-color: #16a085;
+		}
+
+		main button#checkUpdate {
+			background-color: lightgray;
+		}
+	</style>
+
+	<link href="all.css" rel="stylesheet" type="text/css" media="screen" />
+
+	<script type="text/javascript">
+		function typeToHTML(type, title, desc, val, data) {
+			let html = `<h3>${title}</h3><p>${desc}</p>`;
+			let typeSplit;
+
+			if (type.includes('/'))
+				typeSplit = type.split('/');
 			else
-				return [];
-			case 'bool':
-			return Boolean(elem.checked);
-			case 'range':
-			return Number(elem.value);
-			case 'string':
-			return elem.value.toString();
-			case 'number':
-			return Number(elem.value);
-			case 'choise':
-			return elem.value;
+				typeSplit = [type];
+
+			switch (typeSplit[0]) {
+				case 'mult':
+					html += `<input caseVal="${type}" id="${title}" type="text" value="${val.toString().replace(/\,/g, '; ')}">`;
+					break;
+				case 'bool':
+					html += `<input caseVal="${type}" id="${title}" type="checkbox" ${(val == true) ? 'checked' : ''}>`;
+					break;
+				case 'range':
+					html += `<input caseVal="${type}" id="${title}" onchange="change(this)" type="range" value="${val}" min="${data.min}" max="${data.max}"><label for="${title}">${val}</label>`;
+					break;
+				case 'string':
+					html += `<input caseVal="${type}" id="${title}" ${(typeSplit.length > 1) ? `type="${typeSplit[1]}"` : 'type="text"'} value="${val}">`;
+					break;
+				case 'number':
+					html += `<input caseVal="${type}" id="${title}" type="number" value="${val}" min="0" max="100">`;
+					break;
+				case 'choise':
+					html += `<select caseVal="${type}" id="${title}">${data.options.map(value => `<option ${(value === val) ? 'selected' : ''} value="${value}">${value}</option>`).join('')}</select>`;
+					break;
+			}
+
+			return html;
 		}
-	}
 
-	function save() {
-		const json = {};
-		const settingsElem = document.getElementById('settings');
-		const forEachFunc = object => {
-			json[object.id.substr(0, 1).toLowerCase() + object.id.substr(1)] = valToJSON(object, object.getAttribute('caseVal'));
-		};
+		function valToJSON(elem, type) {
+			switch (type) {
+				case 'mult':
+					if (elem.value.trim().length > 0)
+						return (elem.value.trim().replace(/(\s+)?\;(\s+)?/g, ',')).split(',');
+					else
+						return [];
+				case 'bool':
+					return Boolean(elem.checked);
+				case 'range':
+					return Number(elem.value);
+				case 'string':
+					return elem.value.toString();
+				case 'number':
+					return Number(elem.value);
+				case 'choise':
+					return elem.value;
+			}
+		}
 
-		Array.from(settingsElem.querySelectorAll('input')).forEach(forEachFunc);
-		Array.from(settingsElem.querySelectorAll('select')).forEach(forEachFunc);
-		fetch(/updateSettings/, {method: 'POST', body: JSON.stringify(json), credentials: 'same-origin'}).then(response => {
-			response.json().then(json => {
-				if (json.success) {
-					if (confirm('Everything went according to plan. You have to restart the server to activate the changes! Do you want to go back?'))
-						window.location = location.origin;
-				} else alert('An error occured: ', json.info);
+		function save() {
+			const json = {};
+			const settingsElem = document.getElementById('settings');
+			const forEachFunc = object => {
+				json[object.id.substr(0, 1).toLowerCase() + object.id.substr(1)] = valToJSON(object, object.getAttribute('caseVal'));
+			};
+
+			Array.from(settingsElem.querySelectorAll('input')).forEach(forEachFunc);
+			Array.from(settingsElem.querySelectorAll('select')).forEach(forEachFunc);
+			fetch(/updateSettings/, { method: 'POST', body: JSON.stringify(json), credentials: 'same-origin' }).then(response => {
+				response.json().then(json => {
+					if (json.success) {
+						if (confirm('Everything went according to plan. You have to restart the server to activate the changes! Do you want to go back?'))
+							window.location = location.origin;
+					} else alert('An error occured: ', json.info);
+				});
+			}).catch(err => {
+				console.error('An error occurred', err);
 			});
-		}).catch( err => {
-			console.error('An error occurred', err);
-		});
-	}
+		}
 
-	function checkUpdate() {
-		fetch('/checkForUpdates/', {credentials: 'same-origin'}).then(response => {
-			response.json().then(json => {
-				if (json.success) {
-					if (json.data.isAvailable) {
-						if (confirm(`There is a new version available: ${json.data.version}, download?`))
-							window.location = json.data.url;
-					} else if (json.data.greater) {
-						alert(`You are on a greater version number (${json.data.version}) than that on GitHub. You should re-download the latest version. Don't forget to update the settings file!`)
-					} else {
-						alert(`You are already on the latest version: ${json.data.version}. Don't forget to update the settings file!`)
+		function checkUpdate() {
+			fetch('/checkForUpdates/', { credentials: 'same-origin' }).then(response => {
+				response.json().then(json => {
+					if (json.success) {
+						if (json.data.isAvailable) {
+							if (confirm(`There is a new version available: ${json.data.version}, download?`))
+								window.location = json.data.url;
+						} else if (json.data.greater) {
+							alert(`You are on a greater version number (${json.data.version}) than that on GitHub. You should re-download the latest version. Don't forget to update the settings file!`)
+						} else {
+							alert(`You are already on the latest version: ${json.data.version}. Don't forget to update the settings file!`)
+						}
+					} else alert('Could not get the required data...');
+				});
+			}).catch(err => {
+				console.error('An error occurred', err);
+			});
+		}
+
+		function load() {
+			fetch('/getSettings/', { credentials: 'same-origin' }).then(response => {
+				response.json().then(json => {
+					let newHTML = '';
+
+					for (key in json) {
+						const data = json[key];
+						newHTML += typeToHTML(data.type, key.substr(0, 1).toUpperCase() + key.substr(1), data.desc, data.val, data);
 					}
-				} else alert('Could not get the required data...');
+
+					document.getElementById('settings').innerHTML = newHTML;
+				});
+			}).catch(err => {
+				console.error('An error occurred', err);
 			});
-		}).catch( err => {
-			console.error('An error occurred', err);
-		});
-	}
+		}
 
-	function load() {
-		fetch('/getSettings/', {credentials: 'same-origin'}).then(response => {
-			response.json().then(json => {
-				let newHTML = '';
+		function change(elem) {
+			document.querySelector(`label[for="${elem.id}"]`).innerText = elem.value;
+		}
 
-				for (key in json) {
-					const data = json[key];
-					newHTML += typeToHTML(data.type, key.substr(0, 1).toUpperCase() + key.substr(1), data.desc, data.val, data);
-				}
-
-				document.getElementById('settings').innerHTML = newHTML;
-			});
-		}).catch( err => {
-			console.error('An error occurred', err);
-		});
-	}
-
-	function change(elem) {
-		document.querySelector(`label[for="${elem.id}"]`).innerText = elem.value + '%';
-	}
-
-	window.onload = load;
-</script>
+		window.onload = load;
+	</script>
 
 </head>
+
 <body>
 
 	<header>
@@ -169,10 +178,17 @@
 	</header>
 
 	<main>
-		<div id="settings"><div class="ball-scale-multiple"><div></div><div></div><div></div></div></div>
+		<div id="settings">
+			<div class="ball-scale-multiple">
+				<div></div>
+				<div></div>
+				<div></div>
+			</div>
+		</div>
 		<button id="save" onclick="save()">Save</button>
 		<button id="checkUpdate" onclick="checkUpdate()">Check for updates</button>
 	</main>
 
 </body>
+
 </html>

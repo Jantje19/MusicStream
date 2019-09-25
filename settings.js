@@ -66,16 +66,22 @@ module.exports = {
 	},
 	"defaultVolume": {
 		"val": 100,
+		"min": 0,
+		"max": 100,
 		"type": "range",
 		"desc": "The volume that defaults on page load."
 	},
 	"autoplayTime": {
-		"val": 10,
+		"val": 5,
+		"min": 0,
+		"max": 50,
 		"type": "range",
 		"desc": "The amount of time in seconds that has to pass for the next video to start playing."
 	},
 	"skipAmount": {
 		"val": 5,
+		"min": 1,
+		"max": 20,
 		"type": "range",
 		"desc": "The amount of seconds that skip when you press the arrow keys on the videos page."
 	},
@@ -87,7 +93,7 @@ module.exports = {
 	},
 	"url": {
 		"val": "http://localhost:8000",
-		"type": "string",
+		"type": "string/url",
 		"desc": "If you have a URL linked to your MusicStream server, fill it in here, so that the manifest.json can be set up correctly. Should be same origin as document (eg. http://localhost:8000)."
 	}
 }
