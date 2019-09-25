@@ -4,17 +4,17 @@ A NodeJS server and web client for streaming music (and videos) to your network
 ## Installation
 
 ### Manual Installation Steps
-1. Install [Node.js](https://nodejs.org/en/download/package-manager/)
+1. Install [Node.js](https://nodejs.org/en/download/)
 2. [Download](https://github.com/jantje19/MusicStream/releases/latest/) the latest release from GitHub
-3. Extract the files into a folder and rename it to *MusicStream*
-4. Within the *MusicStream* directory run: `npm install && npm start` in a CLI (On windows type `cmd` in the location bar to open a CLI in that folder)
-5. In your browser go to: http://localhost:8000
+3. Within the *musicstream* directory run: `npm install && npm start` in a CLI (On windows type `cmd` in the location bar to open a CLI in that folder)
+4. In your browser go to: http://localhost:8000
 
 ### Running
-Run `npm start` in the *MusicaStream* directory in a CLI.
+Run `npm start` in the *MusicStream* directory in a CLI.
 
 ## Updating
 By default MusicStream will check if there is a new version available (This can be turned off in the settings). It will only notify, not update.
+
 As of [MusicStream version v0.2.5](https://github.com/Jantje19/MusicStream/releases/tag/v0.2.5), you can run `npm run update` or `node update.js` for an automated update process.
 If you're running an older version, you can follow the [instructions below](#manual-updating).
 
@@ -24,10 +24,10 @@ Updating is almost the same as installing, but you have to copy the save files.
 If you follow these steps, you should be fine.
 1. Move/copy the save files to a different location for safekeeping. These are the files that are configured for your setup. Like the settings and playlist files. These include: *settings.js*, *playlists.json*, The *Plugins* folder and other config files that you may have added like the *https-config* file.
 2. Delete the *MusicStream* folder.
-3. Download the latest version from GitHub. The update message will tell you the URL for the latest version, but you can also go to [this URL](https://github.com/Jantje19/MusicStream/releases) and click on the most recent one.
+3. Download the latest version from GitHub. The update message will tell you the URL for the latest version, but you can also go to [this URL](https://github.com/Jantje19/MusicStream/releases/latest) and click on the most recent one.
 4. Extract the downloaded *zip* file.
 5. Move the save files back.
-6. Edit the *settings.js* file to include the newest settings values (This is super important! MusicStream will crash if you don't)
+6. Edit the *settings.js* file to include the newest settings values (This is super important! MusicStream might crash if you don't)
 7. Run `npm install && npm start` in a CLI.
 8. Done! Enjoy the new version
 
@@ -56,7 +56,7 @@ Internet Explorer won't work. (*but why would you use it anyway.*)
 
 **You can still use it on old browsers. On the main page it will ask you to move to the old browsers page. It features a limited interface and features.**
 
-**Only tested (and used) on Google Chrome Canary and Chrome on Android**
+**Only tested (and used) on Google Chrome and Chrome on Android**
 
 ### Privacy
 I am a huge fan of privacy, that's why I try to be as specific as I can describing how my programs handle data. All of the data *MusicStream* collects stays on your own device (it also saves me server costs =P).
@@ -73,10 +73,6 @@ Some third party APIs are used:
 	- What: artist name and song title
 	- When: the request lyrics button is pressed
 	- Which device: server
-- 404 Page:
-	- What: elevator music from orangefreesounds.com & canvas.js (I created canvas.js)
-	- When: on visit
-	- Which: local device
 - Update
 	- What: checking for updates on GitHub
 	- When: on start of MusicStream if enabled
