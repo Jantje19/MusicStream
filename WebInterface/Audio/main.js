@@ -48,7 +48,7 @@ function handlePlaylist(evt, name) {
 			deleteQueue();
 			enqueue(...json.songs);
 			playSong(queue[0], true);
-		}).catch( err => {
+		}).catch(err => {
 			console.error('An error occurred', err);
 		});
 	}
@@ -161,7 +161,7 @@ function saveQueueToTmp(type) {
 	if (type == 'global')
 		data.for = 'global'
 
-	get('saveQueue/audio', {method: 'post', body: JSON.stringify(data)}).then(data => {
+	get('saveQueue/audio', { method: 'post', body: JSON.stringify(data) }).then(data => {
 		console.log(data);
 	}).catch(err => {
 		console.error(err);
@@ -170,26 +170,28 @@ function saveQueueToTmp(type) {
 }
 
 function saveQueueToPlaylist() {
-	const playlistName = prompt('What should the eplaylist name be?').trim();
+	if (queue.length > 1) {
+		const playlistName = prompt('What should the eplaylist name be?').trim();
 
-	if (playlistName != '') {
-		if (queue.length > 1) {
+		if (playlistName.length > 0 && playlistName !== "") {
 			if (confirm('Are you sure the playlist is okay like this?')) {
-				const jsonData = {name: playlistName, songs: queue};
+				const jsonData = { name: playlistName, songs: queue };
 
-				get('/updatePlaylist/', {method: "POST", body: JSON.stringify(jsonData)}).then(json => {
+				get('/updatePlaylist/', { method: "POST", body: JSON.stringify(jsonData) }).then(json => {
 					if (json.success) {
-						if (json.error) alert('Something on the server went wrong.\n' + json.info);
-						else if (json.data.toLowerCase().startsWith('playlist with the name ')) {
-							alert(json.data);
-						} else alert('Something went wrong', json.data);
+						if (json.error)
+							alert('Something on the server went wrong.\n' + json.info);
+						else if (json.data.toLowerCase().startsWith('playlist with the name '))
+							window.location.reload();
+						else
+							alert('Something went wrong', json.data);
 					} else alert(json.info);
 				}).catch(err => {
 					console.error('An error occurred', err);
 				});
 			}
-		} else alert('The playlist is to short. We cannot accept that :/');
-	} else alert('Your playlist name is empty');
+		} else alert('Your playlist name is empty');
+	} else alert('The playlist is too short.');
 }
 
 function getTmpSavedQueue(type, autoHandleResponse) {
@@ -292,13 +294,13 @@ function sharePlaylist() {
 
 function convertToReadableTime(int) {
 	let outp = '';
-	let hours   = Math.floor(int / 3600);
+	let hours = Math.floor(int / 3600);
 	let minutes = Math.floor((int - (hours * 3600)) / 60);
 	let seconds = int - (hours * 3600) - (minutes * 60);
 
-	if (hours < 10) hours = "0"+hours;
-	if (minutes < 10) minutes = "0"+minutes;
-	if (seconds < 10) seconds = "0"+seconds;
+	if (hours < 10) hours = "0" + hours;
+	if (minutes < 10) minutes = "0" + minutes;
+	if (seconds < 10) seconds = "0" + seconds;
 	if (hours > 0) outp += hours + ':';
 
 	outp += minutes + ':';
@@ -308,7 +310,7 @@ function convertToReadableTime(int) {
 }
 
 function updateCSS(newValBefore, newValAfter) {
-	const addRule = function(sheet, selector, styles) {
+	const addRule = function (sheet, selector, styles) {
 		if (sheet.insertRule) return sheet.insertRule(selector + " {" + styles + "}", sheet.cssRules.length);
 		if (sheet.addRule) return sheet.addRule(selector, styles);
 	};
@@ -623,10 +625,10 @@ function load() {
 	// For plugins
 	try {
 		loaded();
-	} catch (err) {}
+	} catch (err) { }
 }
 
-Array.prototype.shuffle = function() {
+Array.prototype.shuffle = function () {
 	let randomIndex;
 	let currentIndex = this.length;
 
@@ -696,7 +698,7 @@ function checkCookies(songsArr) {
 	}
 
 	function getCookies() {
-		const cookieAtts =  getCookieAttributes();
+		const cookieAtts = getCookieAttributes();
 
 		if (cookieAtts) {
 			if ('queue' in cookieAtts) {
