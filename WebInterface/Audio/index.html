@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 
 	<title>Music Stream</title>
 
-	<link rel="shortcut icon" href="Assets/Icons/favicon.ico"/>
-	<link rel="shortcut icon" href="Assets/Icons/favicon.ico" type="image/vnd.microsoft.icon"/>
+	<link rel="shortcut icon" href="Assets/Icons/favicon.ico" />
+	<link rel="shortcut icon" href="Assets/Icons/favicon.ico" type="image/vnd.microsoft.icon" />
 
 	<link rel="apple-touch-icon" sizes="57x57" href="Assets/Icons/apple-icon-57x57.png">
 	<link rel="apple-touch-icon" sizes="60x60" href="Assets/Icons/apple-icon-60x60.png">
@@ -16,7 +17,7 @@
 	<link rel="apple-touch-icon" sizes="144x144" href="Assets/Icons/apple-icon-144x144.png">
 	<link rel="apple-touch-icon" sizes="152x152" href="Assets/Icons/apple-icon-152x152.png">
 	<link rel="apple-touch-icon" sizes="180x180" href="Assets/Icons/apple-icon-180x180.png">
-	<link rel="icon" type="image/png" sizes="192x192"  href="Assets/Icons/android-icon-192x192.png">
+	<link rel="icon" type="image/png" sizes="192x192" href="Assets/Icons/android-icon-192x192.png">
 	<link rel="icon" type="image/png" sizes="32x32" href="Assets/Icons/favicon-32x32.png">
 	<link rel="icon" type="image/png" sizes="96x96" href="Assets/Icons/favicon-96x96.png">
 	<link rel="icon" type="image/png" sizes="16x16" href="Assets/Icons/favicon-16x16.png">
@@ -26,42 +27,42 @@
 	<!--Let browser know website is optimized for mobile-->
 	<!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"/> -->
 	<!-- <meta name="mobile-web-app-capable" content="yes"/> -->
-	<meta name="theme-color" content="#16a085"/>
+	<meta name="theme-color" content="#16a085" />
 	<meta name="msapplication-TileColor" content="#16a085">
-	<meta name="msapplication-navbutton-color" content="#16a085"/>
-	<meta name="apple-mobile-web-app-status-bar-style" content="#16a085"/>
+	<meta name="msapplication-navbutton-color" content="#16a085" />
+	<meta name="apple-mobile-web-app-status-bar-style" content="#16a085" />
 
-	<link href="all.css" rel="stylesheet" type="text/css" media="screen"/>
-	<link href="main.css" rel="stylesheet" type="text/css" media="screen"/>
-	<link href="seekbarStyle.css" rel="stylesheet" type="text/css" media="screen"/>
+	<link href="all.css" rel="stylesheet" type="text/css" media="screen" />
+	<link href="main.css" rel="stylesheet" type="text/css" media="screen" />
+	<link href="seekbarStyle.css" rel="stylesheet" type="text/css" media="screen" />
 
 	<style type="text/css">
 		header h1 {
 			float: none;
 		}
 
-		header > div {
+		header>div {
 			height: 100%;
 		}
 
-		header > div > div {
+		header>div>div {
 			width: 40px;
 			height: 100%;
 			display: inline-block;
 		}
 
-		header > div > div > div {
+		header>div>div>div {
 			display: none;
 		}
 
-		header > div > div > button {
+		header>div>div>button {
 			margin-top: 3px;
 			float: none !important;
 			padding: 0px !important;
 			position: relative !important;
 		}
 
-		header > div:first-child {
+		header>div:first-child {
 			float: left;
 		}
 
@@ -86,7 +87,7 @@
 			z-index: 100000;
 			position: absolute;
 			background-color: white;
-			box-shadow: 0 0 5px rgba(0, 0 , 0, 0.3);
+			box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
 		}
 
 		header #overflowMenuHolder #overflowMenu hr {
@@ -110,7 +111,7 @@
 			display: none;
 		}
 
-		header > div:last-child {
+		header>div:last-child {
 			float: right;
 		}
 	</style>
@@ -119,7 +120,7 @@
 	<script type="text/javascript" src="main.js"></script>
 
 	<script type="text/javascript">
-		var shouldUpdateMostListened = {{collectMostListened}}
+		var shouldUpdateMostListened = {{ collectMostListened }}
 
 		if (!('fetch' in window)) {
 			if (confirm('Your browser is not supported. Do you want to go to the old browsers page?'))
@@ -128,6 +129,7 @@
 	</script>
 
 </head>
+
 <body>
 
 	<div id="saveMenu">
@@ -184,7 +186,11 @@
 				</select>
 				<hr>
 				<div id="songs">
-					<div class="ball-scale-multiple"><div></div><div></div><div></div></div>
+					<div class="ball-scale-multiple">
+						<div></div>
+						<div></div>
+						<div></div>
+					</div>
 				</div>
 			</div>
 			<div id="playlistsContainer">
@@ -197,9 +203,9 @@
 			</div>
 			<div id="queueContainer">
 				<h3>Queue</h3>
-				<button title="Empty queue" style="float: right;" onclick="deleteQueue()"><img src="Assets/ic_clear_all_black.svg"/></button>
-				<button title="Save queue" style="float: right;" onclick="document.getElementById('saveMenu').style.display = 'block';"><img src="Assets/ic_save_black.svg"/></button>
-				<button title="Share playlist" style="float: right;" onclick="sharePlaylist()"><img src="Assets/ic_share_black.svg"/></button>
+				<button title="Empty queue" style="float: right;" onclick="deleteQueue()"><img src="Assets/ic_clear_all_black.svg" /></button>
+				<button title="Save queue" style="float: right;" onclick="document.getElementById('saveMenu').style.display = 'block';"><img src="Assets/ic_save_black.svg" /></button>
+				<button title="Share playlist" style="float: right;" onclick="sharePlaylist()"><img src="Assets/ic_share_black.svg" /></button>
 				<hr style="border-bottom-color: lightgray;">
 				<span id="queueCount">Amount: 0</span>
 				<hr>
@@ -211,7 +217,7 @@
 			</div>
 		</div>
 		<div id="controls">
-			<input type="range" value="0" min="0" max="100" id="seekBar"/>
+			<input type="range" value="0" min="0" max="100" id="seekBar" start="00:00" end="00:00" />
 
 			<div id="mainControls">
 				<div id="left">
@@ -239,4 +245,5 @@
 	</main>
 
 </body>
+
 </html>

@@ -192,7 +192,6 @@ main #main div i {
 
 main #main div h3 {
 	display: inline;
-	margin-bottom: 20px;
 }
 
 main #main div > span {
@@ -332,6 +331,14 @@ main #controls #seekBar:before, main #controls #seekBar:after {
 	content: '00:00';
 	padding-top: 2px;
 	background-color: #12876F;
+}
+
+main #controls #seekBar:before {
+	content: attr(start);
+}
+
+main #controls #seekBar:after {
+	content: attr(end);
 }
 
 main #controls #mainControls {

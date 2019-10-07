@@ -2,7 +2,6 @@ let data;
 let clickTimer;
 let listenTime = 0;
 
-const cssRules = [];
 const audio = new Audio();
 
 const keyShortcuts = {
@@ -309,31 +308,9 @@ function convertToReadableTime(int) {
 	return outp;
 }
 
-function updateCSS(newValBefore, newValAfter) {
-	const addRule = function (sheet, selector, styles) {
-		if (sheet.insertRule) return sheet.insertRule(selector + " {" + styles + "}", sheet.cssRules.length);
-		if (sheet.addRule) return sheet.addRule(selector, styles);
-	};
-
-	if (cssRules.length > 0) {
-		cssRules.forEach((object, key) => {
-			let rule;
-			const styleSheet = document.styleSheets[0];
-			const type = (key == 0) ? 'before' : 'after';
-
-			if ('rules' in styleSheet) rule = styleSheet.rules[object];
-			else if ('cssRules' in styleSheet) rule = styleSheet.cssRules[object];
-			else return;
-
-			rule.style.content = `'${arguments[key]}' !important`;
-			rule.style.cssText = `content: "${arguments[key]}" !important;`;
-			rule.cssText = `#seekBar[type=range]::${type} { content: '${arguments[key]}' !important; }`;
-			rule.selectorText = `#seekBar[type=range]::${type} { content: '${arguments[key]}' !important; }`;
-		});
-	} else {
-		cssRules.push(addRule(document.styleSheets[0], "#seekBar[type=range]::before", `content: '${newValBefore}' !important`));
-		cssRules.push(addRule(document.styleSheets[0], "#seekBar[type=range]::after", `content: '${newValAfter}' !important`));
-	}
+function updateCSS(seekBar, newValBefore, newValAfter) {
+	seekBar.setAttribute('start', newValBefore);
+	seekBar.setAttribute('end', newValAfter);
 }
 
 function reloadSongslist(selectElem, playlistsElem) {
@@ -442,11 +419,11 @@ function load() {
 		seekBarElem.value = (audio.currentTime / audio.duration) * 100;
 
 		if (audio.duration && audio.duration !== Infinity)
-			updateCSS(convertToReadableTime(Math.floor(audio.currentTime)), convertToReadableTime(Math.floor(audio.duration - audio.currentTime)));
+			updateCSS(seekBarElem, convertToReadableTime(Math.floor(audio.currentTime)), convertToReadableTime(Math.floor(audio.duration - audio.currentTime)));
 		else if (audio.duration === Infinity)
-			updateCSS(convertToReadableTime(Math.floor(audio.currentTime)), '?s');
+			updateCSS(seekBarElem, convertToReadableTime(Math.floor(audio.currentTime)), '?s');
 		else
-			updateCSS(convertToReadableTime(Math.floor(audio.currentTime)), '0s');
+			updateCSS(seekBarElem, convertToReadableTime(Math.floor(audio.currentTime)), '0s');
 	});
 
 	document.getElementById('repeat').addEventListener('click', evt => {
