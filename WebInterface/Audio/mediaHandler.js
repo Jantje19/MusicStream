@@ -21,7 +21,7 @@ function end() {
 	const songName = queue[queueIndex];
 
 	if (shouldUpdateMostListened) {
-		get('/updateMostListenedPlaylist', {method: 'POST', body: songName}).then(json => {
+		get('/updateMostListenedPlaylist', { method: 'POST', body: songName }).then(json => {
 			if (json.success) console.log(json.data);
 			else console.warn(json.data);
 		}).catch(err => {
@@ -107,10 +107,10 @@ function startSong() {
 
 	try {
 		document.getElementById('songName').innerText = queue[queueIndex].replace(/(\.\w{2,5})$/, '');
-	} catch (err) {}
+	} catch (err) { }
 	try {
 		document.getElementById('lyricsElem').innerHTML = `<h3>Loading</h3><br><div class="ball-scale-multiple"><div></div><div></div><div></div></div>`;
-	} catch (err) {}
+	} catch (err) { }
 
 	const audioPlayReturnVal = audio.play();
 	if (audioPlayReturnVal) {
@@ -125,7 +125,7 @@ function startSong() {
 		}
 	}
 
-	try {document.getElementById('artistInfo').remove()} catch(err) {}
+	try { document.getElementById('artistInfo').remove() } catch (err) { }
 }
 
 function pauseSong() {
@@ -134,10 +134,12 @@ function pauseSong() {
 }
 
 function stopSong() {
+	const seekBar = document.getElementById('seekBar');
+
 	document.getElementById('toggleBtn').querySelector('img').src = 'Assets/ic_play_arrow_white.svg';
 	document.getElementById('songName').innerText = '';
-	document.getElementById('seekBar').value = 0;
-	updateCSS('0s', '0s');
+	seekBar.value = 0;
+	updateCSS(seekBar, '00:00', '00:00');
 	audio.pause();
 }
 
@@ -260,7 +262,7 @@ function escapeString(string) {
 
 function updateCookies() {
 	document.cookie = 'queueIndex=' + queueIndex;
-	document.cookie = 'queue=' + encodeURIComponent(queue.map(val => {return escape(val)}).join(','));
+	document.cookie = 'queue=' + encodeURIComponent(queue.map(val => { return escape(val) }).join(','));
 }
 
 
@@ -281,7 +283,7 @@ function mediaSession() {
 
 		get('/songInfo/' + queue[queueIndex]).then(json => {
 			if (json.error) return;
-			try {document.getElementById('artistInfo').remove()} catch(err) {}
+			try { document.getElementById('artistInfo').remove() } catch (err) { }
 
 			tagsLoaded = true;
 
@@ -304,7 +306,7 @@ function mediaSession() {
 				if (window.innerWidth > 500) {
 					if (json.image.imageBuffer.data.length > 1e7) return;
 					const arrayBufferView = new Uint8Array(json.image.imageBuffer.data);
-					const blob = new Blob([arrayBufferView], {type: "image/jpeg"});
+					const blob = new Blob([arrayBufferView], { type: "image/jpeg" });
 					const urlCreator = window.URL || window.webkitURL;
 
 					imageUrl = urlCreator.createObjectURL(blob);
@@ -319,7 +321,7 @@ function mediaSession() {
 					img.src = imageUrl;
 					dataDiv.appendChild(img);
 				}
-			} catch (err) {};
+			} catch (err) { };
 
 			document.getElementById('mainControls').appendChild(dataDiv);
 			document.getElementById('showData').setAttribute('activated', true);
@@ -332,7 +334,7 @@ function mediaSession() {
 				img.onload = evt => {
 					navigator.mediaSession.metadata.artwork.length = 0;
 					navigator.mediaSession.metadata.artwork = [
-					{ src: imageUrl, sizes: '512x512', type: 'image/jpeg' },
+						{ src: imageUrl, sizes: '512x512', type: 'image/jpeg' },
 					];
 				}
 			}
@@ -346,12 +348,12 @@ function mediaSession() {
 			title: title,
 			artist: artist,
 			artwork: [
-			{ src: 'Assets/Icons/icon-512.png', sizes: '512x512', type: 'image/png' },
-			{ src: 'Assets/Icons/icon-128.png', sizes: '128x128', type: 'image/png' },
-			{ src: 'Assets/Icons/icon-256.png', sizes: '256x256', type: 'image/png' },
-			{ src: 'Assets/Icons/icon-387.png', sizes: '384x384', type: 'image/png' },
-			{ src: 'Assets/Icons/android-icon-96x96.png', sizes: '96x96',   type: 'image/png' },
-			{ src: 'Assets/Icons/android-icon-192x192.png', sizes: '192x192', type: 'image/png' }
+				{ src: 'Assets/Icons/icon-512.png', sizes: '512x512', type: 'image/png' },
+				{ src: 'Assets/Icons/icon-128.png', sizes: '128x128', type: 'image/png' },
+				{ src: 'Assets/Icons/icon-256.png', sizes: '256x256', type: 'image/png' },
+				{ src: 'Assets/Icons/icon-387.png', sizes: '384x384', type: 'image/png' },
+				{ src: 'Assets/Icons/android-icon-96x96.png', sizes: '96x96', type: 'image/png' },
+				{ src: 'Assets/Icons/android-icon-192x192.png', sizes: '192x192', type: 'image/png' }
 			]
 		});
 
@@ -365,11 +367,11 @@ function mediaSession() {
 			} else playSong(null, true);
 		});
 
-		navigator.mediaSession.setActionHandler('seekbackward', function() {
+		navigator.mediaSession.setActionHandler('seekbackward', function () {
 			audio.currentTime -= 5;
 		});
 
-		navigator.mediaSession.setActionHandler('seekforward', function() {
+		navigator.mediaSession.setActionHandler('seekforward', function () {
 			audio.currentTime += 5;
 		});
 	}
