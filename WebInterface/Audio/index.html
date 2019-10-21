@@ -120,7 +120,7 @@
 	<script type="text/javascript" src="main.js"></script>
 
 	<script type="text/javascript">
-		var shouldUpdateMostListened = {{collectMostListened}}
+		var shouldUpdateMostListened = {{ collectMostListened }};
 
 		if (!('fetch' in window)) {
 			if (confirm('Your browser is not supported. Do you want to go to the old browsers page?'))
@@ -141,6 +141,16 @@
 			<button onclick="handleSaveMenuClick('ip')">IP-based</button>
 			<button onclick="handleSaveMenuClick('global')">Global</button>
 		</div>
+	</div>
+
+	<div id="songContextMenu" class="context-menu">
+		<button onclick="contextMenuClick(this, 'playNext')">Play next</button>
+	</div>
+	<div id="playlistContextMenu" class="context-menu">
+		<button onclick="contextMenuClick(this, 'edit')">Edit</button>
+	</div>
+	<div id="queueContextMenu" class="context-menu">
+		<button onclick="contextMenuClick(this, 'remove')">Remove</button>
 	</div>
 
 	<header>
@@ -217,7 +227,11 @@
 			</div>
 		</div>
 		<div id="controls">
-			<input type="range" value="0" min="0" max="100" id="seekBar" start="00:00" end="00:00" />
+			<<<<<<< Updated upstream
+					<input type="range" value="0" min="0" max="100" id="seekBar" start="00:00" end="00:00" />
+			=======
+			<input type="range" value="0" min="0" max="100" id="seekBar" />
+			>>>>>>> Stashed changes
 
 			<div id="mainControls">
 				<div id="left">

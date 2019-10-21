@@ -157,8 +157,8 @@ function pickRandomSong() {
 function updateInterface() {
 	const elem = document.getElementById('queue');
 
+	document.getElementById('queueCount').innerText = "Amount: " + queue.length;
 	if (queue.length > 0) {
-		document.getElementById('queueCount').innerText = "Amount: " + queue.length;
 		elem.innerHTML = '';
 
 		const containerElem = elem.cloneNode();

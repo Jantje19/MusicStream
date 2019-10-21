@@ -172,6 +172,31 @@ body #saveMenu > div button {
 	background-color: #16a085;
 }
 
+body .context-menu {
+	top: 0;
+	left: 0;
+	width: 100px;
+	display: none;
+	z-index: 10000;
+	position: fixed;
+	background-color: white;
+	box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+}
+
+body .context-menu button {
+	width: 100%;
+	border: none;
+	color: black;
+	cursor: pointer;
+	text-align: left;
+	padding: 10px 20px;
+	background-color: white;
+}
+
+body .context-menu button:hover {
+	background-color: rgba(0, 0, 0, 0.1);
+}
+
 main #main {
 	display: flex;
 	margin-top: 20px;

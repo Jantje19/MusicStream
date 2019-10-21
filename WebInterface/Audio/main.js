@@ -17,8 +17,10 @@ const keyShortcuts = {
 
 function keyPress(evt) {
 	if (audio.src != null) {
-		if (audio.paused) startSong();
-		else pauseSong();
+		if (audio.paused)
+			startSong();
+		else
+			pauseSong();
 	} else playSong(null, true);
 }
 
@@ -79,8 +81,10 @@ function get(url, headers) {
 function queueClick(evt, index) {
 	if (evt.ctrlKey) {
 		queue.splice(index, 1);
-		if (audio.paused || (!audio.paused && index != queueIndex)) updateInterface();
-		else playSong(null, true);
+		if (audio.paused || (!audio.paused && index != queueIndex))
+			updateInterface();
+		else
+			playSong(null, true);
 	} else {
 		updateQueueIndex(Number(index));
 		playSong(null, true);
@@ -128,12 +132,6 @@ function addWholeSongsToQueue() {
 
 function moveQueueItem(oldIndex, newIndex) {
 	queue.move(oldIndex, newIndex);
-	// if (newIndex < queueIndex) queueIndex++;
-	// else if (newIndex > queueIndex) queueIndex--;
-	// else if (newIndex == queueIndex) playSong(newIndex, true);
-	// else if (newIndex == queueIndex && oldIndex > queueIndex) queueIndex++;
-	// else if (newIndex == queueIndex && oldIndex < queueIndex) queueIndex--;
-	// else if (oldIndex == queueIndex);
 	updateInterface();
 }
 
@@ -373,6 +371,19 @@ function updateSongInterface(json, songsElem, playlistsElem) {
 	}
 }
 
+function contextMenuClick(elem, func) {
+	if (elem.parentElement.id === 'songContextMenu') {
+		if (func === 'playNext')
+			songClick({ ctrlKey: true, target: { innerText: elem.parentElement.getAttribute('innerText') } });
+	} else if (elem.parentElement.id === 'playlistContextMenu') {
+		if (func === 'edit')
+			handlePlaylist({ ctrlKey: true }, elem.parentElement.getAttribute('innerText'));
+	} else if (elem.parentElement.id === 'queueContextMenu') {
+		if (func === 'remove')
+			queueClick({ ctrlKey: true }, queue.indexOf(elem.parentElement.getAttribute('innerText')));
+	}
+}
+
 function load() {
 	const overflowMenu = document.getElementById('overflowMenu');
 	const playlistsElem = document.getElementById('playlists');
@@ -407,12 +418,12 @@ function load() {
 				console.error('WUT?');
 			}
 		}
-	});
+	}, { passive: true });
 
 	seekBar.addEventListener('input', evt => {
 		if (audio.src != '' && audio.src != undefined)
 			audio.currentTime = audio.duration / (evt.target.max / evt.target.value)
-	});
+	}, { passive: true });
 
 	audio.addEventListener('timeupdate', evt => {
 		listenTime++;
@@ -444,7 +455,7 @@ function load() {
 		} else {
 			evt.target.setAttribute('activated', true);
 		}
-	});
+	}, { passive: true });
 
 	document.getElementById('shuffle').addEventListener('click', evt => {
 		const val = evt.target.getAttribute('activated');
@@ -467,7 +478,7 @@ function load() {
 			updateCookies();
 			evt.target.setAttribute('activated', true);
 		}
-	});
+	}, { passive: true });
 
 	document.getElementById('searchBtn').addEventListener('click', evt => {
 		const searchInp = document.getElementById('searchInp');
@@ -480,7 +491,7 @@ function load() {
 			searchInp.style.display = 'block';
 			searchInp.focus();
 		}
-	});
+	}, { passive: true });
 
 	Array.from(overflowMenu.querySelectorAll('a')).forEach((object, key) => {
 		object.addEventListener('click', evt => {
@@ -493,39 +504,49 @@ function load() {
 			overflowMenu.style.display = 'none';
 		else
 			overflowMenu.style.display = 'block';
-	});
+	}, { passive: true });
 
 	document.getElementById('searchInp').addEventListener('keyup', evt => {
-		const string = evt.target.value;
+		const string = evt.target.value.trim().toLowerCase();
 
-		const songArr = searchArr(string, data.songs);
-		const playlistArr = searchArr(string, data.playlists);
+		const playlistsElem = document.getElementById('playlists');
+		const songsElem = document.getElementById('songs');
 
-		songsElem.innerHTML = '';
+		const playlistArr = data.playlists.filter(val => {
+			return val.toLowerCase().includes(string);
+		});
+		const songArr = data.songs.filter(val => {
+			return val.toLowerCase().includes(string);
+		});
+
 		playlistsElem.innerHTML = '';
+		songsElem.innerHTML = '';
 
 		songArr.forEach((object, key) => {
-			songsElem.innerHTML += `<button class="song ${key}" onclick="songClick(event)">${object}</button>`;
+			const buttonElem = document.createElement('button');
+
+			buttonElem.classList.add('listElem', 'song', key);
+			buttonElem.addEventListener('click', songClick);
+			buttonElem.innerText = object;
+			buttonElem.title = object;
+
+			songsElem.appendChild(buttonElem);
 		});
 
 		playlistArr.forEach((object, key) => {
-			playlistsElem.innerHTML += `<button class="listElem ${key}" onclick="handlePlaylist(event, '${object}')">${object}</button>`;
+			const buttonElem = document.createElement('button');
+
+			buttonElem.addEventListener('click', evt => handlePlaylist(evt, object));
+			buttonElem.classList.add('listElem', key);
+			buttonElem.innerText = object;
+			buttonElem.title = object;
+
+			playlistsElem.appendChild(buttonElem);
 		});
 
 		document.getElementById('songCount').innerText = "Amount: " + songArr.length;
 		document.getElementById('playlistCount').innerText = "Amount: " + playlistArr.length;
-
-		function searchArr(query, array) {
-			const outp = [];
-
-			for (let i = 0; i < array.length; i++) {
-				const item = array[i];
-				if (item.toString().toLowerCase().indexOf(query.toString().toLowerCase()) > -1) outp.push(item);
-			}
-
-			return outp;
-		}
-	});
+	}, { passive: true });
 
 	document.getElementById('showData').addEventListener('click', evt => {
 		const controlsElem = document.getElementById('controls');
@@ -540,7 +561,7 @@ function load() {
 				controlsElem.style.height = '230px';
 			}
 		}
-	});
+	}, { passive: true });
 
 	document.getElementById('volumeToggle').addEventListener('click', evt => {
 		const popUp = document.getElementById('volumePopUp');
@@ -552,13 +573,13 @@ function load() {
 			popUp.style.display = 'none';
 		else
 			popUp.style.display = 'block';
-	});
+	}, { passive: true });
 
 	document.getElementById('muteBtn').addEventListener('click', evt => {
 		setVolume(0, document.getElementById('volumeToggle'));
 		document.getElementById('volumeSlider').value = 0;
 		document.getElementById('volumePopUp').style.display = 'none';
-	});
+	}, { passive: true });
 
 	document.getElementById('updateJSONBtn').addEventListener('click', evt => {
 		overflowMenu.style.display = 'none';
@@ -571,18 +592,18 @@ function load() {
 		}).catch(err => {
 			console.error('An error occurred', JSON.parse(err));
 		});
-	});
+	}, { passive: true });
 
 	document.getElementById('volumeSlider').addEventListener('change', evt => {
 		setVolume(Number(evt.target.value) / 100, document.getElementById('volumeToggle'));
-	});
+	}, { passive: true });
 
 	document.getElementById('saveMenu').addEventListener('click', evt => {
 		if (evt.target == evt.currentTarget)
 			evt.currentTarget.style.display = 'none';
-	});
+	}, { passive: true });
 
-	document.getElementById('sort').addEventListener('change', reloadSongslist);
+	document.getElementById('sort').addEventListener('change', reloadSongslist, { passive: true });
 
 	// Shortcuts
 	window.addEventListener('keyup', evt => {
@@ -596,7 +617,40 @@ function load() {
 		}
 
 		return true;
-	});
+	}, { passive: true });
+
+	const playlistContextMenu = document.getElementById('playlistContextMenu');
+	const queueContextMenu = document.getElementById('queueContextMenu');
+	const songContextMenu = document.getElementById('songContextMenu');
+	document.addEventListener('contextmenu', evt => {
+		const elem = document.elementFromPoint(evt.x, evt.y);
+		const parentId = elem.parentElement.id;
+		if (parentId === 'songs' || parentId === 'playlists' || parentId === 'queue') {
+			evt.preventDefault();
+
+			playlistContextMenu.style.display = 'none';
+			queueContextMenu.style.display = 'none';
+			songContextMenu.style.display = 'none';
+
+			let menu = songContextMenu;
+
+			if (parentId === 'playlists')
+				menu = playlistContextMenu;
+			else if (parentId === 'queue')
+				menu = queueContextMenu;
+
+			menu.setAttribute('innerText', evt.target.innerText);
+
+			menu.style.left = evt.x + 'px';
+			menu.style.top = evt.y + 1 + 'px';
+			menu.style.display = 'block';
+		}
+	}, { passive: false });
+	document.addEventListener('click', evt => {
+		playlistContextMenu.style.display = 'none';
+		queueContextMenu.style.display = 'none';
+		songContextMenu.style.display = 'none';
+	}, { passive: true });
 
 	reloadSongslist(sortElem, playlistsElem);
 	// For plugins
