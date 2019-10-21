@@ -1,7 +1,10 @@
 if (process.argv[2] === 'spawned') {
 	const msi = require('musicstream-installer');
+
+	const { updateHandler } = require('./installer-helper');
 	const { promises, constants } = require('fs');
 	const { access } = promises;
+
 	const end = () => {
 		console.log("Press 'Enter' to continue");
 		process.stdin.setRawMode(true);
@@ -19,36 +22,7 @@ if (process.argv[2] === 'spawned') {
 
 	access(__filename, constants.F_OK | constants.W_OK | constants.R_OK).then(() => {
 		console.log(`Installing MusicStream in '${process.argv[3]}'.\nDo not close this window!`);
-		msi.updateMusicstream(process.argv[3], (...args) => {
-			if (args[0] === 'download') {
-				process.stdout.cursorTo(0);
-				process.stdout.clearLine(1);
-
-				if (args[1] === Infinity && args[3] === 0)
-					process.stdout.write(`DOWNLOADING: ${args[2].toFixed(1)}MB`);
-				else {
-					const afterStr = `(${args[1].toFixed(2)}%) - ${args[3].toFixed(1)}`;
-					const termWidth = process.stdout.columns;
-					const availableWidth = (termWidth - afterStr.length - 3) / 2;
-					let space = '';
-					let str = '';
-
-					const strVal = availableWidth / 100 * args[1] - 2;
-					if (strVal > 0)
-						str = '='.repeat(strVal);
-
-					const spaceVal = availableWidth - str.length - 2;
-					if (spaceVal > 0)
-						space = ' '.repeat(spaceVal);
-
-					process.stdout.write(`[${str}>${space}]${afterStr}MB`);
-				}
-
-				process.stdout.cursorTo(0);
-			} else {
-				console.log('Update:', ...args);
-			}
-		}, (...args) => {
+		msi.updateMusicstream(process.argv[3], updateHandler, (...args) => {
 			console.log('Done!', ...args);
 			end();
 		}, (...args) => {
@@ -66,7 +40,7 @@ if (process.argv[2] === 'spawned') {
 
 	if (process.argv.includes('--help') || process.argv.includes('-h') || process.argv.includes('help')) {
 		console.log(
-			'Available arguments:\n\t--latest-commit:\tInstalles the latest commit instead of the latest release'
+			'Available arguments:\n\t--latest-commit:\tInstalls the latest commit instead of the latest release'
 		);
 		process.exit();
 	}
