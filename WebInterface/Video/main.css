@@ -53,7 +53,6 @@ body {
 	height:100%;
 	text-align:center;
 	position: absolute;
-	font-family: 'Arial', sans-serif;
 }
 
 h1 {
@@ -427,6 +426,10 @@ main #player #videoElem {
 	width: 100%;
 	height: 40vw;
 	background-color: black;
+}
+
+main #player #videoElem:hover #controls {
+	transform: translateY(0px);
 }
 
 main #player #videoElem video {
