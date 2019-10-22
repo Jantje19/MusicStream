@@ -1,7 +1,7 @@
 const tmpQueueSave = { audio: { global: {} }, videos: {} };
 
 module.exports = {
-	start: function (dirname, fileHandler, fs, os, settings, utils, querystring, id3, ytdl, version, https, URLModule, ffmpeg, serverPlugins, hijackRequestPlugins) {
+	start: function (dirname, fileHandler, fs, os, settings, utils, querystring, id3, ytdl, version, https, URLModule, ffmpeg, path, serverPlugins, hijackRequestPlugins) {
 		const compression = require('compression');
 		const express = require('express');
 		const app = express();
@@ -709,15 +709,16 @@ module.exports = {
 		// Just handle the rest
 		app.get('*', (request, response) => {
 			let url = request.url.replace(/\?(\w+)=(.+)/, '');
-			if (url.length > 1)
-				console.log(utils.logDate() + ' Got a request for ' + url);
+			console.log(utils.logDate() + ' Got a request for ' + url);
 
 			if (url.indexOf('/videos') > -1)
-				utils.sendFile(fs, dirname + 'Video/' + url.replace('/videos/', ''), response);
+				utils.sendFile(fs, path.join(dirname, 'Video/', url.replace('/videos/', '')), response);
+			else if (url.indexOf('/mobile') > -1)
+				utils.sendFile(fs, path.join(dirname, 'Mobile/', url.replace('/mobile/', '')), response);
 			else if (url.indexOf('/') > -1)
-				utils.sendFile(fs, dirname + 'Audio/' + url, response);
+				utils.sendFile(fs, path.join(dirname, 'Audio/', url), response);
 			else
-				utils.sendFile(fs, 'THIS NAME DOES_NOT EXIST', response);
+				response.send('500: Server error');
 		});
 
 		const listenerObject = httpsServer || app;

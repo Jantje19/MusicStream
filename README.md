@@ -32,6 +32,10 @@ If you follow these steps, you should be fine.
 7. Run `npm install && npm start` in a CLI.
 8. Done! Enjoy the new version
 
+## Mobile page
+As of [version v0.2.5](https://github.com/Jantje19/MusicStream/releases/tag/v0.2.5) MusicStream has a dedicated mobile page, written in [Angular](https://angular.io).\
+You can find it at [https://github.com/Jantje19/MusicStreamMobile](https://github.com/Jantje19/MusicStreamMobile).
+
 ## Plugins
 *MusicStream* supports plug-ins. See how it works [here](https://github.com/jantje19/MusicStream-Plugins/).
 I've also created some plug-ins. They can be found [here](https://github.com/Jantje19/MusicStream-Plugins/tree/master/MyPlugins).
