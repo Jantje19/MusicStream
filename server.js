@@ -131,7 +131,9 @@ module.exports = {
 			const url = request.url;
 			console.log(utils.logDate() + ' Got a request for ' + url);
 
-			if (url.toLowerCase().indexOf('sort=') > -1) sort = true;
+			if (url.toLowerCase().indexOf('sort=') > -1 && url.toLowerCase().indexOf('sort=default') < 0)
+				sort = true;
+
 			fileHandler.getJSON(fs, os, utils, settings).then(json => {
 				const songs = [];
 				const videos = {};
