@@ -33,7 +33,7 @@ If you follow these steps, you should be fine.
 8. Done! Enjoy the new version
 
 ## Mobile page
-As of [version v0.2.5](https://github.com/Jantje19/MusicStream/releases/tag/v0.2.5) MusicStream has a dedicated mobile page, written in [Angular](https://angular.io).\
+As of [version v0.2.5](https://github.com/Jantje19/MusicStream/releases/tag/v0.2.5) MusicStream has a dedicated mobile page, made with [Angular](https://angular.io).\
 You can find it at [https://github.com/Jantje19/MusicStreamMobile](https://github.com/Jantje19/MusicStreamMobile).
 
 ## Plugins
