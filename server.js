@@ -47,7 +47,6 @@ module.exports = {
 		const ips = utils.getLocalIP(os);
 
 		app.use(compression());
-		app.use(express.static(dirname));
 
 		app.get('*favicon.ico*', (request, response) => {
 			utils.sendFile(fs, dirname + 'Assets/Icons/favicon.ico', response);
@@ -124,6 +123,14 @@ module.exports = {
 
 		app.get('*/Assets/*', (request, response) => {
 			utils.sendFile(fs, dirname + request.url.replace('videos/', ''), response);
+		});
+
+		app.get('/mobile-assets/*', (request, response) => {
+			utils.sendFile(fs, path.join(dirname, 'Mobile/', request.url), response);
+		});
+
+		app.get('/mobile/favicon.ico', (request, response) => {
+			response.sendFile(path.join(dirname, './Assets/Icons/favicon.ico'));
 		});
 
 		app.get('/data/*', (request, response) => {
@@ -708,7 +715,7 @@ module.exports = {
 
 		// Just handle the rest
 		app.get('*', (request, response) => {
-			let url = request.url.replace(/\?(\w+)=(.+)/, '');
+			const url = request.url.replace(/\?(\w+)=(.+)/, '');
 			console.log(utils.logDate() + ' Got a request for ' + url);
 
 			if (url.indexOf('/videos') > -1)

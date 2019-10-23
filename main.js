@@ -4,6 +4,7 @@ const https = require('https');
 const id3 = require('node-id3');
 const URLModule = require('url');
 const ytdl = require('ytdl-core');
+const pathModule = require('path');
 const server = require('./server.js');
 const ffmpeg = require('fluent-ffmpeg');
 const querystring = require('querystring');
@@ -164,7 +165,7 @@ const loadPlugins = () => {
 const startServer = () => {
 	loadPlugins().then(() => {
 		utils.colorLog(utils.logDate() + ' Plugins loaded', 'bgGreen');
-		const startServerModule = () => server.start(__dirname + '/WebInterface/', fileHandler, fs, os, settings, utils, querystring, id3, ytdl, version, https, URLModule, ffmpeg, pluginServer, hijackRequestPlugins);
+		const startServerModule = () => server.start(__dirname + '/WebInterface/', fileHandler, fs, os, settings, utils, querystring, id3, ytdl, version, https, URLModule, ffmpeg, pathModule, pluginServer, hijackRequestPlugins);
 
 		if (settings.updateJsonOnStart.val == true) {
 			fileHandler.searchSystem(fs, os, utils, settings).then(startServerModule).catch(err => {
@@ -204,12 +205,7 @@ const utils = {
 	*	@return {String}
 	*/
 	getFileExtention: fileName => {
-		const match = fileName.match(/.+(\.\w+)$/i);
-
-		if (match)
-			return match[1];
-		else
-			return;
+		return pathModule.extname(fileName).toLowerCase();
 	},
 
 	/*
@@ -240,8 +236,8 @@ const utils = {
 	*		The express response object
 	*/
 	sendFile: (fs, path, response) => {
-		if (path.endsWith('/'))
-			path = path + 'index.html';
+		if (path.endsWith(pathModule.sep))
+			path = pathModule.join(path, 'index.html');
 
 		fs.exists(path, exists => {
 			if (exists) {
@@ -251,7 +247,7 @@ const utils = {
 							response.status(500).send('Error: 500. An error occured: ' + err);
 						else {
 							for (key in settings)
-								data = data.replace(new RegExp(`\{\{${key}\}\}`, 'g'), settings[key].val);
+								data = data.replace(new RegExp(`\{\{\\s?(${key})\\s?\}\}`, 'g'), settings[key].val);
 
 							// Plugins
 							let buttonHTML = '';
