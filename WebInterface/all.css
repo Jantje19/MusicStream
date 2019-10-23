@@ -1,5 +1,5 @@
 body {
-	font-family: "Roboto", "Segoe UI", "Ubuntu", -apple-system, system-ui, BlinkMacSystemFont, "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+	font-family: Arial, "Segoe UI", "Ubuntu", "Roboto Bold", -apple-system, system-ui, BlinkMacSystemFont, "Open Sans", "Helvetica Neue", Helvetica, sans-serif !important;
 }
 
 header {
