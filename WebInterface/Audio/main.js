@@ -510,8 +510,6 @@ function load() {
 		const string = evt.target.value.trim().toLowerCase();
 
 		const playlistsElem = document.getElementById('playlists');
-		const songsElem = document.getElementById('songs');
-
 		const playlistArr = data.playlists.filter(val => {
 			return val.toLowerCase().includes(string);
 		});
@@ -653,10 +651,24 @@ function load() {
 	}, { passive: true });
 
 	reloadSongslist(sortElem, playlistsElem);
-	// For plugins
-	try {
-		loaded();
-	} catch (err) { }
+
+	// Mobile page
+	(function () {
+		const cookies = getCookieAttributes();
+
+		if ('use-desktop' in cookies && cookies['use-desktop'].toLowerCase() === 'true') {
+			const buttonElem = document.createElement('button');
+
+			buttonElem.innerText = 'Mobile site';
+			buttonElem.addEventListener('click', evt => {
+				document.cookie = 'use-desktop=false; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+				window.location.href = '/mobile/';
+			}, { passive: true });
+
+			overflowMenu.appendChild(document.createElement('hr'));
+			overflowMenu.appendChild(buttonElem);
+		}
+	})();
 }
 
 Array.prototype.shuffle = function () {
@@ -687,25 +699,25 @@ Array.prototype.move = function (old_index, new_index) {
 	return this;
 };
 
+function getCookieAttributes() {
+	const outp = {};
+
+	decodeURIComponent(document.cookie).split(';').forEach((object, key) => {
+		const splitVal = object.trim().split('=');
+
+		if (splitVal.length > 2) {
+			for (let i = 2; i < splitVal.length; i++)
+				splitVal[1] += '=' + splitVal[i];
+		}
+
+		outp[splitVal[0]] = splitVal[1];
+	});
+
+	return outp;
+}
+
 // Location queue-cookie
 function checkCookies(songsArr) {
-	function getCookieAttributes() {
-		const outp = {};
-
-		decodeURIComponent(document.cookie).split(';').forEach((object, key) => {
-			const splitVal = object.trim().split('=');
-
-			if (splitVal.length > 2) {
-				for (let i = 2; i < splitVal.length; i++)
-					splitVal[1] += '=' + splitVal[i];
-			}
-
-			outp[splitVal[0]] = splitVal[1];
-		});
-
-		return outp;
-	}
-
 	function getLocationAttributes() {
 		const json = {};
 		let url = unescape(window.location.search);

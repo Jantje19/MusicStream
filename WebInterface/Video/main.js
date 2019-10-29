@@ -51,7 +51,6 @@ function load() {
 							const optionElem = document.createElement('option');
 
 							if (key == 0) {
-								optionElem.setAttribute('hidden', true);
 								optionElem.setAttribute('disabled', true);
 								optionElem.setAttribute('selected', true);
 							}
@@ -235,11 +234,6 @@ function load() {
 				video.disablePictureInPicture;
 		}
 	})();
-
-	// For plugins
-	try {
-		loaded();
-	} catch (err) { }
 }
 
 function vidClick(evt, title) {
@@ -428,7 +422,8 @@ function setSubtitleTrack(val) {
 }
 
 function removeTracks(videoElem) {
-	Array.from(videoElem.getElementsByTagName('track')).forEach((object, key) => {
+	Array.from(videoElem.getElementsByTagName('track')).forEach(object => {
+		window.URL.revokeObjectURL(object.src);
 		object.remove();
 	});
 }
@@ -437,7 +432,6 @@ function addSubtitleTrack(url, videoElem) {
 	const trackElem = document.createElement('track');
 
 	trackElem.src = url;
-	trackElem.srclang = 'en';
 	trackElem.kind = 'captions';
 	trackElem.setAttribute('default', '');
 

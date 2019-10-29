@@ -2,6 +2,7 @@ const tmpQueueSave = { audio: { global: {} }, videos: {} };
 
 module.exports = {
 	start: function (dirname, fileHandler, fs, os, settings, utils, querystring, id3, ytdl, version, https, URLModule, ffmpeg, path, serverPlugins, hijackRequestPlugins) {
+		const MobileDetect = require('mobile-detect');
 		const compression = require('compression');
 		const express = require('express');
 		const app = express();
@@ -138,7 +139,10 @@ module.exports = {
 			const url = request.url;
 			console.log(utils.logDate() + ' Got a request for ' + url);
 
-			if (url.toLowerCase().indexOf('sort=') > -1 && url.toLowerCase().indexOf('sort=default') < 0)
+			if (url.toLowerCase().indexOf('sort=') > -1 && (
+				url.toLowerCase().indexOf('sort=newest') > -1 ||
+				url.toLowerCase().indexOf('sort=oldest') > -1
+			))
 				sort = true;
 
 			fileHandler.getJSON(fs, os, utils, settings).then(json => {
@@ -694,7 +698,7 @@ module.exports = {
 						args = args[0];
 
 						if (Array.isArray(args)) {
-							args.forEach((object, key) => {
+							args.forEach((object) => {
 								app.post(`/${this.pluginName}/${object.name}*`, object.func);
 							});
 						} else {
@@ -704,7 +708,7 @@ module.exports = {
 				}
 			}
 
-			serverPlugins.forEach((object, key) => {
+			serverPlugins.forEach((object) => {
 				const data = Object.assign({}, availableData);
 				const server = new PluginServerHandler(object.folder);
 
@@ -722,9 +726,20 @@ module.exports = {
 				utils.sendFile(fs, path.join(dirname, 'Video/', url.replace('/videos/', '')), response);
 			else if (url.indexOf('/mobile') > -1)
 				utils.sendFile(fs, path.join(dirname, 'Mobile/', url.replace('/mobile/', '')), response);
-			else if (url.indexOf('/') > -1)
+			else if (url.indexOf('/') > -1) {
+				if (new MobileDetect(request.headers['user-agent']).mobile()) {
+					const cookies = querystring.parse(request.headers['cookie'], '; ')
+
+					if ('use-desktop' in cookies && cookies['use-desktop'].toLowerCase() === 'true')
+						response.cookie('use-desktop', 'true', { maxAge: 2592000 });
+					else {
+						response.redirect('/mobile/');
+						return;
+					}
+				}
+
 				utils.sendFile(fs, path.join(dirname, 'Audio/', url), response);
-			else
+			} else
 				response.send('500: Server error');
 		});
 

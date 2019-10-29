@@ -3,8 +3,7 @@
 	"short_name": "Music Stream",
 	"description": "Stream your music",
 	"start_url": "[[STARTURL]]",
-	"lang": "en",
-
+	"lang": "en-US",
 	"display": "standalone",
 	"theme_color": "#16a085",
 	"background_color": "#16a085",

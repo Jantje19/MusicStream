@@ -415,11 +415,16 @@ main #player #video-settings div:first-child {
 main #player #video-settings button {
 	top: 0;
 	right: 0;
-	color: white;
+	margin: 0;
 	border: none;
+	padding: 5px;
 	cursor: pointer;
 	position: absolute;
 	background-color: transparent;
+}
+
+main #player #video-settings button:hover {
+	background-color: rgba(255, 255, 255, 0.3);
 }
 
 main #player #videoElem {

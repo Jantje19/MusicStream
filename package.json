@@ -23,6 +23,7 @@
 		"compression": "^1.7.4",
 		"express": "^4.17.1",
 		"fluent-ffmpeg": "^2.1.2",
+		"mobile-detect": "^1.4.4",
 		"musicstream-installer": "^0.3.2",
 		"node-id3": "^0.1.11",
 		"ytdl-core": "^0.20.4"

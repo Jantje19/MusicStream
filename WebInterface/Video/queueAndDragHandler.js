@@ -129,7 +129,7 @@ function nextQueueItem() {
 			const object = optsElemArr[i];
 			if (object.defaultSelected) {
 				object.selected = '';
-				return;
+				break;
 			}
 		}
 
