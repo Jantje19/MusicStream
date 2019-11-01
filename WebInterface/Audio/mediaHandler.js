@@ -19,14 +19,26 @@ function enqueue(...vals) {
 
 function end() {
 	const songName = queue[queueIndex];
-
-	if (shouldUpdateMostListened) {
+	const fallback = () => {
 		get('/updateMostListenedPlaylist', { method: 'POST', body: songName }).then(json => {
-			if (json.success) console.log(json.data);
-			else console.warn(json.data);
+			if (json.success)
+				console.log(json.data);
+			else
+				console.warn(json.data);
 		}).catch(err => {
 			console.error('An error occurred', err);
 		});
+	}
+
+	if (shouldUpdateMostListened) {
+		if (window.sw && window.sw.funcs) {
+			window.sw.funcs.updateMostlistened(songName)
+				.catch(fallback);
+
+			return;
+		}
+
+		fallback();
 	}
 
 	next();

@@ -157,6 +157,12 @@ const removeDownload = async file => {
 		cache.delete(generateFileLocation(file)),
 	]);
 }
+const updateMostlistened = async file => {
+	if (!('SyncManager' in window))
+		throw Error('SyncManager is not in window');
+
+	return await (await navigator.serviceWorker.ready).sync.register('updatemostlistened-' + file);
+}
 const checkConnectionSpeed = () => {
 	if (!('connection' in navigator))
 		return;
@@ -185,9 +191,16 @@ wb.addEventListener('waiting', () => {
 
 	toast.addButton('Reload')
 		.addEventListener('click', () => {
+			let eventFired = false;
 			wb.addEventListener('controlling', () => {
 				window.location.reload();
+				eventFired = true;
 			});
+
+			setTimeout(() => {
+				if (!eventFired)
+					window.location.reload();
+			}, 2000);
 
 			wb.messageSW({ type: 'SKIP_WAITING' });
 			toast.dismiss();
@@ -204,6 +217,7 @@ window.sw = new Promise((resolve, reject) => {
 			displayToast: ToastManager.makeText.bind(ToastManager),
 			checkBgFetchAvailability,
 			checkConnectionSpeed,
+			updateMostlistened,
 			removeDownload,
 			getDownloaded,
 			downloadFile,

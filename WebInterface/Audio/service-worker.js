@@ -38,6 +38,15 @@ self.addEventListener('fetch', event => {
 		event.respondWith(doThing(true));
 });
 
+self.addEventListener('sync', event => {
+	if (event.tag.startsWith('updatemostlistened'))
+		event.waitUntil(fetch('/updateMostListenedPlaylist', {
+			body: event.tag.replace('updatemostlistened-', ''),
+			credentials: 'include',
+			method: 'POST',
+		}));
+});
+
 self.addEventListener('backgroundfetchsuccess', event => {
 	const bgFetch = event.registration;
 
