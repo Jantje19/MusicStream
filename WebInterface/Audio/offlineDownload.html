@@ -81,7 +81,7 @@
 
 		function getData() {
 			return new Promise((resolve, reject) => {
-				fetch('/data/', { credentials: 'same-origin' }).then(response => {
+				fetch('/data/?sort={{ audioDefaultSortType }}', { credentials: 'same-origin' }).then(response => {
 					if (response.type === 'opaque')
 						reject('Received a response, but it\'s opaque so can\'t examine it');
 					else if (response.status !== 200)

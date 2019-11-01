@@ -92,10 +92,11 @@
 
 			if (location.hash == '') {
 				alert('No name supplied');
+				window.location = '/';
 				return;
 			}
 
-			getData('/data/').then(json => {
+			getData('/data/?sort={{audioDefaultSortType}}').then(json => {
 				const songsElem = document.getElementById('songs');
 
 				if (json.playlists.includes(playlistName)) {
@@ -193,7 +194,7 @@
 
 	<header>
 		<button id="back"><img src="Assets/ic_arrow_back_white.svg"></button>
-		<div style="padding-top: 5px">
+		<div>
 			<h1>Manage Playlist</h1>
 		</div>
 		<button id="delete" style="right: 30px; left: unset;"><img src="Assets/ic_delete_white.svg"></button>

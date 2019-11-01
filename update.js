@@ -37,6 +37,12 @@ if (process.argv[2] === 'spawned') {
 } else {
 	const latestCommit = process.argv.includes('--latest-commit');
 	const { spawn } = require('child_process');
+	const readline = require('readline');
+
+	const rl = readline.createInterface({
+		input: process.stdin,
+		output: process.stdout
+	});
 
 	if (process.argv.includes('--help') || process.argv.includes('-h') || process.argv.includes('help')) {
 		console.log(
@@ -45,12 +51,21 @@ if (process.argv[2] === 'spawned') {
 		process.exit();
 	}
 
-	console.log('Starting in new console...');
-	const subprocess = spawn(`"${process.argv[0]}"`, [__filename, 'spawned', __dirname, (latestCommit === true) ? 'latestCommit' : ''], {
-		detached: true,
-		stdio: 'ignore',
-		shell: true,
-	});
+	rl.question('This is very experimental and will run in a new window (Won\'t work with SSH).\nMaybe backup important MusicStream files first?\n\nDo you wish to proceed? (Y/n) ', answer => {
+		rl.close();
 
-	subprocess.unref();
+		if (answer[0].toLowerCase() === 'y') {
+			console.log('Starting in new console...');
+			const subprocess = spawn(`"${process.argv[0]}"`, [__filename, 'spawned', __dirname, (latestCommit === true) ? 'latestCommit' : ''], {
+				detached: true,
+				stdio: 'ignore',
+				shell: true,
+			});
+
+			subprocess.unref();
+		} else {
+			console.log('Exiting...');
+			process.exit(1);
+		}
+	});
 }

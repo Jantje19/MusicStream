@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html>
+
 <head lang="en">
 
 	<title>Music Stream - Edit Tags</title>
 
-	<link rel="shortcut icon" href="Assets/Icons/favicon.ico"/>
-	<link rel="shortcut icon" href="Assets/Icons/favicon.ico" type="image/vnd.microsoft.icon"/>
+	<link rel="shortcut icon" href="Assets/Icons/favicon.ico" />
+	<link rel="shortcut icon" href="Assets/Icons/favicon.ico" type="image/vnd.microsoft.icon" />
 
 	<link rel="apple-touch-icon" sizes="57x57" href="Assets/Icons/apple-icon-57x57.png">
 	<link rel="apple-touch-icon" sizes="60x60" href="Assets/Icons/apple-icon-60x60.png">
@@ -16,7 +17,7 @@
 	<link rel="apple-touch-icon" sizes="144x144" href="Assets/Icons/apple-icon-144x144.png">
 	<link rel="apple-touch-icon" sizes="152x152" href="Assets/Icons/apple-icon-152x152.png">
 	<link rel="apple-touch-icon" sizes="180x180" href="Assets/Icons/apple-icon-180x180.png">
-	<link rel="icon" type="image/png" sizes="192x192"  href="Assets/Icons/android-icon-192x192.png">
+	<link rel="icon" type="image/png" sizes="192x192" href="Assets/Icons/android-icon-192x192.png">
 	<link rel="icon" type="image/png" sizes="32x32" href="Assets/Icons/favicon-32x32.png">
 	<link rel="icon" type="image/png" sizes="96x96" href="Assets/Icons/favicon-96x96.png">
 	<link rel="icon" type="image/png" sizes="16x16" href="Assets/Icons/favicon-16x16.png">
@@ -26,13 +27,13 @@
 	<!--Let browser know website is optimized for mobile-->
 	<!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"/> -->
 	<!-- <meta name="mobile-web-app-capable" content="yes"/> -->
-	<meta name="theme-color" content="#16a085"/>
+	<meta name="theme-color" content="#16a085" />
 	<meta name="msapplication-TileColor" content="#16a085">
-	<meta name="msapplication-navbutton-color" content="#16a085"/>
-	<meta name="apple-mobile-web-app-status-bar-style" content="#16a085"/>
+	<meta name="msapplication-navbutton-color" content="#16a085" />
+	<meta name="apple-mobile-web-app-status-bar-style" content="#16a085" />
 
-	<link href="main.css" rel="stylesheet" type="text/css" media="screen"/>
-	<link href="all.css" rel="stylesheet" type="text/css" media="screen"/>
+	<link href="main.css" rel="stylesheet" type="text/css" media="screen" />
+	<link href="all.css" rel="stylesheet" type="text/css" media="screen" />
 
 	<style type="text/css">
 		body {
@@ -101,7 +102,7 @@
 			if (location.hash) {
 				const songName = unescape(location.hash.replace('#', ''));
 
-				fetch('/data/?sort=newest', {credentials: 'same-origin'}).then(response => {
+				fetch('/data/?sort={{audioDefaultSortType}}', { credentials: 'same-origin' }).then(response => {
 					response.json().then(json => {
 						if (json.audio.songs.includes(songName))
 							songSelected(songName);
@@ -110,7 +111,7 @@
 							selectSong(json);
 						}
 					});
-				}).catch( err => {
+				}).catch(err => {
 					console.error('An error occurred', err);
 				});
 			} else showSongSelect();
@@ -129,23 +130,23 @@
 					} else tags[type] = input.value;
 				});
 
-				fetch('/tags/', {method: "POST", body: JSON.stringify({songName: songName, tags: tags}), credentials: 'same-origin'}).then(response => {
+				fetch('/tags/', { method: "POST", body: JSON.stringify({ songName: songName, tags: tags }), credentials: 'same-origin' }).then(response => {
 					response.json().then(json => {
 						if (json.success) {
 							if (confirm('Tags updated! Do you want to go to the home page?'))
 								window.location = window.location.origin;
 						} else alert("ERROR: " + json.info);
 					});
-				}).catch( err => {
+				}).catch(err => {
 					console.error('An error occurred', err);
 				});
 			});
 		}
 
 		function showSongSelect() {
-			fetch('/data/?sort=newest', {credentials: 'same-origin'}).then(response => {
+			fetch('/data/?sort=newest', { credentials: 'same-origin' }).then(response => {
 				response.json().then(json => selectSong(json));
-			}).catch( err => {
+			}).catch(err => {
 				console.error('An error occurred', err);
 			});
 		}
@@ -174,7 +175,7 @@
 
 			location.hash = songName;
 			mainElem.innerHTML = '<div class="ball-scale-multiple"><div></div><div></div><div></div></div>';
-			fetch('/songInfo/' + songName, {credentials: 'same-origin'}).then(response => {
+			fetch('/songInfo/' + songName, { credentials: 'same-origin' }).then(response => {
 				response.json().then(tags => {
 					const div = document.createElement('div');
 
@@ -204,7 +205,7 @@
 
 					mainElem.appendChild(div);
 				});
-			}).catch( err => {
+			}).catch(err => {
 				console.error('An error occurred', err);
 			});
 		}
@@ -213,7 +214,7 @@
 			const songName = location.hash.replace('#', '');
 
 			if (confirm(`Are you sure you want to delete the tags of '${songName}'`)) {
-				fetch('/tags/', {method: "POST", body: JSON.stringify({songName: songName, tags: {delete: true}}), credentials: 'same-origin'}).then(response => {
+				fetch('/tags/', { method: "POST", body: JSON.stringify({ songName: songName, tags: { delete: true } }), credentials: 'same-origin' }).then(response => {
 					response.json().then(json => {
 						if (json.success) {
 							if (confirm('Tags removed! Do you want to go to the home page?'))
@@ -232,15 +233,15 @@
 
 			if (title != "" && artist != "") {
 				getTagsFromLastFm(title, artist).then(tags => {
-					try {document.getElementById('title').value = tags.name;} catch (err) {}
-					try {document.getElementById('artist').value = tags.artist.name;} catch (err) {}
-					try {document.getElementById('album').value = tags.album.title;} catch (err) {}
-					try {document.getElementById('length').value = tags.duration;} catch (err) {}
-					try {document.getElementById('image').value = tags.album.image[2]['#text'];} catch (err) {}
-					try {document.getElementById('comment').value = tags.wiki.summary; } catch (err) {}
+					try { document.getElementById('title').value = tags.name; } catch (err) { }
+					try { document.getElementById('artist').value = tags.artist.name; } catch (err) { }
+					try { document.getElementById('album').value = tags.album.title; } catch (err) { }
+					try { document.getElementById('length').value = tags.duration; } catch (err) { }
+					try { document.getElementById('image').value = tags.album.image[2]['#text']; } catch (err) { }
+					try { document.getElementById('comment').value = tags.wiki.summary; } catch (err) { }
 
-					try {console.log(tags.album.image[2]['#text']);} catch (err) {}
-				}).catch(err => {console.error(err); alert("Error with finding tags: " + err)});
+					try { console.log(tags.album.image[2]['#text']); } catch (err) { }
+				}).catch(err => { console.error(err); alert("Error with finding tags: " + err) });
 			} else alert("Title and artist are required for the Last.FM API.");
 		}
 
@@ -268,22 +269,30 @@
 	</script>
 
 </head>
+
 <body>
 
 	<header>
 		<button onclick="back()" id="back"><img src="Assets/ic_arrow_back_white.svg"></button>
-		<div style="padding-top: 5px"><h1>Edit Tags</h1></div>
+		<div>
+			<h1>Edit Tags</h1>
+		</div>
 	</header>
 
 	<main>
 		<div id="main">
-			<div class="ball-scale-multiple"><div></div><div></div><div></div></div>
+			<div class="ball-scale-multiple">
+				<div></div>
+				<div></div>
+				<div></div>
+			</div>
 		</div>
 
 		<button id="fab"><img src="Assets/ic_send_white.svg"></button>
-	</div>
+		</div>
 
-</main>
+	</main>
 
 </body>
+
 </html>

@@ -40,7 +40,7 @@
 
 		function getData() {
 			return new Promise((resolve, reject) => {
-				fetch('/data/', { credentials: 'same-origin' }).then(response => {
+				fetch('/data/?sort={{audioDefaultSortType}}', { credentials: 'same-origin' }).then(response => {
 					if (response.type === 'opaque') reject('Received a response, but it\'s opaque so can\'t examine it');
 					else if (response.status !== 200) reject('Looks like there was a problem. Status Code: ' + response.status);
 					else {
@@ -199,7 +199,7 @@
 
 	<header>
 		<button id="back"><img src="Assets/ic_arrow_back_white.svg"></button>
-		<div style="padding-top: 5px">
+		<div>
 			<h1>Create Playlist</h1>
 		</div>
 		<div id="searchBar"><input type="text" id="searchInp"></div>
