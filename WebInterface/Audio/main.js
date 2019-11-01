@@ -15,7 +15,7 @@ const keyShortcuts = {
 	}
 }
 
-function keyPress(evt) {
+function keyPress() {
 	if (audio.src != null) {
 		if (audio.paused)
 			startSong();
@@ -25,6 +25,9 @@ function keyPress(evt) {
 }
 
 function getData(type) {
+	if (!navigator.onLine)
+		return window.sw.funcs.getDownloaded();
+
 	return new Promise((resolve, reject) => {
 		get('/data/' + ((type !== null && type !== undefined) ? `?sort=${type}` : '')).then(json => {
 			if (json.error)
@@ -320,11 +323,13 @@ function reloadSongslist(selectElem, playlistsElem) {
 		after = val;
 
 	songsElem.innerHTML = '<div class="ball-scale-multiple"><div></div><div></div><div></div></div>';
-	getData(after).then(data => {
-		updateSongInterface(data, songsElem, playlistsElem);
-	}).catch(err => {
-		songsElem.innerHTML = `<div style="text-align: center"><h3>Oh no</h3><br><br><p>There was an error: <b>${err}</b></p></div>`;
-		console.error('Something went wrong', err);
+	return new Promise((resolve) => {
+		getData(after).then(data => {
+			updateSongInterface(data, songsElem, playlistsElem);
+		}).catch(err => {
+			songsElem.innerHTML = `<div style="text-align: center"><h3>Oh no</h3><br><br><p>There was an error: <b>${err}</b></p></div>`;
+			console.error('Something went wrong', err);
+		}).finally(resolve);
 	});
 }
 
@@ -371,25 +376,101 @@ function updateSongInterface(json, songsElem, playlistsElem) {
 	}
 }
 
+function toastHelper(message, extraInfo) {
+	const toast = window.sw.funcs
+		.displayToast(message, extraInfo)
+		.getToast();
+
+	toast
+		.addButton('Ok')
+		.addEventListener('click', () => {
+			toast.dismiss();
+		}, { passive: true });
+}
+
 function contextMenuClick(elem, func) {
+	const innerText = elem.parentElement.getAttribute('innerText');
+
 	if (elem.parentElement.id === 'songContextMenu') {
 		if (func === 'playNext')
-			songClick({ ctrlKey: true, target: { innerText: elem.parentElement.getAttribute('innerText') } });
+			songClick({ ctrlKey: true, target: { innerText } });
+		else if (func === 'removeDownload')
+			window.sw.funcs
+				.removeDownload(innerText)
+				.then(success => {
+					if (!success)
+						throw Error();
+					else {
+						Array.from(document.getElementById('songs').children)
+							.find(elem => elem.innerText === innerText)
+							.removeAttribute('downloaded');
+
+						toastHelper(`Successfully removed '${innerText}' from cache`);
+					}
+				})
+				.catch(err => {
+					console.error(err);
+					toastHelper(`An error occured when removing '${innerText}' from cache`, err.message);
+				});
 	} else if (elem.parentElement.id === 'playlistContextMenu') {
 		if (func === 'edit')
-			handlePlaylist({ ctrlKey: true }, elem.parentElement.getAttribute('innerText'));
+			handlePlaylist({ ctrlKey: true }, innerText);
+		else if (func === 'downloadPlaylist') {
+			get('/playlist/' + innerText)
+				.then(data => {
+					if (data.success) {
+						const url = new URL(window.location);
+
+						url.pathname = '/offlineDownload.html';
+						url.searchParams.append('songs', encodeURIComponent(JSON.stringify(data.songs)));
+						url.searchParams.append('playlist', encodeURIComponent(innerText));
+
+						window.location = url;
+					} else
+						throw Error(data.error);
+				})
+				.catch(err => {
+					console.error(err);
+					toastHelper('An error occured while fetching the playlist contents', err.message);
+				});
+		}
 	} else if (elem.parentElement.id === 'queueContextMenu') {
 		if (func === 'remove')
-			queueClick({ ctrlKey: true }, queue.indexOf(elem.parentElement.getAttribute('innerText')));
+			queueClick({ ctrlKey: true }, queue.indexOf(innerText));
 	}
 }
 
-function load() {
+function load([swFuncs]) {
+	const overflowMenuBtn = document.getElementById('overflowMenuHolder').querySelector('button');
 	const overflowMenu = document.getElementById('overflowMenu');
 	const playlistsElem = document.getElementById('playlists');
+	const searchInp = document.getElementById('searchInp');
 	const seekBarElem = document.getElementById('seekBar');
-	const songsElem = document.getElementById('songs');
 	const sortElem = document.getElementById('sort');
+
+	if (swFuncs) {
+		document.getElementById('offlineDownload')
+			.style.display = 'block';
+	}
+
+	reloadSongslist(sortElem, playlistsElem)
+		.then(async () => {
+			if (swFuncs) {
+				Array.from(document.getElementsByClassName('downloadAvailable'))
+					.forEach(elem => {
+						elem.style.display = 'block';
+					})
+
+				const songsElem = document.getElementById('songs');
+				const downloaded = await swFuncs.getDownloaded();
+
+				Array.from(songsElem.children)
+					.filter(elem => downloaded.songs.includes(elem.innerText))
+					.forEach(elem => {
+						elem.setAttribute('downloaded', '');
+					});
+			}
+		});
 
 	if (!navigator.onLine) {
 		const btn = document.querySelector('#overflowMenuHolder > button');
@@ -481,8 +562,6 @@ function load() {
 	}, { passive: true });
 
 	document.getElementById('searchBtn').addEventListener('click', evt => {
-		const searchInp = document.getElementById('searchInp');
-
 		if (searchInp.style.display == 'block') {
 			searchInp.blur();
 			searchInp.value = '';
@@ -499,17 +578,19 @@ function load() {
 		});
 	});
 
-	document.getElementById('overflowMenuHolder').querySelector('button').addEventListener('click', evt => {
+	overflowMenuBtn.addEventListener('click', evt => {
 		if (overflowMenu.style.display == 'block')
 			overflowMenu.style.display = 'none';
 		else
 			overflowMenu.style.display = 'block';
 	}, { passive: true });
 
-	document.getElementById('searchInp').addEventListener('keyup', evt => {
+	searchInp.addEventListener('keyup', evt => {
 		const string = evt.target.value.trim().toLowerCase();
 
 		const playlistsElem = document.getElementById('playlists');
+		const songsElem = document.getElementById('songs');
+
 		const playlistArr = data.playlists.filter(val => {
 			return val.toLowerCase().includes(string);
 		});
@@ -636,21 +717,25 @@ function load() {
 				menu = playlistContextMenu;
 			else if (parentId === 'queue')
 				menu = queueContextMenu;
+			else if (parentId === 'songs') {
+				if (elem.hasAttribute('downloaded')) {
+					// Make 'removeDownload' visible
+					menu.children[menu.children.length - 1].style.display = 'block';
+				}
+			}
 
 			menu.setAttribute('innerText', evt.target.innerText);
 
-			menu.style.left = evt.x + 'px';
 			menu.style.top = evt.y + 1 + 'px';
+			menu.style.left = evt.x + 'px';
 			menu.style.display = 'block';
 		}
-	}, { passive: false });
+	});
 	document.addEventListener('click', evt => {
 		playlistContextMenu.style.display = 'none';
 		queueContextMenu.style.display = 'none';
 		songContextMenu.style.display = 'none';
 	}, { passive: true });
-
-	reloadSongslist(sortElem, playlistsElem);
 
 	// Mobile page
 	(function () {
@@ -669,6 +754,9 @@ function load() {
 			overflowMenu.appendChild(buttonElem);
 		}
 	})();
+
+	if (!navigator.onLine)
+		overflowMenuBtn.setAttribute('disabled', true);
 }
 
 Array.prototype.shuffle = function () {
@@ -702,7 +790,7 @@ Array.prototype.move = function (old_index, new_index) {
 function getCookieAttributes() {
 	const outp = {};
 
-	decodeURIComponent(document.cookie).split(';').forEach((object, key) => {
+	decodeURIComponent(document.cookie).split(';').forEach(object => {
 		const splitVal = object.trim().split('=');
 
 		if (splitVal.length > 2) {
@@ -782,4 +870,36 @@ audio.onended = end;
 audio.onplay = updateInterface;
 audio.onpause = updateInterface;
 
-document.addEventListener('DOMContentLoaded', load);
+(function () {
+	const promiseArr = [];
+
+	// Service worker
+	// Only load the handler file if the browser actually supports service workers
+	if ('serviceWorker' in navigator) {
+		promiseArr.push(new Promise((resolve, reject) => {
+			const script = document.createElement('script');
+
+			script.src = 'ServiceWorker/serviceworkerHandler.js';
+			script.type = 'module';
+			script.onload = () => {
+				window.sw
+					.then(funcs => {
+						window.sw.funcs = funcs;
+						resolve(funcs);
+					})
+					.catch(reject);
+			}
+
+			document.head.appendChild(script);
+		}));
+	}
+
+	promiseArr.push(new Promise(resolve => {
+		document.addEventListener('DOMContentLoaded', resolve);
+	}));
+
+	Promise.all(promiseArr).then(load).catch(err => {
+		console.error(err);
+		load([]);
+	});
+})();

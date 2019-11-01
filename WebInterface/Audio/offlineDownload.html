@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html>
+
+<head lang="en">
+
+	<title>Music Stream - Download Offline Songs</title>
+
+	<link rel="shortcut icon" href="Assets/Icons/favicon.ico" />
+	<link rel="shortcut icon" href="Assets/Icons/favicon.ico" type="image/vnd.microsoft.icon" />
+
+	<link rel="apple-touch-icon" sizes="57x57" href="Assets/Icons/apple-icon-57x57.png">
+	<link rel="apple-touch-icon" sizes="60x60" href="Assets/Icons/apple-icon-60x60.png">
+	<link rel="apple-touch-icon" sizes="72x72" href="Assets/Icons/apple-icon-72x72.png">
+	<link rel="apple-touch-icon" sizes="76x76" href="Assets/Icons/apple-icon-76x76.png">
+	<link rel="apple-touch-icon" sizes="114x114" href="Assets/Icons/apple-icon-114x114.png">
+	<link rel="apple-touch-icon" sizes="120x120" href="Assets/Icons/apple-icon-120x120.png">
+	<link rel="apple-touch-icon" sizes="144x144" href="Assets/Icons/apple-icon-144x144.png">
+	<link rel="apple-touch-icon" sizes="152x152" href="Assets/Icons/apple-icon-152x152.png">
+	<link rel="apple-touch-icon" sizes="180x180" href="Assets/Icons/apple-icon-180x180.png">
+	<link rel="icon" type="image/png" sizes="192x192" href="Assets/Icons/android-icon-192x192.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="Assets/Icons/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="96x96" href="Assets/Icons/favicon-96x96.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="Assets/Icons/favicon-16x16.png">
+	<link rel="manifest" href="/manifest.json">
+	<meta name="msapplication-TileImage" content="Assets/Icons/ms-icon-144x144.png">
+
+	<!--Let browser know website is optimized for mobile-->
+	<!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"/> -->
+	<!-- <meta name="mobile-web-app-capable" content="yes"/> -->
+	<meta name="theme-color" content="#16a085" />
+	<meta name="msapplication-TileColor" content="#16a085">
+	<meta name="msapplication-navbutton-color" content="#16a085" />
+	<meta name="apple-mobile-web-app-status-bar-style" content="#16a085" />
+
+	<link href="all.css" rel="stylesheet" type="text/css" media="screen" />
+	<link href="main.css" rel="stylesheet" type="text/css" media="screen" />
+	<style>
+		header button:last-child {
+			top: 10px;
+			left: unset;
+			width: 40px;
+			right: 10px;
+			height: 40px;
+		}
+
+		main {
+			overflow-x: hidden;
+		}
+
+		main #fab img {
+			transform: translateY(-2px);
+		}
+
+		/* Song download progress */
+
+		button.listElem {
+			--progress: 0%;
+			position: relative;
+		}
+
+		button.listElem:after {
+			top: 0;
+			left: 0;
+			content: '';
+			width: 100%;
+			height: 100%;
+			display: block;
+			position: absolute;
+			will-change: transform;
+			transform: translateX(-100%);
+			transition: transform .3s ease;
+			background-color: rgba(0, 100, 0, 0.2);
+			transform: translateX(calc(-100% + var(--progress)));
+		}
+	</style>
+
+	<script src="ServiceWorker/serviceworkerHandler.js" type="module"></script>
+	<script>
+		const queue = new Set();
+		let queueElem;
+
+		function getData() {
+			return new Promise((resolve, reject) => {
+				fetch('/data/', { credentials: 'same-origin' }).then(response => {
+					if (response.type === 'opaque')
+						reject('Received a response, but it\'s opaque so can\'t examine it');
+					else if (response.status !== 200)
+						reject('Looks like there was a problem. Status Code: ' + response.status);
+					else {
+						response.json().then(json => {
+							if (json.error)
+								reject(json.info);
+							else
+								resolve(json.audio);
+						});
+					}
+				}).catch(reject);
+			});
+		}
+		function updateInterface() {
+			queueElem.innerHTML = '';
+
+			for (let song of queue) {
+				const buttonElem = document.createElement('button');
+
+				buttonElem.addEventListener('click', () => buttonElem.remove());
+				buttonElem.classList.add('listElem');
+				buttonElem.innerText = song;
+				buttonElem.title = song;
+
+				queueElem.appendChild(buttonElem);
+			}
+		}
+		function songClick(song) {
+			queue.add(song);
+			updateInterface();
+		}
+
+		document.addEventListener('DOMContentLoaded', () => {
+			document.getElementById('back').addEventListener('click', () => {
+				window.location.href = '/';
+			}, { passive: true });
+
+			queueElem = document.getElementById('downloadQueue');
+
+			if ('serviceWorker' in navigator) {
+				let searchParams;
+
+				if (window.location.search) {
+					searchParams = new URL(window.location).searchParams;
+
+					if (searchParams.has('songs')) {
+						JSON.parse(decodeURIComponent(searchParams.get('songs')))
+							.forEach(songClick);
+
+						window.history.pushState({}, document.title, window.location.pathname);
+					}
+				}
+
+				Promise.all([getData(), window.sw]).then(([json, swFuncs]) => {
+					document.getElementById('fab').addEventListener('click', evt => {
+						const updateHandler = (elem, progress) => {
+							elem.style.setProperty('--progress', (progress * 100) + '%');
+						}
+
+						Promise.all(Array.from(queue).map((song, index) => {
+							return swFuncs.downloadFile(
+								song,
+								progress => updateHandler(queueElem.children[index], progress),
+								() => { console.warn('TODO') }
+							);
+						})).then(songs => {
+							const doFinish = () => {
+								if (confirm('Successfully downloaded all songs.\nWould you like to go back to the home page?'))
+									window.location.href = '/';
+							}
+
+							if (searchParams && searchParams.has('playlist')) {
+								swFuncs.savePlaylist(
+									decodeURIComponent(searchParams.get('playlist')),
+									songs
+								)
+									.catch(console.error)
+									.finally(doFinish);
+
+								return;
+							}
+
+							doFinish();
+						}).catch(err => {
+							console.error(err);
+							const toast = swFuncs
+								.displayToast('Unable to download (some) file(s)', err.message)
+								.getToast();
+
+							toast.addButton('Ok')
+								.addEventListener('click', evt => {
+									toast.dismiss();
+								}, { passive: true });
+						});
+					}, { passive: true });
+
+					swFuncs.getDownloaded().then(({ songs }) => {
+						const songsElem = document.getElementById('songs');
+						const containerElem = songsElem.cloneNode();
+
+						songsElem.innerHTML = '';
+						json.songs
+							.filter(val => !songs.includes(val))
+							.forEach((object, key) => {
+								const buttonElem = document.createElement('button');
+
+								buttonElem.addEventListener('click', evt => songClick(object));
+								buttonElem.classList.add('song', key);
+								buttonElem.innerText = object;
+								buttonElem.title = object;
+
+								containerElem.appendChild(buttonElem);
+							});
+						songsElem.replaceWith(containerElem);
+					}).catch(err => {
+						throw err;
+					});
+
+					document.getElementById('clearCache').addEventListener('click', evt => {
+						if (confirm('All (offline) downloaded information will be deleted...?')) {
+							const elem = evt.currentTarget;
+							elem.setAttribute('disabled', true);
+
+							swFuncs.clearCache()
+								.then(() => {
+									window.location.href = '/';
+								})
+								.catch(console.error)
+								.finally(() => {
+									elem.removeAttribute('disabled');
+								});
+						}
+					}, { passive: true });
+				}).catch(err => console.error(err));
+			} else {
+				alert('Your browser does not support this functionality. You will be redirected to the home page...');
+				window.location = '/';
+			}
+		});
+	</script>
+</head>
+
+<body>
+
+	<header>
+		<button title="Back" id="back"><img src="Assets/ic_arrow_back_white.svg"></button>
+		<div>
+			<h1>Download Offline Songs</h1>
+		</div>
+		<button title="Delete all downloaded information" id="clearCache"><img src="Assets/ic_clear_all_white.svg"></button>
+	</header>
+
+	<main>
+		<div id="main">
+			<div id="songsContainer">
+				<h3>Songs</h3>
+				<hr>
+				<div id="songs">
+					<div class="ball-scale-multiple">
+						<div></div>
+						<div></div>
+						<div></div>
+					</div>
+				</div>
+			</div>
+			<div id="queueContainer">
+				<h3>To download</h3>
+				<hr>
+				<div id="downloadQueue"></div>
+			</div>
+		</div>
+
+		<button id="fab"><img src="Assets/ic_save_alt_white.svg"></button>
+	</main>
+
+</body>
+
+</html>

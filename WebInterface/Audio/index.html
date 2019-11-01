@@ -36,7 +36,11 @@
 	<link href="main.css" rel="stylesheet" type="text/css" media="screen" />
 	<link href="seekbarStyle.css" rel="stylesheet" type="text/css" media="screen" />
 
-	<style type="text/css">
+	<style>
+		.downloadAvailable {
+			display: none;
+		}
+
 		header h1 {
 			float: none;
 		}
@@ -94,6 +98,10 @@
 			margin: 0;
 		}
 
+		header #overflowMenuHolder #overflowMenu #offlineDownload {
+			display: none;
+		}
+
 		header #overflowMenuHolder #overflowMenu button {
 			width: 100%;
 			padding: 10px;
@@ -145,9 +153,11 @@
 
 	<div id="songContextMenu" class="context-menu">
 		<button onclick="contextMenuClick(this, 'playNext')">Play next</button>
+		<button style="display: none" onclick="contextMenuClick(this, 'removeDownload')">Remove download</button>
 	</div>
 	<div id="playlistContextMenu" class="context-menu">
 		<button onclick="contextMenuClick(this, 'edit')">Edit</button>
+		<button class="downloadAvailable" onclick="contextMenuClick(this, 'downloadPlaylist')">Download playlist</button>
 	</div>
 	<div id="queueContextMenu" class="context-menu">
 		<button onclick="contextMenuClick(this, 'remove')">Remove</button>
@@ -169,6 +179,7 @@
 
 				<div id="overflowMenu">
 					<a href="/videos/"><button>Video's</button></a>
+					<a id="offlineDownload" href="/offlineDownload.html"><button>Download songs for offline use</button></a>
 					<button id="updateJSONBtn">Update Library</button>
 					<a href="/editTags.html"><button>Edit Song Tags</button></a>
 					<a href="/downloadYoutube"><button>Youtube Download</button></a>
