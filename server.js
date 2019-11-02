@@ -7,7 +7,7 @@ module.exports = {
 		const express = require('express');
 		const app = express();
 
-		app.get('*manifest.json*', (request, response) => {
+		app.get('*manifest.json*', (_, response) => {
 			fs.readFile(dirname + 'Assets/Icons/manifest.json', 'utf-8', (err, data) => {
 				if (err)
 					response.status(500).send('Server error');
@@ -722,11 +722,14 @@ module.exports = {
 			const url = request.url.replace(/\?(\w+)=(.+)/, '');
 			console.log(utils.logDate() + ' Got a request for ' + url);
 
-			if (url.indexOf('/videos') > -1)
+			if (url.startsWith('/videos'))
 				utils.sendFile(fs, path.join(dirname, 'Video/', url.replace('/videos/', '')), response);
-			else if (url.indexOf('/mobile') > -1)
-				utils.sendFile(fs, path.join(dirname, 'Mobile/', url.replace('/mobile/', '')), response);
-			else if (url.indexOf('/') > -1) {
+			else if (url.startsWith('/mobile'))
+				if (url.indexOf('.') < 0)
+					utils.sendFile(fs, path.join(dirname, 'Mobile/index.html'), response);
+				else
+					utils.sendFile(fs, path.join(dirname, 'Mobile/', url.replace('/mobile/', '')), response);
+			else if (url.startsWith('/')) {
 				if (new MobileDetect(request.headers['user-agent']).mobile()) {
 					const cookies = querystring.parse(request.headers['cookie'], '; ')
 

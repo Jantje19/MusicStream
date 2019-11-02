@@ -29,14 +29,20 @@ function getData(type) {
 		return window.sw.funcs.getDownloaded();
 
 	return new Promise((resolve, reject) => {
-		get('/data/' + ((type !== null && type !== undefined) ? `?sort=${type}` : '')).then(json => {
-			if (json.error)
-				reject(json.error);
-			else {
-				data = json.audio;
-				resolve(json.audio);
-			}
-		}).catch(reject);
+		get('/data/' + ((type !== null && type !== undefined) ? `?sort=${type}` : ''))
+			.then(json => {
+				if (json.error)
+					reject(json.error);
+				else {
+					data = json.audio;
+					resolve(json.audio);
+				}
+			}).catch(err => {
+				console.error(err);
+				window.sw.funcs.getDownloaded()
+					.then(resolve)
+					.catch(reject);
+			});
 	});
 }
 
