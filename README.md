@@ -1,5 +1,7 @@
 # MusicStream
-A NodeJS server and web client for streaming music (and videos) to your network
+A NodeJS server and web client for streaming music (and videos) to your network.
+
+![ALt](https://imgur.com/download/kAQ1la2)
 
 ## Installation
 
