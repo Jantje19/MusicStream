@@ -14,7 +14,7 @@ module.exports = {
 	*		If it should log errors
 	*	@return {Promise}
 	*/
-	searchSystem: (fs, os, utils, settings, silent) => {
+	searchSystem: (fs, os, path, utils, settings, silent) => {
 		let paths = [];
 		const songsArr = [];
 		const videosObj = {};
@@ -27,8 +27,8 @@ module.exports = {
 
 		if (settings.checkOsHomedirs.val) {
 			// Folders that have to be searched
-			paths.push(os.homedir() + '/Music/');
-			paths.push(os.homedir() + '/Videos/');
+			paths.push(path.join(os.homedir(), '/Music/'));
+			paths.push(path.join(os.homedir(), '/Videos/'));
 		}
 
 		if (settings.mediaPaths.val != '')
@@ -42,11 +42,10 @@ module.exports = {
 
 			const homedir = os.homedir();
 			const checkDirs = paths.map(val => {
-				// handleFolders(val.replace('{homedir}', homedir), utils).then(data => resolve(data)).catch(err => reject(err));
-				handleFolders(val.replace('{homedir}', homedir), utils).then(data => {}).catch(err => reject(err));
+				return handleFolders(val.replace('{homedir}', homedir), utils, path);
 			});
 
-			// Wait untill the functions both finish
+			// Wait untill the functions finish
 			Promise.all(checkDirs).then(() => {
 				setTimeout(() => {
 					jsonFileArr = {
@@ -60,7 +59,7 @@ module.exports = {
 						}
 					};
 
-					fs.writeFile(__dirname + '/JSON.json', JSON.stringify(jsonFileArr, 2), err => {
+					fs.writeFile(path.join(__dirname, '/JSON.json'), JSON.stringify(jsonFileArr, 2), err => {
 						if (err) reject(err);
 						else {
 							utils.colorLog(utils.logDate() + ' [[fgBlue, SEARCHSYSTEM:]] Updated the Json file');
@@ -68,9 +67,7 @@ module.exports = {
 						}
 					});
 				}, 1000);
-			}).catch(err => {
-				reject('Err' + err);
-			});
+			}).catch(reject);
 		});
 
 		/*
@@ -81,74 +78,117 @@ module.exports = {
 		*		The utils object in main.js
 		*	@return {Promise}
 		*/
-		function handleFolders(path, utils) {
-			return new Promise((resolve, reject) => {
-				fs.exists(path, exists => {
-					if (exists) {
-						fs.readdir(path, (err, files) => {
-							if (err) reject(err);
-							else {
-								const addToVidArr = (path, fileName, mtime) => {
-									const getFolderFromPath = path => {
-										return path.replace(/\\/g, '/').split('/').filter(val => {return val.trim().length > 0}).pop();
-									}
+		async function handleFolders(path, utils, pathModule) {
+			const exists = await utils.fileExists(path);
 
-									let folderName = getFolderFromPath(path);
-									if (paths.map(val => {return getFolderFromPath(val)}).includes(folderName))
-										folderName = 'Root';
+			if (!exists)
+				throw Error('Directory not found: ' + path);
 
-									if (folderName in videosObj)
-										videosObj[folderName].push({path: path, fileName: fileName, lastChanged: mtime});
-									else
-										videosObj[folderName] = [{path: path, fileName: fileName, lastChanged: mtime}];
-								}
+			const addToVidArr = (path, fileName, fullPath, mtime) => {
+				const getFolderFromPath = path => {
+					return path.replace(/\\/g, '/').split('/').filter(val => { return val.trim().length > 0 }).pop();
+				}
 
-								// Loop through all the files
-								files.forEach((object, key) => {
-									if (object.toLowerCase() !== 'desktop.ini') {
-										// Check if file has same name
-										if (!foundFileNames.includes(object)) {
-											const fileExtention = utils.getFileExtention(object.toLowerCase());
+				let folderName = getFolderFromPath(path);
+				if (paths.map(val => { return getFolderFromPath(val) }).includes(folderName))
+					folderName = 'Root';
 
-											fs.stat(path + object, (err, stats) => {
-												const mtime = new Date(stats.mtime.toString());
+				if (folderName in videosObj)
+					videosObj[folderName].push({ path, fileName, fullPath, lastChanged: mtime });
+				else
+					videosObj[folderName] = [{ path, fileName, fullPath, lastChanged: mtime }];
+			}
 
-												// Check if the file has a file extension that is in the arrays in index.js or that it is a playlist
-												// If it is a file just execute this function again
-												if (audioFileExtensions.includes(fileExtention)) {
-													songsArr.push({path: path, fileName: object, lastChanged: mtime});
-													foundFileNames.push(object);
-												} else if (videoFileExtensions.includes(fileExtention)) {
-													addToVidArr(path, object, mtime);
-													foundFileNames.push(object)
-												} else if (fileExtention == '.m3u') {
-													playlistsArr.push({path: path, fileName: object, lastChanged: mtime});
-													foundFileNames.push(object);
-												} else if (fileExtention == '.vtt') {
-													subtitlesArr.push({path: path, fileName: object});
-													foundFileNames.push(object);
-												} else if (!fileExtention && fs.lstatSync(path + object).isDirectory()) {
-													handleFolders(path + object + '/', utils);
-												} else if (fileExtention && !silent) {
-													console.wrn('File extention not supported', object);
-												} else if (fileExtention && silent) {
-												} else {
-													console.wrn('Something is weird...', 'FILENAME:' + object, 'EXTENSION:' + fileExtention);
-												}
-											});
-										} else {
-											console.wrn(`There are files with the same name: '${object}'`);
-										}
-									}
-								});
+			// Loop through all the files
+			const promiseArr = (await fs.promises.readdir(path)).map(async object => {
+				if (object.toLowerCase() !== 'desktop.ini') {
+					// Check if file has same name
+					if (foundFileNames.includes(object))
+						console.wrn(`There are files with the same name: '${object}'`);
+					else {
+						const fileExtention = utils.getFileExtension(object.toLowerCase());
+						const stats = await fs.promises.stat(pathModule.join(path, object));
+						const fullPath = pathModule.join(path, object);
+						const mtime = new Date(stats.mtime.toString());
 
-								resolve();
-							}
-						});
-					} else reject('Directory not found: ' + path);
-				});
+						// Check if the file has a file extension that is in the arrays in index.js or that it is a playlist
+						// If it is a file just execute this function again
+						if (audioFileExtensions.includes(fileExtention)) {
+							songsArr.push({ path, fileName: object, fullPath, lastChanged: mtime });
+							foundFileNames.push(object);
+						} else if (videoFileExtensions.includes(fileExtention)) {
+							addToVidArr(path, object, fullPath, mtime);
+							foundFileNames.push(object)
+						} else if (fileExtention == '.m3u') {
+							playlistsArr.push({ path, fileName: object, fullPath, lastChanged: mtime });
+							foundFileNames.push(object);
+						} else if (fileExtention == '.vtt') {
+							subtitlesArr.push({ path, fileName: object });
+							foundFileNames.push(object);
+						} else if (!fileExtention && fs.lstatSync(pathModule.join(path, object)).isDirectory()) {
+							handleFolders(pathModule.join(path, object, '/'), utils, pathModule);
+						} else if (fileExtention && !silent) {
+							console.wrn('File extention not supported', object);
+						} else if (fileExtention && silent) {
+						} else {
+							console.wrn('Something is weird...', 'FILENAME:' + object, 'EXTENSION:' + fileExtention);
+						}
+					}
+				}
 			});
+
+			return await Promise.all(promiseArr);
 		}
+	},
+
+	/*
+	*	Returns a Promise with all all the playlists on the system an their contents
+	*
+	*	@param {Object} audio
+	*		Array from fileHandler.getJSON.audio
+	*	@return {Promise}
+	*/
+	getPlaylists: (audio, fs, fileHandler, utils, full = false) => {
+		const handleM3UFiles = () => {
+			return Promise.all(audio.playlists.map(async object => {
+				const songsArr = await fileHandler.readPlayList(fs, object.fullPath, audio.songs);
+
+				if (full)
+					return songsArr;
+
+				return object.fileName;
+
+				if (songsArr.length > 0)
+					return object.fileName;
+				else
+					throw Error(`Playlist '${object.fileName}' is empty`);
+			}));
+		}
+
+		const handlePlaylistsFile = async () => {
+			const playlistsFileLoc = './playlists.json';
+
+			if (!await utils.fileExists(playlistsFileLoc))
+				return [];
+
+			try {
+				const data = fs.promises.readFile(playlistsFileLoc, 'utf-8');
+
+				if (!data)
+					return [];
+
+				const parsedData = JSON.parse(data);
+
+				if (full)
+					return parsedData;
+
+				return Object.keys(parsedData);
+			} catch (err) {
+				return [];
+			}
+		}
+
+		return Promise.all([handleM3UFiles(), handlePlaylistsFile()]);
 	},
 
 	/*
@@ -162,96 +202,64 @@ module.exports = {
 	*		Array from fileHandler.getJSON.audio.songs
 	*	@return {Promise}
 	*/
-	readPlayList: (fs, path, songsArr) => {
+	readPlayList: async (fs, path, songsArr) => {
 		const songs = [];
 
-		return new Promise((resolve, reject) => {
-			fs.exists(path, exists => {
-				if (exists) {
-					fs.readFile(path, 'utf-8', (err, data) => {
-						if (err) reject(err);
-						else {
-							data = data.replace('#EXTM3U', '');
+		songsArr = songsArr.map(val => val.fileName);
 
-							// Split by every song
-							data.split(/#EXTINF:[0-9]+,.+/).forEach((object, key) => {
-								object = object.trim();
+		if (!await utils.fileExists(path))
+			throw Error(`'${path}' does not exist`);
 
-								if (object != '') {
-									const match = object.match(/(.+)(\/|\\)(.+)$/);
-									if (match) {
-										const songName = match[3].toString().trim();
+		// Split by every song
+		(await fs.promises.readFile(path, 'utf-8'))
+			.replace('#EXTM3U', '')
+			.split(/#EXTINF:[0-9]+,.+/)
+			.forEach(object => {
+				object = object.trim();
 
-										if (findSong(songsArr, songName))
-											songs.push(songName);
-									}
-								}
-							});
+				if (object != '') {
+					const match = object.match(/(.+)(\/|\\)(.+)$/);
+					if (match) {
+						const songName = match[3].toString().trim();
 
-							resolve(songs);
-						}
-					});
-				} else reject('File doesn\'t exist');
-			});
-		});
-
-		function findSong(songsArr, songName) {
-			return songsArr.map(val => {return val.fileName}).includes(songName);
-		}
-	},
-
-	updatePlaylist: (fs, body, mostListenedPlaylistName) => {
-		const jsonPath = 'playlists.json';
-
-		return new Promise((resolve, reject) => {
-			fs.exists(__dirname + '/' + jsonPath, exists => {
-				if (exists) {
-					fs.readFile(__dirname + '/' + jsonPath, 'utf-8', (err, data) => {
-						if (err)
-							reject({success: false, err: 'An error occured', info: err});
-						else {
-							data = JSON.parse(data);
-
-							if (body.delete == true) {
-								if (body.name in data) {
-									delete data[body.name];
-									write(data, true);
-								} else {
-									reject({success: false, error: `'${body.name}' not found in 'playlists.json'`})
-								}
-							} else {
-								if (body.name in data) {
-									data[body.name] = body.songs;
-									write(data, true);
-								} else {
-									data[body.name] = body.songs;
-									write(data, false);
-								}
-							}
-						}
-					});
-				} else {
-					const obj = {};
-					obj[body.name] = body.songs;
-					write(obj, false);
+						if (songsArr.includes(songName))
+							songs.push(songName);
+					}
 				}
 			});
 
-			function write(content, alreadyExists) {
-				fs.writeFile(__dirname + '/' + jsonPath, JSON.stringify(content), (err) => {
-					try {
-						if (err)
-							reject({success: false, error: 'There was an error with creating the playlist file', info: err});
-						else if (alreadyExists)
-							resolve({success: true, data: `Playlist with the name '${body.name}' successfuly updated`});
-						else
-							resolve({success: true, data: `Playlist with the name '${body.name}' successfuly added`});
-					} catch (err) {
-						reject({success: false, error: 'There was an error with creating the playlist file', info: err})
-					}
-				});
+		return songs;
+	},
+
+	updatePlaylist: async (fs, body) => {
+		const jsonPath = './playlists.json';
+		const write = async (content, alreadyExists) => {
+			await fs.promises.writeFile(jsonPath, JSON.stringify(content, null, '\t'));
+
+			if (alreadyExists)
+				return `Playlist with the name '${body.name}' successfuly updated`
+			else
+				return `Playlist with the name '${body.name}' successfuly added`;
+		}
+
+		if (utils.fileExists(jsonPath)) {
+			const data = await utils.safeJSONParse(await fs.promises.readFile(jsonPath, 'utf-8'));
+
+			if (body.delete == true) {
+				if (!(body.name in data))
+					throw Error(`'${body.name}' not found in 'playlists.json'`);
+
+				delete data[body.name];
+				return await write(data, true);
+			} else {
+				data[body.name] = body.songs;
+				return await write(data, (body.name in data));
 			}
-		});
+		} else {
+			const obj = {};
+			obj[body.name] = body.songs;
+			return await write(obj, false);
+		}
 	},
 
 	/*
@@ -267,24 +275,16 @@ module.exports = {
 	*		Settings from settings.js
 	*	@return {Promise}
 	*/
-	getJSON: (fs, os, utils, settings) => {
-		return new Promise((resolve, reject) => {
-			const JSONPath = './JSON.json';
+	getJSON: async (fs, os, path, utils, settings) => {
+		const JSONPath = './JSON.json';
 
-			fs.exists(JSONPath, exists => {
-				if (exists) {
-					fs.readFile(JSONPath, 'utf-8', (err, data) => {
-						if (err)
-							reject(err);
-						else
-							resolve(JSON.parse(data));
-					});
-				} else {
-					console.wrn('The JSON file does not exist, so I am creating one...');
-					resolve(this.searchSystem(fs, os, utils, settings));
-				}
-			});
-		});
+		if (await utils.fileExists(jsonPath)) {
+			const data = await fs.promises.readFile(JSONPath, 'utf-8');
+			return await utils.safeJSONParse(data);
+		} else {
+			console.wrn('The JSON file does not exist, so I am creating one...');
+			return await this.searchSystem(fs, os, path, utils, settings);
+		}
 	},
 
 	/*
@@ -298,18 +298,49 @@ module.exports = {
 	*		Native NodeJS fs module
 	*	@return {Promise}
 	*/
-	getSongInfo: (path, id3, fs) => {
+	getSongInfo: (path, id3) => {
 		return new Promise((resolve, reject) => {
-			fs.exists(path, exists => {
-				if (exists) {
+			utils.fileExists(path).then(exists => {
+				if (!exists)
+					reject('File does not exist');
+				else {
 					id3.read(path, (err, tags) => {
 						if (err)
 							reject(err);
 						else
 							resolve(tags);
 					});
-				} else reject('File does not exist');
+				}
 			});
 		});
+	},
+
+	/*
+	*	Loops through the Plugins dir and organizes them for further handling
+	*
+	*	@return {Promise}
+	*/
+	getPlugins: async (pathModule, utils, fs) => {
+		const path = pathModule.join(__dirname, '/Plugins/');
+
+		if (!await utils.fileExists(path))
+			return [];
+		else {
+			return await Promise.all((await fs.promises.readdir(path)).map(async object => {
+				const indexPath = pathModule.join(path, object, '/index.js');
+
+				if (await utils.fileExists(indexPath)) {
+					return {
+						module: require(indexPath),
+						folder: object,
+					};
+				} else {
+					console.err('No index.js file found in ' + path);
+					return {
+						notfound: true
+					};
+				}
+			}));
+		}
 	}
 };

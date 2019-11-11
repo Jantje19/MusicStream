@@ -35,6 +35,7 @@ function end() {
 			window.sw.funcs.updateMostlistened(songName)
 				.catch(fallback);
 
+			next();
 			return;
 		}
 
@@ -255,15 +256,17 @@ function displayLyrics(artist, songName) {
 
 	if (previousTrack != songName) {
 		get(`/getLyrics/${artist}/${songName}`).then(json => {
-			if (json.success) {
+			if (!json.success)
+				lyricsElem.innerHTML = `<h3>Error</h3><br><p>${json.error}</p><a style="color: gray" target="_blank" href="https://makeitpersonal.co/songs/new">Add them yourself.</a>`;
+			else {
 				const lyrics = json.lyrics.trim().replace(/\n/g, '<br>');
 
 				previousTrack = songName;
 				lyricsElem.innerHTML = `<h3>Lyrics</h3><p style="line-height: 1.5;">${lyrics}</p>`;
-			} else lyricsElem.innerHTML = `<h3>Error</h3><br><p>${json.error}</p>`;
+			}
 		}).catch(err => {
 			console.error(err);
-			lyricsElem.innerHTML = `<h3>Error</h3><br><p>Couldn't fetch lyrics</p><br>` + err;
+			lyricsElem.innerHTML = `<h3>Error</h3><br><p>Couldn't fetch lyrics</p><br><a style="color: gray" target="_blank" href="https://makeitpersonal.co/songs/new">Add them yourself.</a>`;
 		});
 	}
 }

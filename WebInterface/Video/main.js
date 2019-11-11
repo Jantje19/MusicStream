@@ -508,7 +508,13 @@ function saveQueueToTmp() {
 		queue: getQueue()
 	};
 
-	fetch('/saveQueue/video', { method: 'POST', body: JSON.stringify(data) }).then(data => {
+	fetch('/saveQueue/video', {
+		body: JSON.stringify(data),
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json'
+		}
+	}).then(data => {
 		data.json().then(json => {
 			if (!json.success)
 				alert('Unable to save: ' + json.error);

@@ -8,7 +8,7 @@ module.exports = {
 		const app = express();
 
 		app.get('*manifest.json*', (_, response) => {
-			fs.readFile(dirname + 'Assets/Icons/manifest.json', 'utf-8', (err, data) => {
+			fs.readFile(path.join(dirname, 'Assets/Icons/manifest.json'), 'utf-8', (err, data) => {
 				if (err)
 					response.status(500).send('Server error');
 				else {
@@ -49,7 +49,7 @@ module.exports = {
 
 		app.use(compression());
 
-		app.get('*favicon.ico*', (request, response) => {
+		app.get('*favicon.ico*', (_, response) => {
 			utils.sendFile(fs, dirname + 'Assets/Icons/favicon.ico', response);
 		});
 
@@ -111,558 +111,86 @@ module.exports = {
 		}
 
 		app.get('*/all.js', (request, response) => {
-			utils.sendFile(fs, dirname + 'all.js', response);
+			console.log(utils.logDate() + ' Got a request for ' + request.url);
+			utils.sendFile(fs, path.join(dirname, 'all.js'), response);
 		});
 
 		app.get('*/all.css', (request, response) => {
-			utils.sendFile(fs, dirname + 'all.css', response);
+			console.log(utils.logDate() + ' Got a request for ' + request.url);
+			utils.sendFile(fs, path.join(dirname, 'all.css'), response);
 		});
 
 		app.get('*/seekbarStyle.css', (request, response) => {
-			utils.sendFile(fs, dirname + 'seekbarStyle.css', response);
+			console.log(utils.logDate() + ' Got a request for ' + request.url);
+			utils.sendFile(fs, path.join(dirname, 'seekbarStyle.css'), response);
 		});
 
 		app.get('*/Assets/*', (request, response) => {
-			utils.sendFile(fs, dirname + request.url.replace('videos/', ''), response);
+			console.log(utils.logDate() + ' Got a request for ' + request.url);
+			utils.sendFile(fs, path.join(dirname, request.url.replace('videos/', '')), response);
 		});
 
 		app.get('/mobile-assets/*', (request, response) => {
+			console.log(utils.logDate() + ' Got a request for ' + request.url);
 			utils.sendFile(fs, path.join(dirname, 'Mobile/', request.url), response);
 		});
 
 		app.get('/mobile/favicon.ico', (request, response) => {
+			console.log(utils.logDate() + ' Got a request for ' + request.url);
 			response.sendFile(path.join(dirname, './Assets/Icons/favicon.ico'));
 		});
 
-		app.get('/data/*', (request, response) => {
-			let sort = false;
-			const url = request.url;
-			console.log(utils.logDate() + ' Got a request for ' + url);
-
-			if (url.toLowerCase().indexOf('sort=') > -1 && (
-				url.toLowerCase().indexOf('sort=newest') > -1 ||
-				url.toLowerCase().indexOf('sort=oldest') > -1
-			))
-				sort = true;
-
-			fileHandler.getJSON(fs, os, utils, settings).then(json => {
-				const songs = [];
-				const videos = {};
-				const subtitles = ('subtitles' in json.video) ? json.video.subtitles.map(val => { return val.fileName }) : [];
-
-				const handleVideos = obj => {
-					for (key in obj) {
-						videos[key] = obj[key].map(val => {
-							return val.fileName;
-						}).filter(val => {
-							return !(settings.ignoredVideoFiles.val.includes(val));
-						});
-					}
-				}
-
-				if (json.audio.songs.length > 0 || Object.keys(json.video.videos).length > 0) {
-					if (sort) {
-						// Sorting videos
-						for (key in json.video.videos)
-							json.video.videos[key] = json.video.videos[key].sort(sortFunc);
-
-						json.audio.songs.sort(sortFunc);
-						// json.video.videos.sort(sortFunc);
-						json.audio.songs.forEach((object, key) => songs.push(object.fileName));
-						handleVideos(json.video.videos);
-					} else {
-						json.audio.songs.forEach((object, key) => songs.push(object.fileName));
-						handleVideos(json.video.videos);
-					}
-
-					getPlaylists = (json, fs) => {
-						return Promise.all([new Promise((resolve, reject) => {
-							const playlists = [];
-
-							if (sort)
-								playlists.sort(sortFunc);
-
-							if (json.audio.playlists.length > 0) {
-								json.audio.playlists.forEach((object, key) => {
-									fileHandler.readPlayList(fs, object.path + object.fileName, json.audio.songs).then(songsArr => {
-										if (songsArr.length > 0)
-											playlists.push(object.fileName);
-
-										if (key == json.audio.playlists.length - 1)
-											resolve(playlists);
-									}).catch(err => reject(err));
-								});
-							} else resolve([]);
-						}), new Promise((resolve, reject) => {
-							fs.exists('./playlists.json', exists => {
-								if (exists) {
-									fs.readFile('./playlists.json', 'utf-8', (err, data) => {
-										if (err) resolve(JSON.parse(data));
-										else {
-											const arr = [];
-											data = JSON.parse(data);
-
-											for (key in data)
-												arr.push(key);
-
-											resolve(arr);
-										}
-									});
-								} else resolve([]);
-							});
-						})
-						]);
-					}
-
-					getPlaylists(json, fs).then(playlists => {
-						function flatten(arr) {
-							return Array.prototype.concat.apply([], arr);
-						}
-
-						playlists = flatten(playlists);
-						// If oldest just reverse :P
-						if (url.toLowerCase().indexOf('sort=oldest') > -1) {
-							// Reverse videos
-							for (key in videos)
-								videos[key] = videos[key].reverse();
-
-							songs.reverse();
-							playlists.reverse();
-						}
-
-						response.send({
-							audio: {
-								songs: songs.filter(val => {
-									return !(settings.ignoredAudioFiles.val.includes(val))
-								}),
-								playlists: playlists
-							},
-							video: {
-								videos: videos,
-								subtitles: subtitles
-							}
-						});
-					}).catch(err => {
-						console.err(err);
-						response.send({ error: "Something went wrong", info: "Either getting the songs or getting the playlists or both went wrong" })
-					});
-				} else response.send({ error: "Not found", info: "There are no media files found on this device." });
-			}).catch(err => {
-				console.err('There was an error with getting the info', err);
-				response.send({ error: "There was an error with getting the info", info: err });
-			});
-
-			const sortFunc = (a, b) => {
-				const dateA = new Date(a.lastChanged);
-				const dateB = new Date(b.lastChanged);
-				return dateB - dateA;
-			}
-		});
-
-		app.get('/checkForUpdates/', (request, response) => {
-			console.log(utils.logDate() + ' Got a request for ' + request.url);
-
-			utils.newVersionAvailable(version).then(newVersion => {
-				response.send({ success: true, data: newVersion });
-			}).catch(err => response.send({ success: false, error: err }));
-		});
-
-		app.get('/updateJSON/', (request, response) => {
-			console.log(utils.logDate() + ' Got a request for ' + request.url);
-
-			fileHandler.searchSystem(fs, os, utils, settings).then(json => {
-				response.send({ success: true });
-			}).catch(err => {
-				console.err(err);
-				response.send({ success: false, error: "There was an error with updating the JSON", info: err });
-			});
-		});
-
 		app.get('/help/', (request, response) => {
-			const url = querystring.unescape(request.url);
-			console.log(utils.logDate() + ' Got a request for ' + url);
-			utils.sendFile(fs, dirname + 'help.html', response);
+			console.log(utils.logDate() + ' Got a request for ' + request.url);
+			utils.sendFile(fs, path.join(dirname, 'help.html'), response);
 		});
 
 		app.get('/settings/', (request, response) => {
-			const url = querystring.unescape(request.url);
-			console.log(utils.logDate() + ' Got a request for ' + url);
-			utils.sendFile(fs, dirname + 'settings.html', response);
+			console.log(utils.logDate() + ' Got a request for ' + request.url);
+			utils.sendFile(fs, path.join(dirname, 'settings.html'), response);
 		});
 
-		app.get('/getSettings', (request, response) => {
-			const url = querystring.unescape(request.url);
-			console.log(utils.logDate() + ' Got a request for ' + url);
-			response.send(settings);
-		});
-
-		app.get('/downloadYoutube*', (request, response) => {
-			const url = querystring.unescape(request.url);
-
-			console.log(utils.logDate() + ' Got a request for ' + url);
-			utils.sendFile(fs, dirname + 'downloadYoutube.html', response);
-		});
-
-		app.get('/LoadPluginJS/*', (request, response) => {
+		app.get('/LoadPluginJS/:filePath', (request, response) => {
 			const url = querystring.unescape(request.url);
 			console.log(utils.logDate() + ' Got a request for ' + url);
 
-			const filePath = url.replace(request.headers.referer, '').replace('/LoadPluginJS/', '');
-			utils.sendFile(fs, __dirname + '/Plugins/' + filePath, response);
+			utils.sendFile(fs, path.join(__dirname, '/Plugins/', filePath), response);
 		});
 
-		app.get('/youtubeData/:id', (request, response) => {
-			const url = querystring.unescape(request.url);
-			const id = request.params.id;
+		app.get('/OldBrowsers/*', (request, response) => {
+			const url = request.url;
 
 			console.log(utils.logDate() + ' Got a request for ' + url);
-			if (ytdl.validateID(id)) {
-				try {
-					ytdl.getInfo(id, (err, info) => {
-						if (err)
-							response.send({ success: false, error: 'No info found for that video id', info: err });
-						else
-							response.send({ success: true, info });
-					});
-				} catch (err) { response.send({ success: false, error: 'Something went wrong', info: err }) };
-			} else response.send({ success: false, error: 'Invalid ID', info: 'The provided ID is not a valid YouTube id' });
-		});
 
-		app.get('/cutFile*', (request, response) => {
-			const url = querystring.unescape(request.url);
-			const params = querystring.parse(URLModule.parse(url).query);
+			fileHandler.getJSON(fs, os, path, utils, settings).then(json => {
+				let html = '';
+				const settings = require('./settings.js');
 
-			if ('filename' in params && ('start' in params || 'end' in params)) {
-				fileHandler.getJSON(fs, os, utils, settings).then(json => {
-					const index = json.audio.songs.map(val => {
-						return val.fileName;
-					}).indexOf(params.filename);
-
-					if (index > -1) {
-						const file = json.audio.songs[index];
-						const ffmpegObj = ffmpeg(file.path + file.fileName);
-
-						if ('end' in params) ffmpegObj.setDuration(params.end);
-						if ('start' in params) ffmpegObj.setStartTime(params.start);
-
-						ffmpegObj.output(file.path + file.fileName);
-						ffmpegObj.on('end', err => {
-							if (err)
-								response.send({ success: false, error: JSON.parse(err) });
-							else
-								response.send({ success: true });
-						});
-
-						ffmpegObj.on('error', err => {
-							console.log("FFMPEG Error", err);
-							response.send({ success: false, error: JSON.parse(err) });
-						});
-
-						ffmpegObj.run();
-					} else response.send({ success: false, error: "File not found" });
+				json.audio.songs.forEach((object) => {
+					if (!settings.ignoredAudioFiles.val.includes(object.fileName))
+						html += `<a href="/song/${object.fileName}" target="_blank">${object.fileName}</a>`;
 				});
-			} else response.send({ success: false, error: "Parameters missing" });
+
+				response.send(html);
+			}).catch(err => response.status(404).send('Error: ' + err));
 		});
 
-		app.get('/getSavedQueue/:type', (request, response) => {
-			if ('params' in request) {
-				if ('type' in request.params) {
-					const paramsType = request.params.type.toLowerCase();
-
-					if (paramsType === 'audio' || paramsType === 'video') {
-						const url = querystring.unescape(request.url);
-						const args = querystring.parse(URLModule.parse(url).query);
-
-						console.log(utils.logDate() + ' Got a request for ' + url);
-
-						const sendData = (data) => {
-							if (data) {
-								if (data.queue)
-									response.send({ success: true, data: data })
-								else
-									response.send({ success: false, error: 'Nothing saved' })
-							} else response.send({ success: false, error: 'Nothing saved' });
-						}
-
-						if (paramsType === 'audio') {
-							if (args) {
-								let objectKey = ('for' in args) ? args.for : request.connection.remoteAddress;
-
-								if (objectKey) {
-									if (objectKey.toLowerCase() == 'global')
-										sendData(tmpQueueSave.audio.global);
-									else {
-										objectKey = request.connection.remoteAddress;
-
-										if (objectKey in tmpQueueSave.audio)
-											sendData(tmpQueueSave.audio[objectKey]);
-										else
-											sendData(null);
-									}
-								} else sendData(tmpQueueSave.audio.global);
-							} else sendData(null);
-						} else if (paramsType === 'video') {
-							sendData(tmpQueueSave.video);
-						} else {
-							sendData(null);
-						}
-
-						return;
-					}
-				}
-			}
-
-			response.send({ success: false, error: 'Invalid type' });
-		});
-
-		app.post('/ytdl*', (request, response) => {
-			let body = '';
-
-			const url = querystring.unescape(request.url);
-			console.log(utils.logDate() + ' Got a POST request for ' + url);
-
-			request.on('data', data => {
-				body += data;
-
-				if (body.length > 1e6) {
-					response.send({ success: false, err: 'The amount of data is too much', info: 'The connection was destroyed because the amount of data passed is too much' });
-					request.connection.destroy();
-				}
-			});
-
-			request.on('end', () => {
-				let json;
-
-				const sendData = data => {
-					if (!response.headersSent)
-						response.send(data);
-				}
-
-				const sendError = err => {
-					console.error(err);
-
-					try {
-						sendData({
-							error: err.toString(),
-							jsonUpdated: false,
-							success: false,
-						});
-					} catch (err) { }
-				}
-
-				const handleProgress = (chunkLength, downloaded, total) => {
-					try {
-						process.stdout.cursorTo(0);
-						process.stdout.clearLine(1);
-						process.stdout.write("DOWNLOADING: " + (downloaded / total * 100).toFixed(2) + '% ');
-					} catch (err) { }
-				}
-
-				const handleEnd = (path, json) => {
-					process.stdout.write('\n');
-
-					fs.exists(path, exists => {
-						if (exists) {
-							fileHandler.searchSystem(fs, os, utils, settings).then(() => {
-								sendData({ success: true, fileName: json.fileName + '.mp3', jsonUpdated: true });
-							}).catch(err => {
-								sendData({ success: true, fileName: json.fileName, jsonUpdated: false });
-							});
-						} else sendError("File does not exist. This is a weird problem... You should investigate.");
-					});
-				}
-
-				const handleVideo = (json, ffmpeg) => {
-					const path = os.homedir() + '/Videos/' + json.fileName + '.mp4';
-					const video = ytdl(json.url, { filter: function (format) { return format.container === 'mp4'; } });
-
-					video.pipe(fs.createWriteStream(path));
-					video.on('progress', handleProgress);
-					video.on('error', sendError);
-					video.on('end', () => {
-						handleEnd(path, json);
-					});
-				}
-
-				const handleAudio = (json, ffmpeg) => {
-					const path = os.homedir() + '/Music/' + json.fileName + '.mp3';
-					const args = {
-						format: 'mp3',
-						bitrate: 128
-					}
-
-					if (json.startTime > -1)
-						args.seek = json.startTime;
-					if (json.endTime > 1)
-						args.duration = json.endTime;
-
-					const reader = ytdl('https://youtube.com/watch?v=' + (new URL(json.url)).searchParams.get('v'), { filter: 'audioonly' });
-					const writer = ffmpeg(reader).format(args.format).audioBitrate(args.bitrate);
-
-					if (args.seek) writer.seekInput(args.seek);
-					if (args.duration) writer.duration(args.duration);
-
-					writer.on('error', sendError);
-					reader.on('progress', handleProgress);
-					reader.on('end', () => {
-						writer.on('end', () => {
-							handleEnd(path, json);
-						});
-					});
-
-					reader.on('error', sendError);
-					writer.output(path).run();
-				}
-
-				try {
-					json = JSON.parse(body);
-				} catch (err) {
-					sendError(err);
-					return;
-				}
-
-				if (json) {
-					if (json.url && json.fileName && json.type) {
-						// Sanitize file name
-						json.fileName = json.fileName.replace('\/', '\\');
-						json.fileName = json.fileName.replace(/[/\\?%*:|"<>]/g, '');
-
-						if (!ytdl.validateURL(json.url)) {
-							sendError('Invalid url');
-							return;
-						}
-
-						if (json.startTime) {
-							const parsedVal = parseInt(json.startTime, 10);
-
-							if (!Number.isNaN(parsedVal))
-								json.startTime = parsedVal;
-							else
-								json.startTime = -1;
-						}
-						if (json.endTime) {
-							const parsedVal = parseInt(json.endTime, 10);
-
-							if (!Number.isNaN(parsedVal))
-								json.endTime = parsedVal;
-							else
-								json.endTime = -1;
-						}
-
-						if (json.type == 'video')
-							handleVideo(json, ffmpeg);
-						else if (json.type == 'audio')
-							handleAudio(json, ffmpeg);
-						else sendError('Type not correct');
-					} else sendError('Tags not found. Expected url, fileName and tags.');
-				} else sendError('No JSON found');
-			});
-		});
-		//
-		app.post('/updateSettings', (request, response) => {
-			let body = '';
-
-			request.on('data', data => {
-				body += data;
-
-				if (body.length > 1e6) {
-					response.send({ success: false, err: 'The amount of data is to much', info: 'The connection was destroyed because the amount of data passed is to much' });
-					request.connection.destroy();
-				}
-			});
-
-			request.on('end', () => {
-				const jsonPath = './settings.js';
-				const url = querystring.unescape(request.url);
-
-				console.log(utils.logDate() + ' Got a POST request for ' + url);
-
-				try {
-					body = JSON.parse(body);
-
-					// Copy the settings
-					data = JSON.parse(JSON.stringify(settings));
-
-					for (key in body)
-						data[key].val = body[key];
-
-					fs.writeFile(jsonPath, 'module.exports = ' + JSON.stringify(data), err => {
-						if (err)
-							response.send({ success: false, info: err });
-						else {
-							response.send({ success: true });
-							console.wrn('MusicStream restarting because the settings updated!');
-							process.exit(131);
-						}
-					});
-				} catch (err) {
-					response.send({ success: false, info: err });
-				}
-			});
-		});
-
-		app.post('/saveQueue/:type', (request, response) => {
-			let body = '';
-
-			const sendError = () => {
-				response.send({ succss: false, error: 'No type specified' });
-				request.connection.destroy();
-			}
-
-			if ('params' in request) {
-				if ('type' in request.params) {
-					request.on('data', data => {
-						body += data;
-
-						if (body.length > 1e6) {
-							request.send({ success: false, error: 'The amount of data is to high', info: 'The connection was destroyed because the amount of data passed is to much' });
-							request.connection.destroy();
-						}
-					});
-
-					request.on('end', () => {
-						const url = querystring.unescape(request.url);
-
-						console.log(utils.logDate() + ' Got a POST request for ' + url);
-
-						try {
-							body = JSON.parse(body);
-						} catch (err) {
-							response.send({ success: false, error: 'Unable to parse JSON', info: err });
-							return;
-						}
-
-						if (request.params.type.toLowerCase() === 'audio') {
-							let objectKey = ('for' in body) ? body.for : request.connection.remoteAddress;
-							const queueIndex = ('queueIndex' in body) ? body.queueIndex : 0;
-							const timeStamp = ('timeStamp' in body) ? body.timeStamp : 0;
-							const queue = ('queue' in body) ? body.queue : [];
-
-							if (objectKey.toLowerCase() == 'global') {
-								tmpQueueSave.audio.global = { queueIndex, timeStamp, queue };
-								response.send({ success: true });
-							} else {
-								tmpQueueSave.audio[request.connection.remoteAddress] = { queueIndex, timeStamp, queue };
-								response.send({ success: true });
-							}
-						} else if (request.params.type.toLowerCase() === 'video') {
-							const queueIndex = ('queueIndex' in body) ? body.queueIndex : 0;
-							const timeStamp = ('timeStamp' in body) ? body.timeStamp : 0;
-							const subtitle = ('subtitle' in body) ? body.subtitle : null;
-							const queue = ('queue' in body) ? body.queue : [];
-
-							tmpQueueSave.video = { queueIndex, timeStamp, queue, subtitle };
-							response.send({ success: true });
-						} else {
-							response.send({ success: false, error: 'Invalid type' });
-						}
-					});
-				} else sendError();
-			} else sendError();
-		});
-
-		require('./serverVideoHandler.js').start(app, dirname, fileHandler, fs, os, settings, utils, querystring, ffmpeg);
-		require('./serverAudioHandler.js').start(app, dirname, fileHandler, fs, os, settings, utils, querystring, id3, https, URLModule, ffmpeg);
+		require('./APIManager.js')(
+			app,
+			dirname,
+			fileHandler,
+			fs,
+			os,
+			path,
+			settings,
+			utils,
+			id3,
+			https,
+			querystring,
+			URLModule,
+			ytdl,
+			ffmpeg
+		);
 
 		// Plugins
 		if (serverPlugins) {

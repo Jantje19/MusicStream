@@ -44,5 +44,27 @@
 			"type": "image/png",
 			"density": "4.0"
 		}
+	],
+	"screenshots": [
+		{
+			"src": "https://i.imgur.com/k6CChZT.png",
+			"sizes": "1366x629",
+			"type": "image/png"
+		},
+		{
+			"src": "https://i.imgur.com/z7fGO4s.png",
+			"sizes": "1280x800",
+			"type": "image/png"
+		},
+		{
+			"src": "https://i.imgur.com/4PwNPDq.png",
+			"sizes": "1366x629",
+			"type": "image/png"
+		},
+		{
+			"src": "https://i.imgur.com/10ySDvb.jpg",
+			"sizes": "270x393",
+			"type": "image/jpeg"
+		}
 	]
 }

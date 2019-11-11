@@ -130,7 +130,14 @@
 					} else tags[type] = input.value;
 				});
 
-				fetch('/tags/', { method: "POST", body: JSON.stringify({ songName: songName, tags: tags }), credentials: 'same-origin' }).then(response => {
+				fetch('/tags/', {
+					body: JSON.stringify({ songName: songName, tags: tags }),
+					credentials: 'same-origin',
+					method: "POST",
+					headers: {
+						'Content-Type': 'application/json'
+					}
+				}).then(response => {
 					response.json().then(json => {
 						if (json.success) {
 							if (confirm('Tags updated! Do you want to go to the home page?'))
@@ -214,7 +221,14 @@
 			const songName = location.hash.replace('#', '');
 
 			if (confirm(`Are you sure you want to delete the tags of '${songName}'`)) {
-				fetch('/tags/', { method: "POST", body: JSON.stringify({ songName: songName, tags: { delete: true } }), credentials: 'same-origin' }).then(response => {
+				fetch('/tags/', {
+					body: JSON.stringify({ songName, tags: { delete: true } }),
+					credentials: 'same-origin',
+					method: "POST",
+					headers: {
+						'Content-Type': 'application/json'
+					}
+				}).then(response => {
 					response.json().then(json => {
 						if (json.success) {
 							if (confirm('Tags removed! Do you want to go to the home page?'))

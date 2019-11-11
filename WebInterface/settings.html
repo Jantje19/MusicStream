@@ -114,7 +114,14 @@
 
 			Array.from(settingsElem.querySelectorAll('input')).forEach(forEachFunc);
 			Array.from(settingsElem.querySelectorAll('select')).forEach(forEachFunc);
-			fetch(/updateSettings/, { method: 'POST', body: JSON.stringify(json), credentials: 'same-origin' }).then(response => {
+			fetch(/updateSettings/, {
+				body: JSON.stringify(json),
+				credentials: 'same-origin',
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				}
+			}).then(response => {
 				response.json().then(json => {
 					if (json.success) {
 						if (confirm('Everything went according to plan. You have to restart the server to activate the changes! Do you want to go back?'))
@@ -147,7 +154,8 @@
 
 		function load() {
 			fetch('/getSettings/', { credentials: 'same-origin' }).then(response => {
-				response.json().then(json => {
+				response.json().then(data => {
+					const json = data.data;
 					let newHTML = '';
 
 					for (key in json) {

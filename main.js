@@ -20,74 +20,12 @@ const hijackRequestPlugins = [];
 
 const loadPlugins = () => {
 	return new Promise((resolve, reject) => {
-		/*
-		*	Loops through the Plugins dir and organizes them for further handling
-		*
-		*	@return {Promise}
-		*/
-		function getPlugins() {
-			return new Promise((resolve, reject) => {
-				const path = __dirname + '/Plugins/';
-				const plugins = [];
-
-				/*
-				*	Gets plugin data
-				*
-				*	@param {String} path
-				*		The plugin path
-				*	@param {String} folderName
-				*		The name of the folder containing the plugin
-				*	@return {Promise}
-				*/
-				function getPlugin(path, folderName) {
-					const indexPath = path + '/index.js';
-
-					return new Promise((resolve, reject) => {
-						// Make sure that there is an index file
-						fs.exists(indexPath, exists => {
-							if (exists) {
-								resolve({
-									module: require(indexPath),
-									folder: folderName,
-								});
-							} else {
-								resolve({
-									notfound: true
-								});
-
-								console.err('No index.js file found in ' + path);
-							}
-						});
-					});
-				}
-
-				fs.exists(path, exists => {
-					if (exists) {
-						fs.readdir(path, (err, data) => {
-							if (err) reject(err);
-							else {
-								data.forEach((object, key) => {
-									plugins.push(getPlugin(path + object, object));
-								});
-
-								Promise.all(plugins).then(plugins => {
-									resolve(plugins);
-								}).catch(err => {
-									reject(err);
-								});
-							}
-						});
-					} else resolve();
-				});
-			});
-		}
-
-		getPlugins().then(plugins => {
-			if (plugins) {
+		fileHandler.getPlugins(pathModule, utils, fs).then(plugins => {
+			if (plugins.length > 0) {
 				utils.colorLog(utils.logDate() + ' Loading plugins...', 'bgGreen');
 
 				// Loop through every plugin and handle the functions
-				plugins.forEach((object, key) => {
+				plugins.forEach(object => {
 					if (!object.notfound) {
 						// If it is a function just run it
 						if ((typeof object.module).toLowerCase() == 'function') {
@@ -105,7 +43,7 @@ const loadPlugins = () => {
 
 							const data = {
 								version: version,
-								path: __dirname + '/Plugins/' + object.pluginFolder,
+								path: pathModule.join(__dirname, '/Plugins/', object.pluginFolder),
 								serverURL: utils.getLocalIP(os)[0] + ':' + (settings.port || 8000)
 							}
 
@@ -165,10 +103,10 @@ const loadPlugins = () => {
 const startServer = () => {
 	loadPlugins().then(() => {
 		utils.colorLog(utils.logDate() + ' Plugins loaded', 'bgGreen');
-		const startServerModule = () => server.start(__dirname + '/WebInterface/', fileHandler, fs, os, settings, utils, querystring, id3, ytdl, version, https, URLModule, ffmpeg, pathModule, pluginServer, hijackRequestPlugins);
+		const startServerModule = () => server.start(pathModule.join(__dirname, '/WebInterface/'), fileHandler, fs, os, settings, utils, querystring, id3, ytdl, version, https, URLModule, ffmpeg, pathModule, pluginServer, hijackRequestPlugins);
 
 		if (settings.updateJsonOnStart.val == true) {
-			fileHandler.searchSystem(fs, os, utils, settings).then(startServerModule).catch(err => {
+			fileHandler.searchSystem(fs, os, pathModule, utils, settings).then(startServerModule).catch(err => {
 				console.err('Couln\'t update the JSON file.', err);
 				startServerModule();
 			});
@@ -204,8 +142,50 @@ const utils = {
 	*	@param {String} filename
 	*	@return {String}
 	*/
-	getFileExtention: fileName => {
+	getFileExtension: fileName => {
 		return pathModule.extname(fileName).toLowerCase();
+	},
+
+	/*
+	*	Fetches the image from url
+	*
+	*	@param {String} url
+	*		The image url
+	*	@return {Promise}
+	*/
+	getImage: url => {
+		return new Promise((resolve, reject) => {
+			Stream = require('stream').Transform;
+
+			https.request(url, response => {
+				const data = new Stream();
+
+				response.on('data', chunk => {
+					data.push(chunk);
+				});
+
+				response.on('error', reject);
+				response.on('end', () => {
+					const buffer = data.read();
+
+					if (buffer instanceof Buffer)
+						resolve(buffer);
+					else
+						reject('Not a buffer');
+				});
+			}).end();
+		});
+	},
+
+	/*
+	*	Checks if file exists
+	*
+	*	@param {String} path
+	*	@param {Number} [mode=F_OK]
+	*	@return {Boolean}
+	*/
+	fileExists: async (path, mode = fs.constants.F_OK) => {
+		return (await fs.promises.access(path, mode)) !== false;
 	},
 
 	/*
@@ -226,6 +206,22 @@ const utils = {
 	},
 
 	/*
+	*	Parses JSON with Promise instead of Error
+	*
+	*	@param {String} str
+	*	@return {Promise<Object>}
+	*/
+	safeJSONParse: str => {
+		return new Promise((resolve, reject) => {
+			try {
+				resolve(JSON.parse(str));
+			} catch (err) {
+				reject(err);
+			}
+		});
+	},
+
+	/*
 	*	Responsible for sending files and parsing the HTML for the handling plugins
 	*
 	*	@param {Object} fs
@@ -239,13 +235,21 @@ const utils = {
 		if (path.endsWith(pathModule.sep))
 			path = pathModule.join(path, 'index.html');
 
-		fs.exists(path, exists => {
-			if (exists) {
-				if (utils.getFileExtention(path) == '.html') {
+		utils.fileExists(path).then(exists => {
+			if (!exists)
+				response.status(404).sendFile(pathModule.join(__dirname, '/WebInterface/404.html'));
+			else {
+				if (utils.getFileExtension(path) !== '.html')
+					response.status(200).sendFile(path)
+				else {
 					fs.readFile(path, 'utf-8', (err, data) => {
-						if (err)
-							response.status(500).send('Error: 500. An error occured: ' + err);
-						else {
+						if (err) {
+							console.err(err);
+							response
+								.status(500)
+								.header("Content-Type", "text/html")
+								.send('<h1>Internal server error</h1>');
+						} else {
 							for (key in settings)
 								data = data.replace(new RegExp(`\{\{\\s?(${key})\\s?\}\}`, 'g'), settings[key].val);
 
@@ -254,12 +258,14 @@ const utils = {
 							const thisPath = path.replace(__dirname, '').replace('/WebInterface/', '').replace(/\/\//g, '/');
 							pluginDomJs.forEach(object => {
 								if (thisPath == object.filePath.replace(/^\//, '')) {
-									if (object.script.startsWith('http')) {
+									if (!object.script.startsWith('http'))
+										data = data.replace('</head>', `<script type="text/javascript" src="/LoadPluginJS/${pathModule.join(object.pluginFolder, '/', object.script)}"></script>\n</head>`)
+									else {
 										if (object.script.startsWith('http://'))
-											console.warn('A plugin is injecting a resource from a non-https source');
+											console.warn('A plugin is injecting a resource from an insecure (non-https) source');
 
 										data = data.replace('</head>', `<script type="text/javascript" src="${object.script}"></script>\n</head>`);
-									} else data = data.replace('</head>', `<script type="text/javascript" src="/LoadPluginJS/${object.pluginFolder + '/' + object.script}"></script>\n</head>`);
+									}
 								}
 							});
 
@@ -276,8 +282,14 @@ const utils = {
 							response.status(200).send(data);
 						}
 					});
-				} else response.status(200).sendFile(path);
-			} else response.status(404).sendFile(__dirname + '/WebInterface/404.html');
+				}
+			}
+		}).catch(err => {
+			console.error(err);
+			response
+				.status(500)
+				.header("Content-Type", "text/html")
+				.send('<h1>Internal server error</h1>');
 		});
 	},
 
@@ -315,15 +327,48 @@ const utils = {
 				res.on('data', chunk => { rawData += chunk; });
 				res.on('end', () => {
 					// If the response is json try to parse
-					if (/^application\/json/.test(contentType)) {
-						try {
-							resolve(JSON.parse(rawData));
-						} catch (err) {
-							reject(err);
-						}
-					} else resolve(rawData);
+					if (/^application\/json/.test(contentType))
+						utils.safeJSONParse(rawData).then(resolve).catch(reject);
+					else
+						resolve(rawData);
 				});
 			}).on('error', err => reject(err));
+		});
+	},
+
+	/*
+	*	Hanles POST request
+	*
+	*	@param {Request} request
+	*		NodeJS request object
+	*	@param {Boolean} [parseJson=false]
+	*		If it should automatically parse JSON if the Content-Type is application/json
+	*	@return {Promise}
+	*/
+	handlePostRequest: (request, parseJSON = true) => {
+		return new Promise((resolve, reject) => {
+			let body = '';
+
+			request.on('data', data => {
+				body += data;
+
+				if (body.length > 1e6) {
+					request.connection.destroy();
+					reject('The connection was destroyed because the amount of data passed is too much');
+				}
+			});
+
+			request.on('end', () => {
+				if (request.headers['content-type'].includes('json') && parseJSON) {
+					utils.safeJSONParse(body)
+						.then(resolve)
+						.catch(reject);
+
+					return;
+				}
+
+				resolve(body);
+			});
 		});
 	},
 
@@ -474,20 +519,20 @@ const utils = {
 				if (index) {
 					if (index[2]) {
 						if (index[2].length > 0) {
-							let JSONData;
-
-							try {
-								JSONData = JSON.parse(`{${index[2]}}`);
-							} catch (err) { }
-
-							if (JSONData) {
-								if ('key' in JSONData && 'cert' in JSONData) {
-									if (fs.existsSync(JSONData.key) && fs.existsSync(JSONData.cert)) {
+							utils.safeJSONParse(`{${index[2]}}`).then(JSONData => {
+								if (!('key' in JSONData && 'cert' in JSONData))
+									console.wrn('Found https argument, but the given JSON value doesn\'t contain one or both of the required arguments (key, cert). Starting with default settings...');
+								else {
+									if (!(fs.existsSync(JSONData.key) && fs.existsSync(JSONData.cert)))
+										console.wrn('Found https argument, but the given cert or key path(s) don\'t exist. Starting with default settings...');
+									else {
 										utils.colorLog('Found https argument. Starting server in https mode!', 'bgGreen');
 										return JSONData;
-									} else console.wrn('Found https argument, but the given cert or key path(s) don\'t exist. Starting with default settings...');
-								} else console.wrn('Found https argument, but the given JSON value doesn\'t contain one or both of the required arguments (key, cert). Starting with default settings...');
-							} else console.wrn('Found https argument, but couln\'t parse the given JSON value. Starting with default settings...');
+									}
+								}
+							}).catch(() => {
+								console.wrn('Found https argument, but couln\'t parse the given JSON value. Starting with default settings...');
+							});
 						}
 					}
 				} else console.wrn('Found https argument, but couln\'t parse the given value. Starting with default settings...');
@@ -500,22 +545,24 @@ const utils = {
 					if (index[2]) {
 						if (index[2].length > 0) {
 							try {
-								if (fs.existsSync(index[2])) {
-									let JSONData = fs.readFileSync(index[2], 'utf-8');
-
-									try {
-										JSONData = JSON.parse(JSONData);
-									} catch (err) { }
-
-									if ((typeof JSONData).toLowerCase() != 'string') {
-										if ('key' in JSONData && 'cert' in JSONData) {
-											if (fs.existsSync(JSONData.key) && fs.existsSync(JSONData.cert)) {
+								if (!fs.existsSync(index[2]))
+									console.wrn('Found https argument, but couln\'t parse the given JSON value. Starting with default settings...');
+								else {
+									utils.safeJSONParse(fs.readFileSync(index[2], 'utf-8')).then(JSONData => {
+										if (!('key' in JSONData && 'cert' in JSONData))
+											console.wrn('Found https argument, but the given JSON value doesn\'t contain one or both of the required arguments (key, cert). Starting with default settings...');
+										else {
+											if (!(fs.existsSync(JSONData.key) && fs.existsSync(JSONData.cert)))
+												console.wrn('Found https argument, but the given cert or key path(s) don\'t exist. Starting with default settings...');
+											else {
 												utils.colorLog('Found https argument. Starting server in https mode!', 'bgGreen');
 												return JSONData;
-											} else console.wrn('Found https argument, but the given cert or key path(s) don\'t exist. Starting with default settings...');
-										} else console.wrn('Found https argument, but the given JSON value doesn\'t contain one or both of the required arguments (key, cert). Starting with default settings...');
-									} else console.wrn('Found https argument, but couln\'t parse the given JSON value. Starting with default settings...');
-								} else console.wrn('Found https argument, but the specified file doesn\'t exist. Starting with default settings...');
+											}
+										}
+									}).catch(() => {
+										console.wrn('Found https argument, but the specified file doesn\'t exist. Starting with default settings...');
+									});
+								}
 							} catch (err) {
 								console.wrn('Found https argument, but couln\'t parse the given file. Starting with default settings...');
 							}
@@ -564,7 +611,7 @@ if (process.argv.includes('-h') || process.argv.includes('--help') || process.ar
 
 	return;
 } else if (process.argv.includes('update-json')) {
-	fileHandler.searchSystem(fs, os, utils, settings).then(json => {
+	fileHandler.searchSystem(fs, os, pathModule, utils, settings).then(() => {
 		console.log('Successfully updated the JSON file.');
 	}).catch(err => {
 		console.log('There was an error with updating the JSON:', err);
@@ -579,7 +626,7 @@ if (process.argv.includes('-h') || process.argv.includes('--help') || process.ar
 		if (fromFileName != toFileName) {
 			utils.colorLog(`Tying to renaming '${fromFileName}' to '${toFileName}'`, 'fgCyan');
 
-			fileHandler.getJSON(fs, os, utils, settings).then(val => {
+			fileHandler.getJSON(fs, os, pathModule, utils, settings).then(val => {
 				console.log('Got all files. Searching...');
 
 				const songsArr = val.audio.songs.map(val => { return val.fileName });
@@ -604,13 +651,13 @@ if (process.argv.includes('-h') || process.argv.includes('--help') || process.ar
 			return new Promise((resolve, reject) => {
 				const obj = valuesArr[arr.indexOf(fromFileName)];
 
-				fs.rename(obj.path + obj.fileName, obj.path + toFileName, err => {
+				fs.rename(path.join(obj.path, obj.fileName), path.join(obj.path, toFileName), err => {
 					if (err)
 						reject(err);
 					else {
 						utils.colorLog(`Successfuly renamed '${fromFileName}' to '${toFileName}'.`, 'fgCyan');
 
-						fileHandler.searchSystem(fs, os, utils, settings, true).then(data => {
+						fileHandler.searchSystem(fs, os, pathModule, utils, settings, true).then(() => {
 							resolve();
 						}).catch(err => {
 							reject(err);
@@ -621,16 +668,16 @@ if (process.argv.includes('-h') || process.argv.includes('--help') || process.ar
 		}
 
 		function replaceInM3UFiles() {
-			function handleFile(object, key) {
+			function handleFile(object, ) {
 				return new Promise((resolve, reject) => {
-					fs.readFile(object.path + object.fileName, 'utf-8', (err, data) => {
+					fs.readFile(object.fullPath, 'utf-8', (err, data) => {
 						if (err)
 							reject(err);
 						else {
 							if (data.indexOf(fromFileName) > -1) {
 								data = data.replace(new RegExp(fromFileName, 'g'), toFileName);
 
-								fs.writeFile(object.path + object.fileName, data, err => {
+								fs.writeFile(object.fullPath, data, err => {
 									if (err)
 										reject(err);
 									else {
@@ -655,49 +702,32 @@ if (process.argv.includes('-h') || process.argv.includes('--help') || process.ar
 			} else return Promise.resolve();
 		}
 
-		function renameInPlaylistFile() {
-			return new Promise((resolve, reject) => {
-				fs.readFile('playlists.json', 'utf-8', (err, data) => {
-					if (err)
-						reject(err);
-					else {
-						try {
-							data = JSON.parse(data);
+		async function renameInPlaylistFile() {
+			const data = await utils.safeJSONParse(await fs.promises.readFile('./playlists.json', 'utf-8'));
 
-							for (key in data) {
-								if (key == settings.mostListenedPlaylistName.val) {
-									for (val in data[key]) {
-										if (val == fromFileName) {
-											console.log('Found in \'' + key + '\'');
+			for (key in data) {
+				if (key == settings.mostListenedPlaylistName.val) {
+					for (val in data[key]) {
+						if (val == fromFileName) {
+							console.log('Found in \'' + key + '\'');
 
-											data[key][toFileName] = data[key][fromFileName];
-											delete data[key][fromFileName];
-										}
-									}
-								} else {
-									data[key].forEach((object, indx) => {
-										if (object == fromFileName) {
-											console.log('Found in \'' + key + '\'');
-											data[key].splice(indx, 1, toFileName);
-										}
-									});
-								}
-							}
-
-							fs.writeFile('playlists.json', JSON.stringify(data), err => {
-								if (err)
-									reject(err);
-								else {
-									console.log(`'${fromFileName}' renamed to '${toFileName}' in all playlists (except the .m3u files).`);
-									resolve();
-								}
-							});
-						} catch (err) {
-							reject(err);
+							data[key][toFileName] = data[key][fromFileName];
+							delete data[key][fromFileName];
 						}
 					}
-				});
-			});
+				} else {
+					data[key].forEach((object, indx) => {
+						if (object == fromFileName) {
+							console.log('Found in \'' + key + '\'');
+							data[key].splice(indx, 1, toFileName);
+						}
+					});
+				}
+			}
+
+			const returnVal = await fs.promises.writeFile('./playlists.json', JSON.stringify(data));
+			console.log(`'${fromFileName}' renamed to '${toFileName}' in all playlists (except the .m3u files).`);
+			return returnVal;
 		}
 
 		Promise.all([renameFile(), replaceInM3UFiles(), renameInPlaylistFile()]).then(() => {

@@ -218,7 +218,7 @@
 				fetch('/youtubeData/' + vidId, { credentials: 'same-origin' }).then(response => {
 					response.json().then(json => {
 						if (json.success) {
-							json = json.info;
+							json = json.data;
 							const { videoDetails } = json.player_response;
 
 							if (!videoDetails.title)
@@ -253,7 +253,6 @@
 								});
 								const val = match.splice(0, 1)[0].trim();
 
-								console.log(val);
 								if (!artist) artist = val;
 								if (!title) title = match.join('-').trim();
 							}
@@ -401,7 +400,14 @@
 					videoInputElem.style.alignItems = 'center';
 					videoInputElem.style.justifyContent = 'center';
 					videoInputElem.innerHTML = '<b>Downloading... This may take a while.</b>';
-					fetch('/ytdl', { method: "POST", credentials: 'same-origin', body: JSON.stringify(data) }).then(response => {
+					fetch('/ytdl', {
+						body: JSON.stringify(data),
+						credentials: 'same-origin',
+						method: "POST",
+						headers: {
+							'Content-Type': 'application/json'
+						},
+					}).then(response => {
 						response.json().then(json => {
 							if (json.success) {
 								if (useTags && type == 'audio') {
@@ -412,7 +418,14 @@
 
 									if (type == 'audio') {
 										videoInputElem.innerHTML = '<b>Setting tags...</b>';
-										fetch('/tags', { method: 'POST', body: JSON.stringify(body), credentials: 'same-origin' }).then(response => {
+										fetch('/tags', {
+											body: JSON.stringify(body),
+											credentials: 'same-origin',
+											method: "POST",
+											headers: {
+												'Content-Type': 'application/json'
+											}
+										}).then(response => {
 											response.json().then(json => {
 												videoInputElem.innerHTML = '<b>Done!</b>';
 												if (json.success) {

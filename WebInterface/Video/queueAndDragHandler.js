@@ -3,7 +3,7 @@ let queueIndex = 0;
 
 fetch('/getSettings/', { credentials: 'same-origin' }).then(response => {
 	response.json().then(json => {
-		settings = json;
+		settings = json.data;
 	}).catch(err => { console.log(err); });
 }).catch(err => {
 	console.error('An error occurred', err);

@@ -114,7 +114,14 @@
 						if (confirm('Are you sure the playlist is okay like this?')) {
 							const jsonData = { name: playlistName, songs: innerElems.map(obj => { return obj.innerText }) };
 
-							fetch('/updatePlaylist/', { method: "POST", body: JSON.stringify(jsonData), credentials: 'same-origin' }).then(response => {
+							fetch('/updatePlaylist/', {
+								body: JSON.stringify(jsonData),
+								credentials: 'same-origin',
+								method: "POST",
+								headers: {
+									'Content-Type': 'application/json'
+								}
+							}).then(response => {
 								response.json().then(json => {
 									if (json.success) {
 										if (json.error) alert('Something on the server went wrong.\n' + json.info);

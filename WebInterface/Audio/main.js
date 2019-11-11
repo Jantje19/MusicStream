@@ -29,7 +29,7 @@ function getData(type) {
 		return window.sw.funcs.getDownloaded();
 
 	return new Promise((resolve, reject) => {
-		get('/data/' + ((type !== null && type !== undefined) ? `?sort=${type}` : ''))
+		get('/data/' + ((type !== null && type !== undefined) ? '?sort=' + type : ''))
 			.then(json => {
 				if (json.error)
 					reject(json.error);
@@ -167,7 +167,13 @@ function saveQueueToTmp(type) {
 	if (type == 'global')
 		data.for = 'global'
 
-	get('saveQueue/audio', { method: 'post', body: JSON.stringify(data) }).then(data => {
+	get('saveQueue/audio', {
+		body: JSON.stringify(data),
+		method: 'post',
+		headers: {
+			'Content-Type': 'application/json'
+		}
+	}).then(data => {
 		console.log(data);
 	}).catch(err => {
 		console.error(err);
@@ -183,7 +189,14 @@ function saveQueueToPlaylist() {
 			if (confirm('Are you sure the playlist is okay like this?')) {
 				const jsonData = { name: playlistName, songs: queue };
 
-				get('/updatePlaylist/', { method: "POST", body: JSON.stringify(jsonData) }).then(json => {
+				get('/updatePlaylist/', {
+					body: JSON.stringify(jsonData),
+					credentials: 'include',
+					method: "POST",
+					headers: {
+						'Content-Type': 'application/json'
+					}
+				}).then(json => {
 					if (json.success) {
 						if (json.error)
 							alert('Something on the server went wrong.\n' + json.info);

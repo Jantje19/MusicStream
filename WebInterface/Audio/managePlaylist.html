@@ -142,7 +142,14 @@
 					if (confirm('Are you sure the playlist is okay like this?')) {
 						const jsonData = { name: getPlaylistName(), songs: innerElems.map(obj => { return obj.innerText }) };
 
-						fetch('/updatePlaylist/', { method: "POST", body: JSON.stringify(jsonData), credentials: 'same-origin' }).then(response => {
+						fetch('/updatePlaylist/', {
+							body: JSON.stringify(jsonData),
+							credentials: 'same-origin',
+							method: "POST",
+							headers: {
+								'Content-Type': 'application/json'
+							}
+						}).then(response => {
 							response.json().then(json => {
 								if (json.success) {
 									if (json.error)
@@ -167,7 +174,14 @@
 						delete: true
 					}
 
-					fetch('updatePlaylist/', { method: 'POST', body: JSON.stringify(data), credentials: 'same-origin' }).then(response => {
+					fetch('updatePlaylist/', {
+						body: JSON.stringify(data),
+						credentials: 'same-origin',
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/json'
+						}
+					}).then(response => {
 						response.json().then(json => {
 							if (json.success == true)
 								window.location = window.location.origin;

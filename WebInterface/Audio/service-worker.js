@@ -1,6 +1,7 @@
 importScripts('ServiceWorker/workbox-sw.js');
 
 const musicCache = 'ms-media';
+workbox.setConfig({ debug: false });
 // workbox.setConfig({ debug: true });
 workbox.core.setCacheNameDetails({
 	prefix: 'musicstream'
