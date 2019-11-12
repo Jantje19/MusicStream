@@ -50,12 +50,12 @@ module.exports = {
 				setTimeout(() => {
 					jsonFileArr = {
 						audio: {
-							songs: songsArr,
-							playlists: playlistsArr
+							playlists: playlistsArr,
+							songs: songsArr
 						},
 						video: {
+							subtitles: subtitlesArr,
 							videos: videosObj,
-							subtitles: subtitlesArr
 						}
 					};
 
@@ -172,12 +172,12 @@ module.exports = {
 				return [];
 
 			try {
-				const data = fs.promises.readFile(playlistsFileLoc, 'utf-8');
+				const data = await fs.promises.readFile(playlistsFileLoc, 'utf-8');
 
 				if (!data)
 					return [];
 
-				const parsedData = JSON.parse(data);
+				const parsedData = await utils.safeJSONParse(data);
 
 				if (full)
 					return parsedData;
