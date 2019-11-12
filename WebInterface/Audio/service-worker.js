@@ -1,8 +1,10 @@
-importScripts('ServiceWorker/workbox-sw.js');
+importScripts('ServiceWorker/workbox/workbox-sw.js');
 
 const musicCache = 'ms-media';
-workbox.setConfig({ debug: false });
-// workbox.setConfig({ debug: true });
+workbox.setConfig({
+	modulePathPrefix: '/ServiceWorker/workbox/',
+	debug: false,
+});
 workbox.core.setCacheNameDetails({
 	prefix: 'musicstream'
 });
