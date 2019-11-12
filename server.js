@@ -126,17 +126,21 @@ module.exports = {
 		});
 
 		app.get('*/Assets/*', (request, response) => {
-			console.log(utils.logDate() + ' Got a request for ' + request.url);
+			// console.log(utils.logDate() + ' Got a request for ' + request.url);
+			response.header('Cache-Control', 'public, max-age=31536000'); // Cache for a year
 			utils.sendFile(fs, path.join(dirname, request.url.replace('videos/', '')), response);
 		});
 
 		app.get('/mobile-assets/*', (request, response) => {
 			console.log(utils.logDate() + ' Got a request for ' + request.url);
+			response.header('Cache-Control', 'public, max-age=31536000'); // Cache for a year
 			utils.sendFile(fs, path.join(dirname, 'Mobile/', request.url), response);
 		});
 
 		app.get('/mobile/favicon.ico', (request, response) => {
 			console.log(utils.logDate() + ' Got a request for ' + request.url);
+
+			response.header('Cache-Control', 'public, max-age=31536000'); // Cache for a year
 			response.sendFile(path.join(dirname, './Assets/Icons/favicon.ico'));
 		});
 

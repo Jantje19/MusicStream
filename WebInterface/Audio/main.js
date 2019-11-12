@@ -682,7 +682,7 @@ function load([swFuncs]) {
 	document.getElementById('updateJSONBtn').addEventListener('click', evt => {
 		overflowMenu.style.display = 'none';
 
-		get('/updateJSON/').then(json => {
+		get('/updateJSON/', { method: 'POST', credentials: 'include' }).then(json => {
 			if (json.success) {
 				if (confirm('Updated media list!\nShould the songs list be updated?'))
 					reloadSongslist(sortElem);
@@ -817,7 +817,7 @@ function getCookieAttributes() {
 				splitVal[1] += '=' + splitVal[i];
 		}
 
-		outp[splitVal[0]] = splitVal[1];
+		outp[splitVal[0]] = unescape(splitVal[1]);
 	});
 
 	return outp;
@@ -827,24 +827,13 @@ function getCookieAttributes() {
 function checkCookies(songsArr) {
 	function getLocationAttributes() {
 		const json = {};
-		let url = unescape(window.location.search);
 
-		if (url.indexOf('?') > -1) {
-			url = url.substr(1);
-			url.split('&').forEach((object, key) => {
-				object = object.replace(/(\[AMP\])/g, '&');
+		if (window.location.search) {
+			for (const [key, value] of new URLSearchParams(window.location.search))
+				json[key] = value;
+		}
 
-				const regEx = /^(.+)=(.+)$/;
-				const values = regEx.exec(object);
-
-				let name = values[1];
-				let value = values[2];
-
-				json[name] = value;
-			});
-
-			return json;
-		} else return;
+		return json;
 	}
 
 	function getCookies() {
@@ -852,8 +841,8 @@ function checkCookies(songsArr) {
 
 		if (cookieAtts) {
 			if ('queue' in cookieAtts) {
-				cookieAtts['queue'].split(',').forEach((object, key) => {
-					object = unescape(object);
+				cookieAtts['queue'].split(',').forEach(object => {
+					object = decodeURIComponent(object);
 
 					if (songsArr.includes(object))
 						enqueue(object);
@@ -876,13 +865,18 @@ function checkCookies(songsArr) {
 			});
 
 			if (arr.length > 0) {
-				arr.forEach((object, key) => {
+				arr.forEach(object => {
 					queue.push(object);
 				});
+
 				playSong(queue[queueIndex], true);
-			} else getCookies();
-		} else getCookies();
-	} else getCookies();
+
+				return;
+			}
+		}
+	}
+
+	getCookies();
 }
 
 audio.onended = end;

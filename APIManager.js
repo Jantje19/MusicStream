@@ -86,16 +86,6 @@ module.exports = (app, dirname, fileHandler, fs, os, pathModule, settings, utils
 		});
 	});
 
-	app.get('/updateJSON', (request, response) => {
-		console.log(utils.logDate() + ' Got a request for ' + request.url);
-
-		fileHandler.searchSystem(fs, os, pathModule, utils, settings).then(data => {
-			response.send({ success: true, data });
-		}).catch(err => {
-			handleError(response, "There was an error with updating the JSON", err);
-		});
-	});
-
 	app.get('/getSettings', (request, response) => {
 		console.log(utils.logDate() + ' Got a request for ' + request.url);
 
@@ -178,6 +168,22 @@ module.exports = (app, dirname, fileHandler, fs, os, pathModule, settings, utils
 		}
 
 		handleError(response, 'Invalid type');
+	});
+
+	app.post('/updateJSON', (request, response) => {
+		console.log(utils.logDate() + ' Got a request for ' + request.url);
+
+		utils.handlePostRequest(request)
+			.then(() => {
+				fileHandler.searchSystem(fs, os, pathModule, utils, settings).then(data => {
+					response.send({ success: true, data });
+				}).catch(err => {
+					handleError(response, "There was an error with updating the JSON", err);
+				});
+			})
+			.catch(err => {
+				handleError(response, 'Unable to parse request body', err);
+			});
 	});
 
 	app.post('/ytdl*', (request, response) => {
@@ -405,7 +411,7 @@ module.exports = (app, dirname, fileHandler, fs, os, pathModule, settings, utils
 						const playlist = json.audio.playlists[inArray.index];
 
 						// Let fileHandler.js handle this
-						fileHandler.readPlayList(fs, pathModule.join(playlist.path, playlist.fileName), json.audio.songs).then(songsArr => {
+						fileHandler.readPlayList(fs, pathModule.join(playlist.path, playlist.fileName), utils, json.audio.songs).then(songsArr => {
 							response.send({ success: true, songs: songsArr });
 						}).catch(err => {
 							handleError(response, 'There was an error with reading the playlist', err);
@@ -480,7 +486,9 @@ module.exports = (app, dirname, fileHandler, fs, os, pathModule, settings, utils
 			});
 
 			if (song)
-				response.sendFile(song.fullPath);
+				response
+					.header('Cache-Control', 'public, max-age=3600')
+					.sendFile(song.fullPath);
 			else
 				handleError(response, `The song '${songName}' was not found`);
 		}).catch(err => {
@@ -489,7 +497,7 @@ module.exports = (app, dirname, fileHandler, fs, os, pathModule, settings, utils
 	});
 
 	app.get('/songInfo/:songName', (request, response) => {
-		console.log(utils.logDate() + ' Got a request for ' + request.url);
+		console.log(utils.logDate() + ' Got a request for ' + querystring.unescape(request.url));
 
 		if (!request.params.songName) {
 			handleError(response, 'Song name not specified');
@@ -502,7 +510,7 @@ module.exports = (app, dirname, fileHandler, fs, os, pathModule, settings, utils
 			});
 
 			if (song) {
-				fileHandler.getSongInfo(song.fullPath, id3).then(tags => {
+				fileHandler.getSongInfo(song.fullPath, id3, utils).then(tags => {
 					if (tags.image) {
 						if (tags.image.imageBuffer) {
 							if (tags.image.imageBuffer.length > 1e7)
@@ -510,11 +518,18 @@ module.exports = (app, dirname, fileHandler, fs, os, pathModule, settings, utils
 						}
 					}
 
-					response.send(tags);
-				}).catch(err => response.send({ error: 'Couldn\'t find ID3 tags', info: err }));
+					response.send({
+						success: true,
+						tags
+					});
+				}).catch(err => {
+					handleError(response, 'Couldn\'t find ID3 tags', err);
+				});
 			} else
 				handleError(response, `'${songName}' was not found`);
-		}).catch(err => response.send({ error: "There was an error with getting the song", info: err }));
+		}).catch(err => {
+			handleError(response, 'Unable to get songs list', err);
+		});
 	});
 
 	app.get('/getLyrics/:artist/:songName', (request, response) => {
@@ -711,7 +726,9 @@ module.exports = (app, dirname, fileHandler, fs, os, pathModule, settings, utils
 			});
 
 			if (video)
-				response.sendFile(video.fullPath);
+				response
+					.header('Cache-Control', 'public, max-age=3600')
+					.sendFile(video.fullPath);
 			else
 				handleError(response, `The video '${fileName}' was not found`);
 		}).catch(err => {

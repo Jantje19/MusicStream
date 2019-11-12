@@ -100,7 +100,7 @@
 
 		function load() {
 			if (location.hash) {
-				const songName = unescape(location.hash.replace('#', ''));
+				const songName = decodeURIComponent(location.hash.replace('#', ''));
 
 				fetch('/data/?sort={{audioDefaultSortType}}', { credentials: 'same-origin' }).then(response => {
 					response.json().then(json => {
@@ -117,7 +117,7 @@
 			} else showSongSelect();
 
 			document.getElementById('fab').addEventListener('click', evt => {
-				const songName = unescape(location.hash.replace('#', ''));
+				const songName = decodeURIComponent(location.hash.replace('#', ''));
 				const tags = {};
 
 				Array.from(document.getElementById('tagEditor').childNodes).forEach((object, key) => {
@@ -131,7 +131,7 @@
 				});
 
 				fetch('/tags/', {
-					body: JSON.stringify({ songName: songName, tags: tags }),
+					body: JSON.stringify({ songName, tags: tags }),
 					credentials: 'same-origin',
 					method: "POST",
 					headers: {
@@ -184,33 +184,37 @@
 			mainElem.innerHTML = '<div class="ball-scale-multiple"><div></div><div></div><div></div></div>';
 			fetch('/songInfo/' + songName, { credentials: 'same-origin' }).then(response => {
 				response.json().then(tags => {
-					const div = document.createElement('div');
+					if (!tags.success)
+						alert(tags.error);
+					else {
+						const div = document.createElement('div');
 
-					document.getElementById('fab').style.transform = 'translateY(0)';
-					document.querySelector('header').innerHTML += '<button title="Delete all the tags" onclick="deleteTags()" style="left: unset; right: 30px"><img src="Assets/ic_delete_white.svg"></button>';
-					document.querySelector('header').innerHTML += '<button title="Fetch tags from Last.FM" onclick="handleLastFmBtn()" style="left: unset; right: 70px"><img src="Assets/ic_cached_white.svg"></button>';
+						document.getElementById('fab').style.transform = 'translateY(0)';
+						document.querySelector('header').innerHTML += '<button title="Delete all the tags" onclick="deleteTags()" style="left: unset; right: 30px"><img src="Assets/ic_delete_white.svg"></button>';
+						document.querySelector('header').innerHTML += '<button title="Fetch tags from Last.FM" onclick="handleLastFmBtn()" style="left: unset; right: 70px"><img src="Assets/ic_cached_white.svg"></button>';
 
-					div.id = 'tagEditor';
-					mainElem.innerHTML = '<h3>Tag editor</h3>';
-					availableTags.forEach((object, key) => {
-						let songTag = '';
-						const innerDiv = document.createElement('div');
+						div.id = 'tagEditor';
+						mainElem.innerHTML = '<h3>Tag editor</h3>';
+						availableTags.forEach((object, key) => {
+							let songTag = '';
+							const innerDiv = document.createElement('div');
 
-						if (object in tags) songTag = tags[object];
+							if (object in tags.tags)
+								songTag = tags.tags[object];
 
-						if (object == 'comment') {
-							if (songTag.text)
-								songTag = songTag.text;
-						}
+							if (object == 'comment') {
+								if (songTag.text)
+									songTag = songTag.text;
+							}
 
+							innerDiv.innerHTML += `<label for="${object}">${object}</label>`;
+							innerDiv.innerHTML += `<input id="${object}" value="${songTag}"><br>`;
+							div.appendChild(innerDiv);
+						});
+						div.innerHTML += `<div><label for="image">image (only url)</label><input id="image" type="url"></div>`;
 
-						innerDiv.innerHTML += `<label for="${object}">${object}</label>`;
-						innerDiv.innerHTML += `<input id="${object}" value="${songTag}"><br>`;
-						div.appendChild(innerDiv);
-					});
-					div.innerHTML += `<div><label for="image">image (only url)</label><input id="image" type="url"></div>`;
-
-					mainElem.appendChild(div);
+						mainElem.appendChild(div);
+					}
 				});
 			}).catch(err => {
 				console.error('An error occurred', err);

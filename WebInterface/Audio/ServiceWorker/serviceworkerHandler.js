@@ -89,12 +89,18 @@ const downloadFile = (file, progressUpdateHandler, songInfoFetched) => {
 
 			fetch(infoFileLoc)
 				.then(resp => {
-					cache.put(infoFileLoc, resp)
-						.then(() => {
-							songInfoFetched()
-							resolve();
-						})
-						.catch(reject);
+					const respClone = resp.clone();
+
+					resp.json().then(data => {
+						if (data.success) {
+							cache.put(infoFileLoc, respClone)
+								.then(() => {
+									songInfoFetched()
+									resolve();
+								})
+								.catch(reject);
+						}
+					}).catch(reject);
 				})
 				.catch(reject);
 		}));

@@ -290,21 +290,23 @@ function mediaSession() {
 
 	let title = songName;
 	let artist = songName;
-	let tagsLoaded = false;
 
 	if (match) {
 		artist = match.splice(0, 1)[0].trim();
 		title = match.join('-').trim();
 
-		get('/songInfo/' + queue[queueIndex]).then(json => {
-			if (json.error) return;
-			try { document.getElementById('artistInfo').remove() } catch (err) { }
+		get('/songInfo/' + queue[queueIndex]).then(data => {
+			if (!data.success)
+				return;
 
-			tagsLoaded = true;
+			try {
+				document.getElementById('artistInfo').remove()
+			} catch (err) { }
 
-			let imageUrl;
-			const img = new Image();
 			const dataDiv = document.createElement('div');
+			const img = new Image();
+			const json = data.tags;
+			let imageUrl;
 
 			dataDiv.id = 'artistInfo';
 			dataDiv.innerHTML += '<p style="font-size: 120%;">Song info:</p>';

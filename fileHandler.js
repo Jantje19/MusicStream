@@ -151,7 +151,7 @@ module.exports = {
 	getPlaylists: (audio, fs, fileHandler, utils, full = false) => {
 		const handleM3UFiles = () => {
 			return Promise.all(audio.playlists.map(async object => {
-				const songsArr = await fileHandler.readPlayList(fs, object.fullPath, audio.songs);
+				const songsArr = await fileHandler.readPlayList(fs, object.fullPath, utils, audio.songs);
 
 				if (full)
 					return songsArr;
@@ -202,7 +202,7 @@ module.exports = {
 	*		Array from fileHandler.getJSON.audio.songs
 	*	@return {Promise}
 	*/
-	readPlayList: async (fs, path, songsArr) => {
+	readPlayList: async (fs, path, utils, songsArr) => {
 		const songs = [];
 
 		songsArr = songsArr.map(val => val.fileName);
@@ -278,7 +278,7 @@ module.exports = {
 	getJSON: async (fs, os, path, utils, settings) => {
 		const JSONPath = './JSON.json';
 
-		if (await utils.fileExists(jsonPath)) {
+		if (await utils.fileExists(JSONPath)) {
 			const data = await fs.promises.readFile(JSONPath, 'utf-8');
 			return await utils.safeJSONParse(data);
 		} else {
@@ -294,11 +294,11 @@ module.exports = {
 	*		File location
 	*	@param {Object} id3
 	*		id3 module
-	*	@param {Object} fs
-	*		Native NodeJS fs module
+	*	@param {Object} utils
+	*		MusicStream utils object
 	*	@return {Promise}
 	*/
-	getSongInfo: (path, id3) => {
+	getSongInfo: (path, id3, utils) => {
 		return new Promise((resolve, reject) => {
 			utils.fileExists(path).then(exists => {
 				if (!exists)

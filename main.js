@@ -184,8 +184,17 @@ const utils = {
 	*	@param {Number} [mode=F_OK]
 	*	@return {Boolean}
 	*/
-	fileExists: async (path, mode = fs.constants.F_OK) => {
-		return (await fs.promises.access(path, mode)) !== false;
+	fileExists: (path, mode = fs.constants.F_OK) => {
+		return new Promise((resolve, reject) => {
+			fs.promises.access(path, mode).then(exists => {
+				resolve(exists !== false);
+			}).catch(err => {
+				if (err.code === 'ENOENT')
+					resolve(false);
+				else
+					reject(err);
+			});
+		});
 	},
 
 	/*
@@ -359,7 +368,7 @@ const utils = {
 			});
 
 			request.on('end', () => {
-				if (request.headers['content-type'].includes('json') && parseJSON) {
+				if ((request.headers['content-type'] || '').includes('json') && parseJSON) {
 					utils.safeJSONParse(body)
 						.then(resolve)
 						.catch(reject);
