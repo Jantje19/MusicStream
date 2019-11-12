@@ -721,9 +721,17 @@ module.exports = (app, dirname, fileHandler, fs, os, pathModule, settings, utils
 			return handleError(response, 'No file name found');
 
 		fileHandler.getJSON(fs, os, pathModule, utils, settings).then(json => {
-			const video = json.video.videos.find(val => {
-				return val.fileName === request.params.fileName;
-			});
+			const video = (function() {
+				for (let key in json.video.videos) {
+					const foundVal = json.video.videos[key].find(val => {
+						return val.fileName === request.params.fileName;
+					});
+					if (foundVal)
+						return foundVal;
+				}
+
+				return null;
+			})();
 
 			if (video)
 				response

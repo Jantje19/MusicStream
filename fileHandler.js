@@ -123,7 +123,7 @@ module.exports = {
 							playlistsArr.push({ path, fileName: object, fullPath, lastChanged: mtime });
 							foundFileNames.push(object);
 						} else if (fileExtention == '.vtt') {
-							subtitlesArr.push({ path, fileName: object });
+							subtitlesArr.push({ path, fileName: object, fullPath });
 							foundFileNames.push(object);
 						} else if (!fileExtention && fs.lstatSync(pathModule.join(path, object)).isDirectory()) {
 							handleFolders(pathModule.join(path, object, '/'), utils, pathModule);
