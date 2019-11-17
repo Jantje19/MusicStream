@@ -561,7 +561,7 @@ module.exports = (app, dirname, fileHandler, fs, os, pathModule, settings, utils
 				if (json.name === settings.mostListenedPlaylistName.val)
 					handleError(response, `Cannot access '${json.name}'. This file is not editable`);
 				else
-					fileHandler.updatePlaylist(fs, json, settings.mostListenedPlaylistName.val)
+					fileHandler.updatePlaylist(fs, json, settings.mostListenedPlaylistName.val, utils)
 						.then(data => {
 							response.send({
 								success: true,
@@ -652,7 +652,7 @@ module.exports = (app, dirname, fileHandler, fs, os, pathModule, settings, utils
 		}
 
 		utils.handlePostRequest(request)
-			.then(() => {
+			.then(body => {
 				const jsonPath = './playlists.json';
 				let songs = {};
 
@@ -694,10 +694,10 @@ module.exports = (app, dirname, fileHandler, fs, os, pathModule, settings, utils
 							}
 
 							function send() {
-								fileHandler.updatePlaylist(fs, { name: settings.mostListenedPlaylistName.val, songs }, settings.mostListenedPlaylistName.val)
+								fileHandler.updatePlaylist(fs, { name: settings.mostListenedPlaylistName.val, songs }, utils)
 									.then(() => response.send({ success: true, data: body + ' successfully added to ' + settings.mostListenedPlaylistName.val }))
 									.catch(err => {
-										handleError(response, 'Something happened when tried to add ' + body + ' to ' + settings.mostListenedPlaylistName.val, err);
+										handleError(response, `Something happened when trying to add '${body}' to '${settings.mostListenedPlaylistName.val}'`, err);
 									});
 							}
 						})
@@ -721,7 +721,7 @@ module.exports = (app, dirname, fileHandler, fs, os, pathModule, settings, utils
 			return handleError(response, 'No file name found');
 
 		fileHandler.getJSON(fs, os, pathModule, utils, settings).then(json => {
-			const video = (function() {
+			const video = (function () {
 				for (let key in json.video.videos) {
 					const foundVal = json.video.videos[key].find(val => {
 						return val.fileName === request.params.fileName;

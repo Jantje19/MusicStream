@@ -300,12 +300,11 @@ main #main #queueContainer #queue button:not(.tmpBtn) {
 }
 
 main #main #queueContainer #queue button:not(.tmpBtn):before {
-	left: 0;
 	right: 0;
+	left: 5px;
 	color: black;
 	display: block;
 	font-size: 1em;
-	margin-left: 4%;
 	position: absolute;
 	content: attr(index);
 }

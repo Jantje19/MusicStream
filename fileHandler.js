@@ -231,7 +231,7 @@ module.exports = {
 		return songs;
 	},
 
-	updatePlaylist: async (fs, body) => {
+	updatePlaylist: async (fs, body, utils) => {
 		const jsonPath = './playlists.json';
 		const write = async (content, alreadyExists) => {
 			await fs.promises.writeFile(jsonPath, JSON.stringify(content, null, '\t'));

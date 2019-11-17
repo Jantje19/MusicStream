@@ -18,8 +18,8 @@ self.addEventListener('message', event => {
 	}
 });
 
-self.addEventListener('fetch', event => {
-	const doThing = async (ifOnlineAlwaysFetch = false) => {
+(function () {
+	const doThing = async (event, ifOnlineAlwaysFetch = false) => {
 		if (navigator.onLine && ifOnlineAlwaysFetch)
 			return await fetch(event.request, { credentials: 'include' });
 
@@ -32,14 +32,16 @@ self.addEventListener('fetch', event => {
 		return await fetch(event.request, { credentials: 'include' });
 	}
 
-	if (event.request.url.includes('/song/'))
-		event.respondWith(doThing());
-	else if (
-		event.request.url.includes('/songInfo/') ||
-		event.request.url.includes('/playlist/')
-	)
-		event.respondWith(doThing(true));
-});
+	self.addEventListener('fetch', event => {
+		if (event.request.url.includes('/song/'))
+			event.respondWith(doThing(event));
+		else if (
+			event.request.url.includes('/songInfo/') ||
+			event.request.url.includes('/playlist/')
+		)
+			event.respondWith(doThing(event, true));
+	});
+}());
 
 self.addEventListener('sync', event => {
 	if (event.tag.startsWith('updatemostlistened'))
