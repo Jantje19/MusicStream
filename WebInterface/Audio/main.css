@@ -467,11 +467,13 @@ main #controls #mainControls #artistInfo .infoBtn {
 main #controls #mainControls #artistInfo #thumbnail {
 	cursor: zoom-in;
 	transform: scale(1);
+	will-change: transform;
+	transform-origin: bottom right;
 	transition: transform .3s ease;
 }
 
-main #controls #mainControls #artistInfo #thumbnail:hover {
-	transform: scale(3) translate(-30px, -40px);
+main #controls #mainControls #artistInfo #thumbnail:hover, main #controls #mainControls #artistInfo #thumbnail:focus {
+	transform: scale(3);
 }
 
 main #fab {

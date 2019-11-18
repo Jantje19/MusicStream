@@ -1,6 +1,9 @@
+const blobImageArr = [];
 const queue = [];
+
+let prevLoadedMediaSessionSong;
+let previousLyricsSong;
 let queueIndex = 0;
-let previousTrack;
 
 function enqueue(...vals) {
 	if (Array.isArray(vals[0]))
@@ -138,7 +141,11 @@ function startSong() {
 		}
 	}
 
-	try { document.getElementById('artistInfo').remove() } catch (err) { }
+	if (prevLoadedMediaSessionSong !== queue[queueIndex]) {
+		try {
+			document.getElementById('artistInfo').remove();
+		} catch (err) { }
+	}
 }
 
 function pauseSong() {
@@ -254,14 +261,14 @@ function displayLyrics(artist, songName) {
 		document.body.addEventListener('click', clickEvt);
 	}, 100);
 
-	if (previousTrack != songName) {
+	if (previousLyricsSong != songName) {
 		get(`/getLyrics/${artist}/${songName}`).then(json => {
 			if (!json.success)
 				lyricsElem.innerHTML = `<h3>Error</h3><br><p>${json.error}</p><a style="color: gray" target="_blank" href="https://makeitpersonal.co/songs/new">Add them yourself.</a>`;
 			else {
 				const lyrics = json.lyrics.trim().replace(/\n/g, '<br>');
 
-				previousTrack = songName;
+				previousLyricsSong = songName;
 				lyricsElem.innerHTML = `<h3>Lyrics</h3><p style="line-height: 1.5;">${lyrics}</p>`;
 			}
 		}).catch(err => {
@@ -285,6 +292,11 @@ function updateCookies() {
 
 // Media Sessions
 function mediaSession() {
+	if (prevLoadedMediaSessionSong === queue[queueIndex])
+		return;
+
+	prevLoadedMediaSessionSong = queue[queueIndex];
+
 	const songName = queue[queueIndex].replace(/(\.\w{3})$/, '');
 	const match = songName.split(/(\-|\–)/);
 
@@ -300,7 +312,7 @@ function mediaSession() {
 				return;
 
 			try {
-				document.getElementById('artistInfo').remove()
+				document.getElementById('artistInfo').remove();
 			} catch (err) { }
 
 			const dataDiv = document.createElement('div');
@@ -326,6 +338,12 @@ function mediaSession() {
 					const blob = new Blob([arrayBufferView], { type: "image/jpeg" });
 					const urlCreator = window.URL || window.webkitURL;
 
+					// Revoke previous images
+					for (let i = blobImageArr.length - 1; i >= 0; i--) {
+						urlCreator.revokeObjectURL(blobImageArr[i]);
+						blobImageArr.splice(i, 1);
+					}
+
 					imageUrl = urlCreator.createObjectURL(blob);
 					img.id = 'thumbnail';
 					img.style.top = '40px';
@@ -336,6 +354,8 @@ function mediaSession() {
 					img.style.border = '2px white solid';
 					img.style.boxShadow = '0 0 10px rgba(0, 0, 0, 0.3)';
 					img.src = imageUrl;
+
+					blobImageArr.push(imageUrl);
 					dataDiv.appendChild(img);
 				}
 			} catch (err) { };
@@ -372,24 +392,6 @@ function mediaSession() {
 				{ src: 'Assets/Icons/android-icon-96x96.png', sizes: '96x96', type: 'image/png' },
 				{ src: 'Assets/Icons/android-icon-192x192.png', sizes: '192x192', type: 'image/png' }
 			]
-		});
-
-		navigator.mediaSession.setActionHandler('nexttrack', next);
-		navigator.mediaSession.setActionHandler('previoustrack', previous);
-		navigator.mediaSession.setActionHandler('pause', evt => pauseSong(null, true));
-		navigator.mediaSession.setActionHandler('play', evt => {
-			if (audio.src != null) {
-				if (audio.paused) startSong();
-				else pauseSong();
-			} else playSong(null, true);
-		});
-
-		navigator.mediaSession.setActionHandler('seekbackward', function () {
-			audio.currentTime -= 5;
-		});
-
-		navigator.mediaSession.setActionHandler('seekforward', function () {
-			audio.currentTime += 5;
 		});
 	}
 }

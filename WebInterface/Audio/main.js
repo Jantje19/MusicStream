@@ -472,6 +472,26 @@ function load([swFuncs]) {
 			.style.display = 'block';
 	}
 
+	if ('mediaSession' in navigator) {
+		navigator.mediaSession.setActionHandler('nexttrack', next);
+		navigator.mediaSession.setActionHandler('previoustrack', previous);
+		navigator.mediaSession.setActionHandler('pause', evt => pauseSong(null, true));
+		navigator.mediaSession.setActionHandler('play', evt => {
+			if (audio.src != null) {
+				if (audio.paused) startSong();
+				else pauseSong();
+			} else playSong(null, true);
+		});
+
+		navigator.mediaSession.setActionHandler('seekbackward', function () {
+			audio.currentTime -= 5;
+		});
+
+		navigator.mediaSession.setActionHandler('seekforward', function () {
+			audio.currentTime += 5;
+		});
+	}
+
 	reloadSongslist(sortElem, playlistsElem)
 		.then(async () => {
 			if (swFuncs) {
