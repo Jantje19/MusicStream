@@ -2,6 +2,7 @@ import { Workbox } from '/ServiceWorker/workbox/workbox-window.prod.mjs';
 import ToastManager from '/ServiceWorker/ToastElement.mjs';
 
 const wb = new Workbox('service-worker.js', { scope: './' });
+const musicCache = 'ms-media';
 
 const generateFileLocation = (fileName, path = '/song/') => {
 	return location.origin + path + fileName;
