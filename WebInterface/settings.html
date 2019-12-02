@@ -29,6 +29,7 @@
 	<meta name="msapplication-navbutton-color" content="#16a085" />
 	<meta name="apple-mobile-web-app-status-bar-style" content="#16a085" />
 
+	<link href="all.css" rel="stylesheet" type="text/css" media="screen" />
 	<style type="text/css">
 		* {
 			font-family: -apple-system, BlinkMacSystemFont,
@@ -49,8 +50,10 @@
 
 		header h1 {
 			margin: 0;
-			margin-left: 10px;
+			padding-top: 7px;
 			font-weight: unset;
+			text-align: center;
+			float: none !important;
 		}
 
 		main div#settings {
@@ -72,8 +75,6 @@
 			background-color: lightgray;
 		}
 	</style>
-
-	<link href="all.css" rel="stylesheet" type="text/css" media="screen" />
 
 	<script type="text/javascript">
 		function typeToHTML(type, title, desc, val, data) {
@@ -110,7 +111,10 @@
 		}
 
 		function valToJSON(elem, type) {
-			switch (type) {
+			const splitVal = type.split('/');
+			const subType = splitVal[1];
+
+			switch (splitVal[0]) {
 				case 'mult':
 					if (elem.value.trim().length > 0)
 						return (elem.value.trim().replace(/(\s+)?\;(\s+)?/g, ',')).split(',');
@@ -119,11 +123,11 @@
 				case 'bool':
 					return Boolean(elem.checked);
 				case 'range':
-					return Number(elem.value);
+					return parseInt(elem.value, 10);
 				case 'string':
 					return elem.value.toString();
 				case 'number':
-					return Number(elem.value);
+					return parseInt(elem.value, 10);
 				case 'choise':
 					return elem.value;
 			}
@@ -192,13 +196,17 @@
 			}).catch(err => {
 				console.error('An error occurred', err);
 			});
+
+			document.getElementById('back').addEventListener('click', () => {
+				window.location = '/';
+			}, { passive: true });
 		}
 
 		function change(elem) {
 			document.querySelector(`label[for="${elem.id}"]`).innerText = elem.value;
 		}
 
-		window.onload = load;
+		document.addEventListener('DOMContentLoaded', load, { passive: true });
 	</script>
 
 </head>
@@ -206,6 +214,7 @@
 <body>
 
 	<header>
+		<button title="Back" id="back"><img src="/Assets/ic_arrow_back_white.svg" /></button>
 		<h1>Settings</h1>
 	</header>
 

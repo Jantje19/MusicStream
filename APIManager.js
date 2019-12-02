@@ -331,7 +331,7 @@ module.exports = (app, dirname, fileHandler, fs, os, pathModule, settings, utils
 				for (key in body)
 					data[key].val = body[key];
 
-				fs.writeFile(jsonPath, 'module.exports = ' + JSON.stringify(data), err => {
+				fs.writeFile(jsonPath, 'module.exports = ' + JSON.stringify(data, null, '\t'), err => {
 					if (err)
 						handleError(response, 'Unable to write settings file', err);
 					else {
@@ -560,8 +560,10 @@ module.exports = (app, dirname, fileHandler, fs, os, pathModule, settings, utils
 			.then(json => {
 				if (json.name === settings.mostListenedPlaylistName.val)
 					handleError(response, `Cannot access '${json.name}'. This file is not editable`);
+				else if (json.song && json.songs.length < 1)
+					handleError(response, 'No songs defined');
 				else
-					fileHandler.updatePlaylist(fs, json, settings.mostListenedPlaylistName.val, utils)
+					fileHandler.updatePlaylist(fs, json, utils)
 						.then(data => {
 							response.send({
 								success: true,
