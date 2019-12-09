@@ -164,6 +164,15 @@ workbox.routing.registerRoute(
 );
 
 workbox.routing.registerRoute(
+	'/mobile/',
+	new workbox.strategies.NetworkFirst({
+		fetchOptions: {
+			credentials: 'include',
+		}
+	})
+);
+
+workbox.routing.registerRoute(
 	/^https:\/\/fonts\.googleapis\.com/,
 	new workbox.strategies.StaleWhileRevalidate()
 );
