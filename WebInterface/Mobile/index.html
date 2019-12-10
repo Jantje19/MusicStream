@@ -10,25 +10,17 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="icon" type="image/x-icon" href="favicon.ico">
 	<link href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Outlined" rel="stylesheet" defer>
+	<script src="/mobile-assets/sw.js" type="module"></script>
 	<script>
 		const sortMethod = '{{audioDefaultSortType}}';
 
 		if ('paintWorklet' in CSS)
 			CSS.paintWorklet.addModule('/mobile-assets/ripple.js');
 	</script>
-	<script type="module">
-		import { Workbox } from '/ServiceWorker/workbox/workbox-window.prod.mjs';
-
-		if ('serviceWorker' in navigator) {
-			const wb = new Workbox('/service-worker.js', { scope: '/mobile/' });
-
-			wb.register().catch(console.error);
-		}
-	</script>
 <link rel="stylesheet" href="styles.b6e53e2ee6fd8fd7da57.css"></head>
 
 <body>
 	<app-root class="mat-app-background"></app-root>
-<script src="runtime-es2015.b948044840398824f16e.js" type="module"></script><script src="runtime-es5.b948044840398824f16e.js" nomodule defer></script><script src="polyfills-es5.b7e2f9f08b35601e5daf.js" nomodule defer></script><script src="polyfills-es2015.112742535940c89f9491.js" type="module"></script><script src="main-es2015.e5992b7dd02648188050.js" type="module"></script><script src="main-es5.e5992b7dd02648188050.js" nomodule defer></script></body>
+<script src="runtime-es2015.b948044840398824f16e.js" type="module"></script><script src="runtime-es5.b948044840398824f16e.js" nomodule defer></script><script src="polyfills-es5.b7e2f9f08b35601e5daf.js" nomodule defer></script><script src="polyfills-es2015.112742535940c89f9491.js" type="module"></script><script src="main-es2015.147448819956464a4f22.js" type="module"></script><script src="main-es5.147448819956464a4f22.js" nomodule defer></script></body>
 
 </html>

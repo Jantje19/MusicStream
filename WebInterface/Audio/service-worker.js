@@ -96,11 +96,15 @@ self.addEventListener('backgroundfetchclick', () => {
 	event.waitUntil(caches.open(cacheName).then((cache) => cache.addAll(urls)));
 }); */
 
-// TODO
-workbox.precaching.precacheAndRoute([
-	'/Assets/ic_play_arrow_white.svg',
-	'/Assets/ic_pause_white.svg',
-]);
+if (self.location.pathname === '/service-worker-mobile.js')
+	workbox.precaching.precacheAndRoute([]);
+else {
+	// TODO
+	workbox.precaching.precacheAndRoute([
+		'/Assets/ic_play_arrow_white.svg',
+		'/Assets/ic_pause_white.svg',
+	]);
+}
 
 workbox.routing.registerRoute(
 	new RegExp('/Assets/'),
@@ -165,6 +169,15 @@ workbox.routing.registerRoute(
 
 workbox.routing.registerRoute(
 	'/mobile/',
+	new workbox.strategies.NetworkFirst({
+		fetchOptions: {
+			credentials: 'include',
+		}
+	})
+);
+
+workbox.routing.registerRoute(
+	'/getSettings/',
 	new workbox.strategies.NetworkFirst({
 		fetchOptions: {
 			credentials: 'include',

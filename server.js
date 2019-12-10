@@ -179,6 +179,10 @@ module.exports = {
 			}).catch(err => response.status(404).send('Error: ' + err));
 		});
 
+		app.get('/service-worker-mobile.js', (_, response) => {
+			response.sendFile(path.join(dirname, './Audio/service-worker.js'));
+		});
+
 		require('./APIManager.js')(
 			app,
 			dirname,
@@ -262,7 +266,7 @@ module.exports = {
 				else
 					utils.sendFile(fs, path.join(dirname, 'Mobile/', url.replace('/mobile/', '')), response);
 			else if (url.startsWith('/')) {
-				if (new MobileDetect(request.headers['user-agent']).mobile()) {
+				if (new MobileDetect(request.headers['user-agent']).mobile() && !url.toLowerCase().includes('service')) {
 					const cookies = querystring.parse(request.headers['cookie'], '; ')
 
 					if ('use-desktop' in cookies && cookies['use-desktop'].toLowerCase() === 'true')
