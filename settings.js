@@ -15,12 +15,19 @@ module.exports = {
 		"desc": "The name of the playlist that stores the songs you listened and how many times."
 	},
 	"audioFileExtensions": {
-		"val": [".mp3", ".m3a", ".wav", ".m4u"],
+		"val": [
+			".mp3",
+			".m3a",
+			".wav",
+			".m4u"
+		],
 		"type": "mult",
 		"desc": "The accepted audio file extensions."
 	},
 	"videoFileExtensions": {
-		"val": [".mp4"],
+		"val": [
+			".mp4"
+		],
 		"type": "mult",
 		"desc": "The accepted video file extensions."
 	},
@@ -45,12 +52,12 @@ module.exports = {
 		"desc": "The paths the server should check for media files. {homedir} is replaced by the os.homedir."
 	},
 	"updateJsonOnStart": {
-		"val": true,
+		"val": false,
 		"type": "bool",
 		"desc": "If true, it will first check the filesystem for songs and video's, then it will start the server."
 	},
 	"checkForUpdateOnStart": {
-		"val": true,
+		"val": false,
 		"type": "bool",
 		"desc": "If true, it will first check the local version number against Githubs, if it finds a new version it will notify you, otherwise it will just start the server. This makes startup times slower."
 	},
@@ -72,7 +79,7 @@ module.exports = {
 		"desc": "The volume that defaults on page load."
 	},
 	"autoplayTime": {
-		"val": 5,
+		"val": 3,
 		"min": 0,
 		"max": 50,
 		"type": "range",
@@ -86,13 +93,17 @@ module.exports = {
 		"desc": "The amount of seconds that skip when you press the arrow keys on the videos page."
 	},
 	"audioDefaultSortType": {
-		"val": "default",
+		"val": "newest",
 		"type": "choise",
-		"options": ["default", "newest", "oldest"],
+		"options": [
+			"default",
+			"newest",
+			"oldest"
+		],
 		"desc": "The default sorting of songs in the audio player."
 	},
 	"url": {
-		"val": "http://localhost:8000",
+		"val": "http://localhost:8000/",
 		"type": "string/url",
 		"desc": "If you have a URL linked to your MusicStream server, fill it in here, so that the manifest.json can be set up correctly. Should be same origin as document (eg. http://localhost:8000)."
 	}

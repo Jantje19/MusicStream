@@ -184,6 +184,8 @@ module.exports = {
 
 				return Object.keys(parsedData);
 			} catch (err) {
+				console.err('getPlaylists: handlePlaylistsFile:');
+				console.err(err);
 				return [];
 			}
 		}

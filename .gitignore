@@ -1,3 +1,15 @@
 node_modules
 JSON.json
 playlists.json
+.vscode
+CHANGELOG.txt
+Plugins
+Plugins-off
+test.js
+settings.js
+settings_default.js
+sw-toolbox.js
+*.pdn
+.gitignore
+AlbumCover.png
+*.ps1
