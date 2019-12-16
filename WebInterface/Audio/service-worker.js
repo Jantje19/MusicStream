@@ -43,12 +43,31 @@ self.addEventListener('message', event => {
 	});
 }());
 
+const updatesChannel = new BroadcastChannel('bgsync-update');
 self.addEventListener('sync', event => {
 	if (event.tag.startsWith('updatemostlistened'))
-		event.waitUntil(fetch('/updateMostListenedPlaylist', {
-			body: event.tag.replace('updatemostlistened-', ''),
-			credentials: 'include',
-			method: 'POST',
+		event.waitUntil(new Promise((resolve, reject) => {
+			const tags = event.tag.replace('updatemostlistened-', '').split('-');
+			const songName = tags.slice(1).join('-');
+			const id = tags[0];
+
+			fetch('/updateMostListenedPlaylist', {
+				credentials: 'include',
+				body: songName,
+				method: 'POST'
+			}).then(resp => {
+				return resp.json();
+			}).then(json => {
+				if (json.success !== true)
+					reject();
+				else {
+					updatesChannel.postMessage({ success: true, id });
+					resolve();
+				}
+			}).catch(err => {
+				updatesChannel.postMessage({ success: false, id });
+				reject(err);
+			});
 		}));
 });
 
@@ -99,7 +118,6 @@ self.addEventListener('backgroundfetchclick', () => {
 if (self.location.pathname === '/service-worker-mobile.js')
 	workbox.precaching.precacheAndRoute([]);
 else {
-	// TODO
 	workbox.precaching.precacheAndRoute([
 		'/Assets/ic_play_arrow_white.svg',
 		'/Assets/ic_pause_white.svg',

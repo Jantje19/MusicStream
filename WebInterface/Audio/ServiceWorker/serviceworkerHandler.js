@@ -164,11 +164,11 @@ const removeDownload = async file => {
 		cache.delete(generateFileLocation(file)),
 	]);
 }
-const updateMostlistened = async file => {
+const updateMostlistened = async (file, tag = 'TagNotSpecified') => {
 	if (!('SyncManager' in window))
 		throw Error('SyncManager is not in window');
 
-	return await (await navigator.serviceWorker.ready).sync.register('updatemostlistened-' + file);
+	return await (await navigator.serviceWorker.ready).sync.register(`updatemostlistened-${tag}-${file}`);
 }
 const checkConnectionSpeed = () => {
 	if (!('connection' in navigator))
