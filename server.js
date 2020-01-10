@@ -7,13 +7,22 @@ module.exports = {
 		const express = require('express');
 		const app = express();
 
-		app.get('*manifest.json*', (_, response) => {
+		app.get('*manifest.json*', (request, response) => {
 			fs.readFile(path.join(dirname, 'Assets/Icons/manifest.json'), 'utf-8', (err, data) => {
 				if (err)
 					response.status(500).send('Server error');
 				else {
+					if (!new MobileDetect(request.headers['user-agent']).mobile())
+						data = data.replace('[[STARTURL]]', settings.url.val);
+					else {
+						const url = new URL(settings.url.val);
+
+						url.pathname = '/mobile/';
+						data = data.replace('[[STARTURL]]', url.toString());
+					}
+
 					response.setHeader('Content-Type', 'application/json');
-					response.send(data.replace('[[STARTURL]]', settings.url.val));
+					response.send(data);
 				}
 			});
 		});
