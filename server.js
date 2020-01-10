@@ -255,7 +255,7 @@ module.exports = {
 
 		// Just handle the rest
 		app.get('*', (request, response) => {
-			const url = request.url.replace(/\?(\w+)=(.+)/, '');
+			const url = URLModule.parse(request.url).pathname;
 			console.log(utils.logDate() + ' Got a request for ' + url);
 
 			if (url.startsWith('/videos'))
@@ -272,6 +272,7 @@ module.exports = {
 					if ('use-desktop' in cookies && cookies['use-desktop'].toLowerCase() === 'true')
 						response.cookie('use-desktop', 'true', { maxAge: 2592000 });
 					else {
+						response.cookie('used-mobile', 'true', { maxAge: 2592000 });
 						response.redirect('/mobile/');
 						return;
 					}

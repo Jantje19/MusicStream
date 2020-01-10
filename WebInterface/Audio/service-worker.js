@@ -40,6 +40,27 @@ self.addEventListener('message', event => {
 			event.request.url.includes('/playlist/')
 		)
 			event.respondWith(doThing(event, true));
+		else {
+			const url = new URL(event.request.url);
+
+			if (
+				url.pathname === '/' &&
+				!url.search.length > 0
+			)
+				event.respondWith(new Response(`
+				<p>Redirecting...</p>
+				<script>
+					if (
+						document.cookie.includes('used-mobile=true') &&
+						!document.cookie.includes('use-desktop=true')
+					)
+						window.location = '/mobile/';
+					else
+						window.location = '/?no_redirect';
+				</script>`, {
+					headers: { 'Content-Type': 'text/html' }
+				}));
+		}
 	});
 }());
 
