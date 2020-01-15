@@ -47,18 +47,25 @@ self.addEventListener('message', event => {
 				url.pathname === '/' &&
 				!url.search.length > 0
 			)
-				event.respondWith(new Response(`
-				<p>Redirecting...</p>
-				<script>
-					if (
-						document.cookie.includes('used-mobile=true') &&
-						!document.cookie.includes('use-desktop=true')
-					)
-						window.location = '/mobile/';
-					else
-						window.location = '/?no_redirect';
-				</script>`, {
-					headers: { 'Content-Type': 'text/html' }
+				event.respondWith(new Promise((resolve, reject) => {
+					fetch('/ServiceWorker/redirector.html')
+						.then(resolve)
+						.catch(() => {
+							// Fallback
+							resolve(new Response(`
+								<p>Redirecting...</p>
+								<script>
+									if (
+										document.cookie.includes('used-mobile=true') &&
+										!document.cookie.includes('use-desktop=true')
+									)
+										window.location = '/mobile/';
+									else
+										window.location = '/?no_redirect';
+								</script>`, {
+								headers: { 'Content-Type': 'text/html' }
+							}));
+						});
 				}));
 		}
 	});
@@ -136,14 +143,17 @@ self.addEventListener('backgroundfetchclick', () => {
 	event.waitUntil(caches.open(cacheName).then((cache) => cache.addAll(urls)));
 }); */
 
-if (self.location.pathname === '/service-worker-mobile.js')
-	workbox.precaching.precacheAndRoute([]);
-else {
-	workbox.precaching.precacheAndRoute([
-		'/Assets/ic_play_arrow_white.svg',
-		'/Assets/ic_pause_white.svg',
-	]);
-}
+(function () {
+	const precacheArray = ['/ServiceWorker/redirector.html'];
+
+	if (self.location.pathname !== '/service-worker-mobile.js')
+		precacheArray.push(
+			'/Assets/ic_play_arrow_white.svg',
+			'/Assets/ic_pause_white.svg',
+		);
+
+	workbox.precaching.precacheAndRoute(precacheArray);
+})();
 
 workbox.routing.registerRoute(
 	new RegExp('/Assets/'),
