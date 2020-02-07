@@ -52,12 +52,12 @@ module.exports = {
 		"desc": "The paths the server should check for media files. {homedir} is replaced by the os.homedir."
 	},
 	"updateJsonOnStart": {
-		"val": false,
+		"val": true,
 		"type": "bool",
 		"desc": "If true, it will first check the filesystem for songs and video's, then it will start the server."
 	},
 	"checkForUpdateOnStart": {
-		"val": false,
+		"val": true,
 		"type": "bool",
 		"desc": "If true, it will first check the local version number against Githubs, if it finds a new version it will notify you, otherwise it will just start the server. This makes startup times slower."
 	},
@@ -79,7 +79,7 @@ module.exports = {
 		"desc": "The volume that defaults on page load."
 	},
 	"autoplayTime": {
-		"val": 3,
+		"val": 5,
 		"min": 0,
 		"max": 50,
 		"type": "range",
@@ -93,7 +93,7 @@ module.exports = {
 		"desc": "The amount of seconds that skip when you press the arrow keys on the videos page."
 	},
 	"audioDefaultSortType": {
-		"val": "newest",
+		"val": "default",
 		"type": "choise",
 		"options": [
 			"default",
