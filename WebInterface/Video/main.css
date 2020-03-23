@@ -1,17 +1,6 @@
 /* reset */
-html, body, div, span, applet, object, iframe,
-h1, h2, h3, h4, h5, h6, p, blockquote, pre,
-a, abbr, acronym, address, big, cite, code,
-del, dfn, em, img, ins, kbd, q, s, samp,
-small, strike, strong, sub, sup, tt, var,
-b, u, i, center,
-dl, dt, dd, ol, ul, li,
-fieldset, form, label, legend,
-table, caption, tbody, tfoot, thead, tr, th, td,
-article, aside, canvas, details, embed,
-figure, figcaption, footer, header, hgroup,
-menu, nav, output, ruby, section, summary,
-time, mark, audio, video {
+
+html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary, time, mark, audio, video {
 	margin: 0;
 	padding: 0;
 	border: 0;
@@ -19,58 +8,62 @@ time, mark, audio, video {
 	font: inherit;
 	vertical-align: baseline;
 }
+
 /* HTML5 display-role reset for older browsers */
-article, aside, details, figcaption, figure,
-footer, header, hgroup, menu, nav, section {
+
+article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section {
 	display: block;
 }
+
 body {
 	line-height: 1;
 }
+
 ol, ul {
 	list-style: none;
 }
+
 blockquote, q {
 	quotes: none;
 }
-blockquote:before, blockquote:after,
-q:before, q:after {
+
+blockquote:before, blockquote:after, q:before, q:after {
 	content: '';
 	content: none;
 }
+
 table {
 	border-collapse: collapse;
 	border-spacing: 0;
 }
-
 
 /* Main */
 
 body {
 	top: 0;
 	left: 0;
-	width:100%;
-	height:100%;
-	text-align:center;
+	width: 100%;
+	height: 100%;
+	text-align: center;
 	position: absolute;
 }
 
 h1 {
-	padding:2%;
-	font-size:250%;
+	padding: 2%;
+	font-size: 250%;
 }
 
 h2 {
-	padding:2%;
-	font-size:200%;
+	padding: 2%;
+	font-size: 200%;
 }
 
 h3 {
-	font-size:150%;
+	font-size: 150%;
 }
 
 h4 {
-	font-size:100%;
+	font-size: 100%;
 }
 
 hr {
@@ -89,19 +82,19 @@ b {
 
 a {
 	color: #FFFFFF;
-	cursor:pointer;
-	text-decoration:none;
-
-	-webkit-transition:all .5s;
-	transition:all .5s;
+	cursor: pointer;
+	text-decoration: none;
+	-webkit-transition: all .5s;
+	transition: all .5s;
 }
 
 a:hover {
-	color:#16a085;
-	text-decoration:underline;
+	color: #16a085;
+	text-decoration: underline;
 }
 
 /* Identifiers */
+
 #overflow-menu {
 	top: 50px;
 	right: 1%;
@@ -124,14 +117,14 @@ a:hover {
 	transition: background-color .3s ease;
 }
 
-header > div:last-child {
+header>div:last-child {
 	right: 0;
 	padding: 0;
 	margin: 0 20px;
 	position: absolute;
 }
 
-header > div:last-child > button {
+header>div:last-child>button {
 	left: unset;
 	margin-left: 10px;
 	position: relative;
@@ -141,23 +134,23 @@ main {
 	display: flex;
 }
 
-main > div {
+main>div {
 	flex: 1;
 }
 
-main > div:first-child {
+main>div:first-child {
 	height: 90vh;
 	flex-grow: 1.5;
 	max-width: 60%;
 }
 
-main #queueWrapper > div#queueBtnHolder {
+main #queueWrapper>div#queueBtnHolder {
 	width: 40px;
 	float: left;
 	transform: translateY(-40%);
 }
 
-main #queueWrapper > div#queueBtnHolder>button {
+main #queueWrapper>div#queueBtnHolder>button {
 	width: 40px;
 	height: 40px;
 	border: none;
@@ -167,7 +160,7 @@ main #queueWrapper > div#queueBtnHolder>button {
 	background-color: transparent;
 }
 
-main #queueWrapper > div#queueBtnHolder > button:before {
+main #queueWrapper>div#queueBtnHolder>button:before {
 	top: 0;
 	left: 0;
 	opacity: 0;
@@ -182,11 +175,11 @@ main #queueWrapper > div#queueBtnHolder > button:before {
 	background-color: rgba(0, 0, 0, 0.3);
 }
 
-main #queueWrapper > div#queueBtnHolder > button:hover:before {
+main #queueWrapper>div#queueBtnHolder>button:hover:before {
 	opacity: 1;
 }
 
-main > #videos > div > button, main > #videos .video, main #queue .queueItem {
+main>#videos>div>button, main>#videos .video, main #queue .queueItem {
 	margin: 0;
 	width: 100%;
 	border: none;
@@ -196,17 +189,16 @@ main > #videos > div > button, main > #videos .video, main #queue .queueItem {
 	background-color: transparent;
 	border-bottom: 1px lightgray solid;
 	transition: background-color .3s ease;
-
 	overflow: hidden;
 	white-space: nowrap;
 	text-overflow: ellipsis;
 }
 
-main > #videos > div > button:last-child, main > #videos .video:last-child, main #queue .queueItem:last-child {
+main>#videos>div>button:last-child, main>#videos .video:last-child, main #queue .queueItem:last-child {
 	border-bottom: none;
 }
 
-main > div:last-child button:hover, main #queue .queueItem:hover {
+main>div:last-child button:hover, main #queue .queueItem:hover {
 	background-color: rgba(0, 0, 0, 0.15);
 }
 
@@ -224,26 +216,26 @@ main #videos {
 	/*overflow-y: scroll;*/
 }
 
-main #videos > div > div {
+main #videos>div>div {
 	overflow: hidden;
 }
 
-main #videos > div > button {
+main #videos>div>button {
 	color: white;
 	background-color: #12876f;
 	/*border-bottom: 1px lightgray solid;*/
 }
 
-main #videos > div > button span {
+main #videos>div>button span {
 	margin-top: 3px;
 	display: inline-block;
 }
 
-main #videos > div > button > div {
+main #videos>div>button>div {
 	float: right;
 }
 
-main #videos > div > button > div > button {
+main #videos>div>button>div>button {
 	margin: 0;
 	padding: 0;
 	width: auto;
@@ -254,11 +246,11 @@ main #videos > div > button > div > button {
 	background-color: transparent;
 }
 
-main #videos > div.closed > div {
+main #videos>div.closed>div {
 	height: 0px;
 }
 
-main #videos > div.closed > button .toggleArrow {
+main #videos>div.closed>button .toggleArrow {
 	transform: rotate(180deg);
 }
 
@@ -270,7 +262,7 @@ main #videos #loaderWrapper {
 	justify-content: center;
 }
 
-main #videos #loaderWrapper > div {
+main #videos #loaderWrapper>div {
 	overflow: unset;
 	transform: translate(0px, 30px);
 }
@@ -328,6 +320,10 @@ main #loader .ball-scale-multiple {
 main #loader .ball-scale-multiple div:first-child {
 	opacity: .8;
 	animation: none;
+}
+
+main #player:not([active]) {
+	cursor: none;
 }
 
 main #player #autoplay {
@@ -433,7 +429,7 @@ main #player #videoElem {
 	background-color: black;
 }
 
-main #player #videoElem:hover #controls {
+main #player[active] #videoElem #controls {
 	transform: translateY(0px);
 }
 
@@ -444,7 +440,6 @@ main #player #videoElem video {
 
 main #player #videoElem #controls {
 	--height: 40px;
-
 	left: 0px;
 	width: 100%;
 	bottom: 0px;
@@ -456,7 +451,6 @@ main #player #videoElem #controls {
 	transform: translateY(105%);
 	transition: transform .3s ease;
 	box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
-
 	grid-template-rows: var(--height);
 	grid-template-columns: var(--height) auto calc(var(--height) * 3);
 }
@@ -468,13 +462,13 @@ main #player #videoElem #controls span {
 	white-space: nowrap;
 }
 
-main #player #videoElem #controls > div {
+main #player #videoElem #controls>div {
 	display: flex;
 	align-items: center;
 	justify-content: center;
 }
 
-main #player #videoElem #controls > div > button {
+main #player #videoElem #controls>div>button {
 	margin: 0;
 	padding: 0;
 	width: 40px;
@@ -483,7 +477,7 @@ main #player #videoElem #controls > div > button {
 	display: flex;
 	cursor: pointer;
 	position: relative;
-    align-items: center;
+	align-items: center;
 	justify-content: center;
 	background-color: transparent;
 }
@@ -506,12 +500,9 @@ main #player #videoElem #controls button:hover:before {
 	opacity: 0.15;
 }
 
-main #player #videoElem #controls > div {
+main #player #videoElem #controls>div {
 	height: 100%;
 }
-
-
-
 
 video:full-screen {
 	box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
@@ -529,8 +520,6 @@ video:-webkit-full-screen {
 	box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
 }
 
-
-
 #player:full-screen, #player:full-screen #videoElem {
 	height: 100%;
 }
@@ -546,8 +535,6 @@ video:-webkit-full-screen {
 #player:-webkit-full-screen, #player:-webkit-full-screen #videoElem {
 	height: 100%;
 }
-
-
 
 main #controls #seekBar[type=range] {
 	width: 80%;

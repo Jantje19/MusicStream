@@ -2,12 +2,33 @@ let video, int, videoSettingsElem, selectElem;
 
 function load() {
 	video = document.querySelector('video');
+	const playerElem = document.getElementById('player');
 	const videosElem = document.getElementById('videos');
 	const seekBarElem = document.getElementById('seekBar');
 	const timeEndElem = document.getElementById('time-end');
 	const timeStartElem = document.getElementById('time-start');
 	const overflowMenuElem = document.getElementById('overflow-menu');
 	const videoTimeJumpElem = document.getElementById('video-time-jump');
+
+	// Auto-hide controls
+	(function () {
+		let timeout;
+
+		playerElem.addEventListener('mousemove', evt => {
+			clearTimeout(timeout);
+			playerElem.setAttribute('active', true);
+
+			if (!evt.path.find(val => val.id === 'controls')) {
+				timeout = setTimeout(() => {
+					playerElem.removeAttribute('active');
+				}, 1000);
+			}
+		}, { passive: true });
+		playerElem.addEventListener('mouseout', () => {
+			clearTimeout(timeout);
+			playerElem.removeAttribute('active');
+		}, { passive: true });
+	}());
 
 	videoSettingsElem = document.getElementById('video-settings');
 	fetch('/data/', { credentials: 'same-origin' }).then(response => {
