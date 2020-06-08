@@ -1,3 +1,4 @@
+const tmpQueueSave = { audio: { global: {} }, videos: {} };
 const handleError = (response, message, error) => {
 	if (error)
 		console.err(message + ':\t' + error);
@@ -142,13 +143,13 @@ module.exports = (app, dirname, fileHandler, fs, os, pathModule, settings, utils
 
 				if (paramsType === 'audio') {
 					if (args) {
-						let objectKey = ('for' in args) ? args.for : request.connection.remoteAddress;
+						let objectKey = ('for' in args) ? args.for : request.ip;
 
 						if (objectKey) {
 							if (objectKey.toLowerCase() == 'global')
 								sendData(tmpQueueSave.audio.global);
 							else {
-								objectKey = request.connection.remoteAddress;
+								objectKey = request.ip;
 
 								if (objectKey in tmpQueueSave.audio)
 									sendData(tmpQueueSave.audio[objectKey]);
@@ -353,7 +354,7 @@ module.exports = (app, dirname, fileHandler, fs, os, pathModule, settings, utils
 			utils.handlePostRequest(request)
 				.then(body => {
 					if (request.params.type.toLowerCase() === 'audio') {
-						let objectKey = ('for' in body) ? body.for : request.connection.remoteAddress;
+						let objectKey = ('for' in body) ? body.for : request.ip;
 						const queueIndex = ('queueIndex' in body) ? body.queueIndex : 0;
 						const timeStamp = ('timeStamp' in body) ? body.timeStamp : 0;
 						const queue = ('queue' in body) ? body.queue : [];
@@ -362,7 +363,7 @@ module.exports = (app, dirname, fileHandler, fs, os, pathModule, settings, utils
 							tmpQueueSave.audio.global = { queueIndex, timeStamp, queue };
 							response.send({ success: true });
 						} else {
-							tmpQueueSave.audio[request.connection.remoteAddress] = { queueIndex, timeStamp, queue };
+							tmpQueueSave.audio[request.ip] = { queueIndex, timeStamp, queue };
 							response.send({ success: true });
 						}
 					} else if (request.params.type.toLowerCase() === 'video') {

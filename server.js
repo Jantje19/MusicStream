@@ -1,5 +1,3 @@
-const tmpQueueSave = { audio: { global: {} }, videos: {} };
-
 module.exports = {
 	start: function (dirname, fileHandler, fs, os, settings, utils, querystring, id3, ytdl, version, https, URLModule, ffmpeg, path, serverPlugins, hijackRequestPlugins) {
 		const MobileDetect = require('mobile-detect');
