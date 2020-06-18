@@ -124,12 +124,12 @@
 							}).then(response => {
 								response.json().then(json => {
 									if (json.success) {
-										if (json.error) alert('Something on the server went wrong.\n' + json.info);
+										if (json.error) alert('Something on the server went wrong');
 										else if (json.data.toLowerCase().startsWith('playlist with the name ')) {
 											alert(json.data);
 											window.location = '/managePlaylist.html#' + playlistName;
 										} else alert('Something went wrong', json.data);
-									} else alert(json.info);
+									} else alert(json.error);
 								});
 							}).catch(err => {
 								console.error('An error occurred', err);

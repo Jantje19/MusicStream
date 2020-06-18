@@ -199,12 +199,12 @@ function saveQueueToPlaylist() {
 				}).then(json => {
 					if (json.success) {
 						if (json.error)
-							alert('Something on the server went wrong.\n' + json.info);
+							alert('Something on the server went wrong');
 						else if (json.data.toLowerCase().startsWith('playlist with the name '))
 							window.location.reload();
 						else
 							alert('Something went wrong', json.data);
-					} else alert(json.info);
+					} else alert(json.error);
 				}).catch(err => {
 					console.error('An error occurred', err);
 				});

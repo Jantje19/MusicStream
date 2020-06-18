@@ -244,7 +244,7 @@ module.exports = {
 				return `Playlist with the name '${body.name}' successfuly added`;
 		}
 
-		if (utils.fileExists(jsonPath)) {
+		if (await utils.fileExists(jsonPath)) {
 			const data = await utils.safeJSONParse(await fs.promises.readFile(jsonPath, 'utf-8'));
 
 			if (body.delete == true) {
