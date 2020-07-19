@@ -395,7 +395,7 @@ module.exports = (app, dirname, fileHandler, fs, os, pathModule, settings, utils
 
 			console.log(utils.logDate() + ' Got a request for ' + url);
 
-			// Check if it has a file extention, otherwise read the playlists.json file
+			// Check if it has a file extension, otherwise read the playlists.json file
 			if (settings.audioFileExtensions.val.includes(utils.getFileExtension(playlistName))) {
 				fileHandler.getJSON(fs, os, pathModule, utils, settings).then(json => {
 					const inArray = (function (playlists, name) {
@@ -462,7 +462,7 @@ module.exports = (app, dirname, fileHandler, fs, os, pathModule, settings, utils
 							} else
 								handleError(response, `The playlist '${playlistName}' was not found`);
 						} else
-							handleError(response, 'The server couln\'t handle the URL')
+							handleError(response, 'The server couldn\'t handle the URL')
 					}
 				}).catch(err => {
 					handleError(response, 'Unable to read playlists file', err);
@@ -648,7 +648,7 @@ module.exports = (app, dirname, fileHandler, fs, os, pathModule, settings, utils
 		console.log(utils.logDate() + ' Got a POST request for ' + request.url);
 
 		if (!settings.collectMostListened.val) {
-			handleError(response, 'Settings prohibit the collection of the MostListined playlist');
+			handleError(response, 'Settings prohibit the collection of the MostListened playlist');
 			response.set("Connection", "close");
 			request.connection.destroy();
 			return;
