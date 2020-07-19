@@ -1,4 +1,4 @@
-module.exports = {
+const obj = {
 	/*
 	*	Searches system for media files
 	*
@@ -284,8 +284,8 @@ module.exports = {
 			const data = await fs.promises.readFile(JSONPath, 'utf-8');
 			return await utils.safeJSONParse(data);
 		} else {
-			console.wrn('The JSON file does not exist, so I am creating one...');
-			return await this.searchSystem(fs, os, path, utils, settings);
+			console.wrn('The JSON file does not exist, so one is created...');
+			return await obj.searchSystem(fs, os, path, utils, settings);
 		}
 	},
 
@@ -346,3 +346,5 @@ module.exports = {
 		}
 	}
 };
+
+module.exports = obj;
