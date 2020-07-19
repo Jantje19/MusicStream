@@ -102,7 +102,7 @@
 				case 'number':
 					html += `<input caseVal="${type}" id="${title}" type="number" value="${val}" min="0" max="100">`;
 					break;
-				case 'choise':
+				case 'choice':
 					html += `<select caseVal="${type}" id="${title}">${data.options.map(value => `<option ${(value === val) ? 'selected' : ''} value="${value}">${value}</option>`).join('')}</select>`;
 					break;
 			}
@@ -128,7 +128,7 @@
 					return elem.value.toString();
 				case 'number':
 					return parseInt(elem.value, 10);
-				case 'choise':
+				case 'choice':
 					return elem.value;
 			}
 		}

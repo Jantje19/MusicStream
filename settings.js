@@ -94,7 +94,7 @@ module.exports = {
 	},
 	"audioDefaultSortType": {
 		"val": "default",
-		"type": "choise",
+		"type": "choice",
 		"options": [
 			"default",
 			"newest",

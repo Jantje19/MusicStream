@@ -61,15 +61,15 @@ module.exports = {
 		});
 
 		const imports = {
-			fs: fs,
-			os: os,
-			id3: id3,
-			ytdl: ytdl,
-			utils: utils,
-			https: https,
-			URLModule: URLModule,
-			fileHandler: fileHandler,
-			querystring: querystring
+			fs,
+			os,
+			id3,
+			ytdl,
+			utils,
+			https,
+			URLModule,
+			fileHandler,
+			querystring
 		}
 
 		const availableData = {
