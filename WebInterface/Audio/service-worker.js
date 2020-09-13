@@ -24,7 +24,9 @@ self.addEventListener('message', event => {
 			return await fetch(event.request, { credentials: 'include' });
 
 		const cache = await caches.open(musicCache);
-		const match = await cache.match(event.request);
+		const match = await cache.match(event.request, {
+			ignoreVary: true
+		});
 
 		if (match)
 			return match;
@@ -47,7 +49,7 @@ self.addEventListener('message', event => {
 				url.pathname === '/' &&
 				!url.search.length > 0
 			)
-				event.respondWith(new Promise((resolve, reject) => {
+				event.respondWith(new Promise(resolve => {
 					fetch('/ServiceWorker/redirector.html')
 						.then(resolve)
 						.catch(() => {
@@ -102,46 +104,51 @@ self.addEventListener('sync', event => {
 self.addEventListener('backgroundfetchsuccess', event => {
 	const bgFetch = event.registration;
 
-	event.waitUntil(async () => {
+	event.waitUntil((async () => {
+		const title = bgFetch.id.replace('song-', '');
 		const cache = await caches.open(musicCache);
 		const records = await bgFetch.matchAll();
 
-		const promises = records.map(async record => {
-			await cache.put(record.request, await record.responseReady);
-		});
+		await Promise.all(records.map(async record => {
+			const response = await record.responseReady;
+			const newHeaders = new Headers(response.headers);
 
-		await Promise.all(promises);
+			newHeaders.set('x-filename', title);
+			await cache.put(record.request, new Response(await response.blob(), {
+				status: response.status,
+				headers: newHeaders,
+			}));
+		}));
 
-		// TODO: urlCreator.revokeObjectURL()
-		postMessage({ type: 'bgfetch', data: { id: bgFetch.id, stored: true } });
-	})();
-});
-
-self.addEventListener('backgroundfetchfail', event => {
-	// TODO: urlCreator.revokeObjectURL()
-	console.log('Background fetch failed', event);
-});
-
-self.addEventListener('backgroundfetchclick', () => {
-	clients.openWindow('/');
-});
-
-/* self.addEventListener('activate', (event) => {
-	event.waitUntil(async () => {
-		// Remove old caches
-		for (const cacheName of await caches.keys()) {
-			if (!cacheName.startsWith('podcast-') && cacheName !== staticCache && cacheName !== dynamicCache) {
-				await caches.delete(cacheName);
-			}
+		if ('index' in registration) {
+			await registration.index.add({
+				description: 'MusicStream downloaded song',
+				category: 'audio',
+				id: bgFetch.id,
+				launchUrl: '/',
+				url: '/',
+				title,
+				icons: [{
+					src: '/image/' + title,
+					type: 'image/png',
+				}],
+			});
 		}
-	})();
-}); */
 
-/* self.addEventListener('install', (event) => {
-	const urls = [];
-	const cacheName = workbox.core.cacheNames.runtime;
-	event.waitUntil(caches.open(cacheName).then((cache) => cache.addAll(urls)));
-}); */
+		(await clients.matchAll({
+			type: "window"
+		})).forEach(client => {
+			if (client.visibilityState === 'visible')
+				client.postMessage({ type: 'bgfetch', data: { id: bgFetch.id, stored: true } });
+		});
+	})());
+});
+
+self.addEventListener('backgroundfetchfailure', console.error);
+self.addEventListener('backgroundfetchabort', console.error);
+self.addEventListener('backgroundfetchclick', () => {
+	clients.openWindow('/offlineDownload.html'); // TODO: Let this page show ongoing fetches!
+});
 
 (function () {
 	const precacheArray = ['/ServiceWorker/redirector.html'];
@@ -155,8 +162,9 @@ self.addEventListener('backgroundfetchclick', () => {
 	workbox.precaching.precacheAndRoute(precacheArray);
 })();
 
+
 workbox.routing.registerRoute(
-	new RegExp('/Assets/'),
+	'/Assets/',
 	new workbox.strategies.StaleWhileRevalidate({
 		cacheName: 'ms-image-cache',
 		fetchOptions: {
@@ -208,7 +216,7 @@ workbox.routing.registerRoute(
 );
 
 workbox.routing.registerRoute(
-	'/',
+	'/?no_redirect',
 	new workbox.strategies.NetworkFirst({
 		fetchOptions: {
 			credentials: 'include',
