@@ -120,19 +120,16 @@ header #searchBtn:hover:before {
 }
 
 .ball-scale-multiple > div {
-	background-color: rgba(22, 160, 133, 0.5);
-	width: 15px;
-	height: 15px;
-	border-radius: 100%;
-	margin: 2px;
-	animation-fill-mode: both;
-	position: absolute;
-	left: -30px;
-	top: 0px;
-	opacity: 0;
+	top: 0;
 	margin: 0;
+	opacity: 0;
+	left: -30px;
 	width: 60px;
 	height: 60px;
+	position: absolute;
+	border-radius: 100%;
+	animation-fill-mode: both;
+	background-color: rgba(22, 160, 133, 0.5);
 	animation: ball-scale-multiple 1s 0s linear infinite;
 }
 

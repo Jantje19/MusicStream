@@ -125,7 +125,10 @@ function startSong() {
 		document.getElementById('songName').innerText = queue[queueIndex].replace(/(\.\w{2,5})$/, '');
 	} catch (err) { }
 	try {
-		document.getElementById('lyricsElem').innerHTML = `<h3>Loading</h3><br><div class="ball-scale-multiple"><div></div><div></div><div></div></div>`;
+		const elem = document.getElementById('lyricsElem').getElementsByTagName('div')[0];
+
+		elem.innerHTML = '';
+		elem.appendChild(document.getElementById('lyricsElem-loading').content.cloneNode(true));
 	} catch (err) { }
 
 	const audioPlayReturnVal = audio.play();
@@ -224,67 +227,59 @@ function setVolume(volumeNum, elem) {
 }
 
 function displayLyrics(artist, songName) {
-	let lyricsElem = document.getElementById('lyricsElem');
+	let lyricsElemContainer = document.getElementById('lyricsElem');
+	let lyricsElem = lyricsElemContainer.getElementsByTagName('div')[0];
 
-	if (!lyricsElem) {
-		lyricsElem = document.createElement('div');
-
-		lyricsElem.id = 'lyricsElem';
-		lyricsElem.innerHTML = `<h3>Loading</h3><br><div class="ball-scale-multiple"><div></div><div></div><div></div></div>`;
-
-		document.body.appendChild(lyricsElem);
-	} else lyricsElem.style.display = 'block';
-
-	function isDescendant(parent, child) {
-		let looped = 0;
-		let node = child.parentNode;
-
-		while (node != null && looped < 5) {
-			if (node == parent)
-				return true;
-
-			looped++;
-			node = node.parentNode;
-		}
-
-		return false;
-	}
-
+	lyricsElemContainer.style.display = 'block';
 	setTimeout(() => {
-		function clickEvt(evt) {
-			if (!isDescendant(lyricsElem, evt.target)) {
-				lyricsElem.style.display = 'none';
+		document.body.addEventListener('click', function clickEvt(evt) {
+			if (!evt.path.includes(lyricsElemContainer)) {
+				lyricsElemContainer.style.display = 'none';
 				document.body.removeEventListener('click', clickEvt);
 			}
-		}
-
-		document.body.addEventListener('click', clickEvt);
-	}, 100);
+		});
+	}, 500);
 
 	if (previousLyricsSong != songName) {
 		get(`/getLyrics/${artist}/${songName}`).then(json => {
-			if (!json.success)
-				lyricsElem.innerHTML = `<h3>Error</h3><br><p>${json.error}</p><a style="color: gray" target="_blank" href="https://makeitpersonal.co/songs/new">Add them yourself.</a>`;
-			else {
+			if (!json.success) {
+				const templateElem = document.getElementById('lyricsElem-error').content.cloneNode(true);
+				templateElem.querySelector('p').innerText = json.error;
+
+				lyricsElem.innerHTML = '';
+				lyricsElem.appendChild(templateElem);
+			} else {
+				const templateElem = document.getElementById('lyricsElem-lyrics').content.cloneNode(true);
 				const lyrics = json.lyrics.trim().replace(/\n/g, '<br>');
 
+				templateElem.querySelector('p').innerText = lyrics;
 				previousLyricsSong = songName;
-				lyricsElem.innerHTML = `<h3>Lyrics</h3><p style="line-height: 1.5;">${lyrics}</p>`;
+
+				lyricsElem.innerHTML = '';
+				lyricsElem.appendChild(templateElem);
 			}
 		}).catch(err => {
 			console.error(err);
-			lyricsElem.innerHTML = `<h3>Error</h3><br><p>Couldn't fetch lyrics</p><br><a style="color: gray" target="_blank" href="https://makeitpersonal.co/songs/new">Add them yourself.</a>`;
+
+			const templateElem = document.getElementById('lyricsElem-error').content.cloneNode(true);
+			templateElem.querySelector('p').innerText = "Couldn't fetch lyrics";
+
+			lyricsElem.innerHTML = '';
+			lyricsElem.appendChild(templateElem);
 		});
 	}
 }
 
 function escapeString(string) {
-	return string.replace(/\'/g, "\\\'");
+	if (string)
+		return string.replace(/\'/g, "\\\'");
+	else
+		return '';
 }
 
 function updateCookies() {
-	document.cookie = 'queueIndex=' + queueIndex;
-	document.cookie = 'queue=' + encodeURIComponent(queue.map(val => { return escape(val) }).join(','));
+	document.cookie = `queue=${encodeURIComponent(queue.map(val => { return escape(val) }).join(','))}; SameSite=Strict`;
+	document.cookie = `queueIndex=${queueIndex}; SameSite=Strict`;
 }
 
 
@@ -321,13 +316,44 @@ function mediaSession() {
 			let imageUrl;
 
 			dataDiv.id = 'artistInfo';
-			dataDiv.innerHTML += '<p style="font-size: 120%;">Song info:</p>';
-			dataDiv.innerHTML += `<img title="View lyrics" class="infoBtn" onclick="displayLyrics('${escapeString(json.artist)}', '${escapeString(json.title)}')" src="Assets/ic_music_note_white.svg">`;
-			dataDiv.innerHTML += `<img title="Edit tags" class="infoBtn" onclick="window.location = '/editTags.html#${queue[queueIndex]}'" src="Assets/ic_edit_white.svg"> <hr>`
-			dataDiv.innerHTML += `<p><b>Title:</b> ${json.title}</p>`;
-			dataDiv.innerHTML += `<p><b>Artist:</b> ${json.artist}</p>`;
-			dataDiv.innerHTML += `<p><b>Album:</b> ${json.album}</p>`;
-			dataDiv.innerHTML += `<p><b>Year:</b> ${json.year}</p>`;
+
+			(() => {
+				const pElem = document.createElement('p');
+				pElem.innerText = 'Song info:';
+				pElem.style.fontSize = '120%';
+				dataDiv.appendChild(pElem);
+
+				const lyricsBtn = document.createElement('img');
+				const tagsBtn = document.createElement('img');
+
+				lyricsBtn.src = 'Assets/ic_music_note_white.svg';
+				lyricsBtn.className = 'infoBtn';
+				lyricsBtn.title = 'View lyrics';
+
+				tagsBtn.src = 'Assets/ic_edit_white.svg';
+				tagsBtn.className = 'infoBtn';
+				tagsBtn.title = 'Edit tags';
+
+				dataDiv.appendChild(lyricsBtn);
+				dataDiv.appendChild(tagsBtn);
+				dataDiv.appendChild(document.createElement('hr'));
+
+				tagsBtn.addEventListener('click', () => window.location = '/editTags.html#' + queue[queueIndex]);
+				lyricsBtn.addEventListener('click', () => displayLyrics(json.artist, json.title));
+
+				['Title', 'Artist', 'Album', 'Year'].forEach(val => {
+					const spanElem = document.createElement('span');
+					const pElem = document.createElement('p');
+					const bElem = document.createElement('b');
+
+					spanElem.innerText = ' ' + json[val.toLowerCase()];
+					bElem.innerText = val + ':';
+
+					pElem.appendChild(bElem);
+					pElem.appendChild(spanElem);
+					dataDiv.appendChild(pElem);
+				});
+			})();
 
 			document.title = 'Music Stream - ' + title.replace(/-/g, '');
 

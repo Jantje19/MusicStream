@@ -498,16 +498,19 @@ function load([swFuncs]) {
 				Array.from(document.getElementsByClassName('downloadAvailable'))
 					.forEach(elem => {
 						elem.style.display = 'block';
-					})
+					});
 
-				const songsElem = document.getElementById('songs');
 				const downloaded = await swFuncs.getDownloaded();
 
-				Array.from(songsElem.children)
-					.filter(elem => downloaded.songs.includes(elem.innerText))
+				Array.from(document.getElementById('songs').children)
 					.forEach(elem => {
-						elem.setAttribute('downloaded', '');
+						if (downloaded.songs.includes(elem.innerText))
+							elem.setAttribute('downloaded', '');
 					});
+				Array.from(document.getElementById('playlists').children).forEach(elem => {
+					if (downloaded.playlists.includes(elem.innerText))
+						elem.setAttribute('downloaded', '');
+				});
 			}
 		});
 
@@ -752,11 +755,14 @@ function load([swFuncs]) {
 
 			let menu = songContextMenu;
 
-			if (parentId === 'playlists')
-				menu = playlistContextMenu;
-			else if (parentId === 'queue')
+			if (parentId === 'queue')
 				menu = queueContextMenu;
-			else if (parentId === 'songs') {
+			else if (parentId === 'playlists') {
+				menu = playlistContextMenu;
+
+				if (elem.hasAttribute('downloaded'))
+					menu.children[menu.children.length - 1].style.display = 'none';
+			} else if (parentId === 'songs') {
 				if (elem.hasAttribute('downloaded')) {
 					// Make 'removeDownload' visible
 					menu.children[menu.children.length - 1].style.display = 'block';
@@ -785,7 +791,7 @@ function load([swFuncs]) {
 
 			buttonElem.innerText = 'Mobile site';
 			buttonElem.addEventListener('click', evt => {
-				document.cookie = 'use-desktop=false; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+				document.cookie = 'use-desktop=false; expires=Thu, 01 Jan 1970 00:00:01 GMT; SameSite=Strict;';
 				window.location.href = '/mobile/';
 			}, { passive: true });
 

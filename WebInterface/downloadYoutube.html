@@ -219,7 +219,7 @@
 					response.json().then(json => {
 						if (json.success) {
 							json = json.data;
-							const { videoDetails } = json.player_response;
+							const { videoDetails } = json;
 
 							if (!videoDetails.title)
 								videoDetails.title = 'unknown - unknown';
@@ -231,17 +231,17 @@
 								videoInfo.innerHTML += `<img alt="thumbnail" src="${videoDetails.thumbnail.thumbnails[videoDetails.thumbnail.thumbnails.length - 1].url}" />`;
 
 							videoInfo.innerHTML += `<h3>${videoDetails.title}</h3>`;
-							videoInfo.innerHTML += `<div><a href="${json.author.channel_url}"><img alt="author" src="${json.author.avatar}"><span>${json.author.name}</span></a></div>`;
+							videoInfo.innerHTML += `<div><a href="${videoDetails.author.channel_url}"><img alt="author" src="${videoDetails.author.avatar}"><span>${videoDetails.author.name}</span></a></div>`;
 							videoInfo.innerHTML += `<p><b>View Count:</b> ${videoDetails.viewCount}</p>`;
 							videoInfo.innerHTML += '<hr>';
-							videoInfo.innerHTML += `<p id="description">${json.description.replace(/\n/g, '<br>')}</p>`;
+							videoInfo.innerHTML += `<p id="description">${videoDetails.description.simpleText.replace(/\n/g, '<br>')}</p>`;
 
 							// Set values
 							let title = '';
 							let album = '';
 							let artist = '';
 
-							const vals = analyzeDescription(json.description);
+							const vals = analyzeDescription(videoDetails.description.simpleText);
 
 							if (vals.title) title = vals.title;
 							if (vals.album) album = vals.album;
