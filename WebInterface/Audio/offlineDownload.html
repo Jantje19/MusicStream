@@ -139,7 +139,7 @@
 
 				Promise.all([getData(), window.sw]).then(([json, swFuncs]) => {
 					document.getElementById('fab').addEventListener('click', evt => {
-						const updateHandler = (elem, { progress }) => {
+						const updateHandler = (elem, progress) => {
 							if (elem && progress)
 								elem.style.setProperty('--progress', (progress * 100) + '%');
 						}
@@ -147,7 +147,7 @@
 						Promise.all(Array.from(queue).map((song, index) => {
 							return swFuncs.downloadFile(
 								song,
-								progress => updateHandler(queueElem.children[index], progress)
+								updateHandler.bind(this, queueElem.children[index])
 							);
 						})).then(songs => {
 							const doFinish = () => {

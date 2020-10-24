@@ -110,11 +110,10 @@ module.exports = (app, dirname, fileHandler, fs, os, pathModule, settings, utils
 		console.log(utils.logDate() + ' Got a request for ' + url);
 		if (ytdl.validateID(id)) {
 			try {
-				ytdl.getInfo(id, (err, info) => {
-					if (err)
-						handleError(response, 'No info found for that video id', err);
-					else
-						response.send({ success: true, data: info });
+				ytdl.getInfo(id).then(info => {
+					response.send({ success: true, data: info });
+				}).catch(err => {
+					handleError(response, 'No info found for that video id', err);
 				});
 			} catch (err) {
 				handleError(response, 'Unable to find YouTube data', err);
@@ -446,12 +445,24 @@ module.exports = (app, dirname, fileHandler, fs, os, pathModule, settings, utils
 										handleError(response, 'Unable to read playlists file', err);
 									else {
 										utils.safeJSONParse(data).then(data => {
+											const filterPlaylist = playlistSongs => {
+												fileHandler.getJSON(fs, os, pathModule, utils, settings)
+													.then(({ audio }) => {
+														response.send({
+															success: true, songs: playlistSongs.filter(song => {
+																return audio.songs.find(obj => obj.fileName === song);
+															})
+														});
+													})
+													.catch(err => handleError(response, 'Unable to filter playlist', err));
+											}
+
 											if (playlistName == settings.mostListenedPlaylistName.val && !showFull && playlistName in data)
-												response.send({ success: true, songs: utils.sortJSON(data[settings.mostListenedPlaylistName.val]).map(val => { return val[0] }) });
+												filterPlaylist(utils.sortJSON(data[settings.mostListenedPlaylistName.val]).map(val => { return val[0] }));
 											else if (playlistName == settings.mostListenedPlaylistName.val && showFull && playlistName in data)
-												response.send({ success: true, songs: utils.sortJSON(data[settings.mostListenedPlaylistName.val]) });
+												filterPlaylist(utils.sortJSON(data[settings.mostListenedPlaylistName.val]));
 											else if (playlistName in data)
-												response.send({ success: true, songs: data[playlistName] });
+												filterPlaylist(data[playlistName]);
 											else
 												handleError(response, 'Playlist not found');
 										}).catch(err => {
@@ -519,7 +530,7 @@ module.exports = (app, dirname, fileHandler, fs, os, pathModule, settings, utils
 						}
 					}
 
-					response.send({
+					response.json({
 						success: true,
 						tags
 					});
@@ -713,6 +724,30 @@ module.exports = (app, dirname, fileHandler, fs, os, pathModule, settings, utils
 			}).catch(err => {
 				handleError(response, 'Unable to handle request body', err);
 			});
+	});
+
+	app.get('/image/:file', async (request, response) => {
+		const json = await fileHandler.getJSON(fs, os, pathModule, utils, settings);
+		const song = json.audio.songs.find(val => val.fileName === request.params.file);
+
+		if (!song)
+			response.status(404).end();
+		else {
+			const tags = id3.read(song.fullPath);
+
+			if (!tags || !('image' in tags))
+				response.sendFile(pathModule.join(__dirname, './WebInterface/Assets/Record.png'), err => {
+					if (err)
+						response.status(500).end();
+				});
+			else {
+				const img = tags.image;
+
+				response.header({
+					'Content-Type': 'image/' + img.mime
+				}).send(img.imageBuffer);
+			}
+		}
 	});
 
 	/* Video */

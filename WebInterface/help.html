@@ -235,11 +235,11 @@
 
 				<hr>
 
-				<h3>Supported extensions</h3>
+				<h3>Supported file-extensions</h3>
 
 				<p>
-					By default the supported file extensions are: <i>'mp3'</i>, <i>'m3a'</i> and <i>'wav'</i>. But you
-					can add or remove extensions on the <a href="/settings/">settings page</a>. Take into account that
+					By default the supported file-extensions are: <i>'mp3'</i>, <i>'m3a'</i> and <i>'wav'</i>.But you
+					can add or remove extensions in the <a href="/settings/">settings</a>. Take into account that
 					not every browser supports the same file extensions.
 				</p>
 
@@ -248,9 +248,8 @@
 				<h3>Most Listened Playlist</h3>
 
 				<p>
-					This playlist will be updated when a song ends. The name is editable on the <a
-					   href="/settings/">settings page</a>. Take into account that after initialization of the playlist
-					name you have to update the <i>playlists.json</i> too.
+					This playlist will be updated when a song ends. You can change the name in the <a href="/settings/">settings</a>.
+					Take into account that after initialization of the playlist name you have to update the <i>playlists.json</i> file too.
 				</p>
 
 				<hr>
@@ -258,8 +257,7 @@
 				<h3>Song Info</h3>
 
 				<p>
-					When a song is played, it first queries the <i>Last.fm service</i> for the artist. Then it queries
-					the local server for the song tags. If found, it replaces the artist info.<br>
+					When a song is played, it queries the server for the song tags. If found, it replaces the artist info.<br>
 					The web MediaSession API also gets initialized.
 				</p>
 
@@ -277,20 +275,7 @@
 				<h3>Mobile phone support</h3>
 
 				<p>
-					The interface is not (yet) designed for small screens. However, it still can be used on mobile
-					phones.<br>
-					As of right now the web MediaSession API only works on mobile phones.<br>
-					The web interface has a manifest for adding it to the home screen.
-				</p>
-
-				<hr>
-
-				<h3>Old Browsers</h3>
-
-				<p>
-					When an old browser is detected, the page asks if you want to switch to a page with limited
-					functionality, so that you can still use it on old browsers. Note: only the home page checks for old
-					browsers.
+					If the server detects that you are using a mobile phone. It will redirect you to the mobile version.
 				</p>
 			</div>
 		</div>
@@ -311,11 +296,11 @@
 
 				<hr>
 
-				<h3>Supported extensions</h3>
+				<h3>Supported file-extensions</h3>
 
 				<p>
-					By default the supported file extension is <i>'mp4'</i>. But you can add or remove extensions on the
-					<a href="/settings/">settings page</a>. Take into account that not every browser supports the same
+					By default the supported file-extension is <i>'mp4'</i>. But you can add or remove extensions in the
+					<a href="/settings/">settings</a>. Take into account that not every browser supports the same
 					file extensions.
 				</p>
 
@@ -333,27 +318,22 @@
 				<h3>Mobile phone support</h3>
 
 				<p>
-					The interface is not (yet) designed for small screens. However, it still can be used on mobile
-					phones.<br>
-					The web interface has a manifest for adding it to the home screen.
+					The interface is not (yet) designed for small screens.
 				</p>
 			</div>
 		</div>
 
 		<div>
 			<div>
-				<h2>Youtube Download</h2>
+				<h2>YouTube Download</h2>
 				<button><img src="/Assets/ic_keyboard_arrow_up_white.svg"></button>
 			</div>
 
 			<div maxHeight="200">
 				<p>
-					This feature is used for downloading youtube videos. Simply paste the youtube url into the input
+					This feature is used for downloading YouTube videos. Simply paste the YouTube url into the input
 					box, select the type and hit <i>Search</i>, the page and the server will handle the rest.
-					You can monitor the progress in the servers terminal window.<br>
-					The tag functionality can act a big wonky sometimes and I don't know how to fix it, but you can add
-					the tags yourself (or auto-add them) on the <a href="/editTags.html">edit tags page</a>.<br>
-					You can use this to download audio and video. It'll automaticly add it to the right folder.
+					You can monitor the progress in the server's terminal window.
 				</p>
 			</div>
 		</div>
@@ -450,7 +430,7 @@
 					<code>{name: **PLAYLIST NAME**, songs: **SONGS ARRAY**}</code>
 				</p>
 
-				<h4 style="font-size: 0.8em;"><a href="/updateMostListenedPlaylist">Update Most Listened Playlist</a>
+				<h4 style="font-size: 0.8em;"><a href="/updateMostListenedPlaylist/">Update Most Listened Playlist</a>
 				</h4>
 
 				<p>
@@ -482,7 +462,7 @@
 					It returns a JSON object
 				</p>
 
-				<h4 style="font-size: 0.8em;">Youtube Download</h4>
+				<h4 style="font-size: 0.8em;">YouTube Download</h4>
 				<h5 style="font-size: 0.7em;"><a href="/ytdl/">(GET) YTDL</a></h5>
 				<p>
 					Returns the info from the YouTube video.
@@ -490,7 +470,7 @@
 				</p>
 				<h5 style="font-size: 0.7em;"><a href="/ytdl/">(POST) YTDL</a></h5>
 				<p>
-					Downloads the youtube video.
+					Downloads the YouTube video.
 					<b style="font-size: 0.7em">Body</b><br>
 					<code>{url: **YouTube URL**, type: **Audio/Video**, fileName: **The name you want to give the song**}</code>
 				</p>
@@ -527,11 +507,11 @@
 				<b>The website says that there are no media files</b>
 				<p>
 					By default <i>MusicStream</i> searches in the <i>Music</i> and <i>Video</i> folders of the home
-					directory (On windows it looks like this: "C:/Users/&lt;USER&gt;/Documents/Music/". On linux it
+					directory (On windows it looks like this: "C:/Users/&lt;USER&gt;/Documents/Music/". On UNIX systems it
 					looks like: "/home/&lt;USER&gt;/Music/"). If this directory doesn't exist the console will notify
 					you.<br><br>
 					If the directory doesn't exist or is empty, no files will be found. You can either move all of your
-					media files into those directories, or you can go into settings and untick the "CheckOsHomedirs"
+					media files into those directories, or you can go into settings and un-check the "CheckOsHomedirs"
 					checkbox and add a path to the "MediaPaths" input box.
 				</p>
 			</div>
@@ -539,13 +519,10 @@
 			<div>
 				<b>I get a <i>'No info found for that video id'</i> error when I try to download a YouTube video.</b>
 				<p>
-					Unfortunally YouTube updates its video API rather frequently. This means that the NPM-package
-					responsable for downloading the YouTube video has to be updated frequently. So try running the
-					<code>npm update</code> command. If that doesn't work go to <a
-					   href="https://www.npmjs.com/package/ytdl-core">this</a> page and find the latest version number
-					(most of the times it looks something like <i>0.20.1</i>), then run
-					<code>npm install ytdl-core@VERSION-NUMBER</code> (of course replace <i>VERSION-NUMBER</i> with the
-					version number found on <a href="https://www.npmjs.com/package/ytdl-core">this</a> page).
+					Unfortunately YouTube updates its video API rather frequently. This means that the NPM-package
+					responsible for downloading the YouTube video has to be updated frequently. So try running the
+					<code>npm update</code> command. If that doesn't work, run
+					<code>npm install ytdl-core@latest</code>.
 				</p>
 			</div>
 
@@ -554,7 +531,7 @@
 				<p>
 					Bugs can be reported on the <a href="https://github.com/Jantje19/MusicStream/issues/new/">Github
 						issue tracker</a> with the <i style="background-color: red">bug</i> label. Please be so
-					thoughtful to try to recreate the bug and submit an as detailed as possible explaination.
+					thoughtful to try to recreate the bug and submit a detailed explanation.
 					Screenshots are always appreciated.
 				</p>
 			</div>
@@ -572,7 +549,7 @@
 				<b>Can I help the development?</b>
 				<p>
 					You sure can. All the support is greatly appreciated. I am currently maintaining this project on my
-					own. Every designer, product developer, software engenierer or other help is always helpfull. Even
+					own. Every designer, product developer, software engineer or other help is always helpful. Even
 					pointing out spelling mistakes is super useful. You can fork this project on <a
 					   href="https://github.com/jantje19/MusicStream/">Github</a>.
 				</p>

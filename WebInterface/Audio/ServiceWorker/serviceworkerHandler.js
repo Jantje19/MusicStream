@@ -7,14 +7,21 @@ const musicCache = 'ms-media';
 const generateFileLocation = (fileName, path = '/song/') => {
 	return location.origin + path + fileName;
 }
-const downloadFile = (file, progressUpdateHandler, songInfoFetched) => {
-	// BackgroundFetch has a lot of bugs (or I'm using it wrong), so it's not used
-	/* const doDownloadBgFetch = async () => {
+const downloadFile = (file, progressUpdateHandler) => {
+	const doDownloadBgFetch = async fileLocation => {
 		const reg = await navigator.serviceWorker.ready;
-		const bgFetch = await reg.backgroundFetch.fetch("song-" + file, [location.origin + '/song/' + file], {
-			title: tags.title,
-			icons: [{ src: imageUrl, type: 'image/jpeg' }],
-			downloadTotal: 3296488 // size //|| tags.size
+		const size = await (async () => {
+			const controller = new AbortController();
+			const signal = controller.signal;
+			const resp = await fetch(fileLocation, { credentials: 'include', signal });
+			controller.abort();
+			return resp.headers.get('Content-Length');
+		})();
+
+		const bgFetch = await reg.backgroundFetch.fetch("song-" + file, [fileLocation, generateFileLocation(file, '/songInfo/')], {
+			icons: [{ src: generateFileLocation(file, '/image/'), type: 'image/jpeg' }],
+			downloadTotal: size,
+			title: file,
 		});
 
 		function doUpdate() {
@@ -40,110 +47,173 @@ const downloadFile = (file, progressUpdateHandler, songInfoFetched) => {
 
 		doUpdate();
 		bgFetch.addEventListener('progress', doUpdate);
-	} */
-
-	const doDownload = async () => {
-		const fileLocation = generateFileLocation(file);
-		const cache = await caches.open(musicCache);
-
-		if (await cache.match(fileLocation)) {
-			progressUpdateHandler(1);
-			return;
-		}
-
-		const response = await fetch(fileLocation, { credentials: 'include' });
-		const size = parseInt(response.headers.get('Content-Length'), 10);
-		const reader = response.body.getReader();
-		let lastUpdated = 0;
-		let downloaded = 0;
-		const chunks = [];
-
-		while (true) {
-			const { done, value } = await reader.read();
-
-			if (done)
-				break;
-
-			downloaded += value.length;
-			chunks.push(value);
-
-			const progress = downloaded / size;
-			const now = Date.now();
-
-			if (now - lastUpdated > 500 || progress === 1) {
-				progressUpdateHandler(progress);
-				lastUpdated = now;
-			}
-		}
-
-		const newHeaders = new Headers(response.headers);
-		const promiseArr = [];
-
-		newHeaders.set('x-filename', file);
-		promiseArr.push(cache.put(fileLocation, new Response(new Blob(chunks), {
-			status: response.status,
-			headers: newHeaders,
-			statusText: file
-		})));
-		promiseArr.push(new Promise((resolve, reject) => {
-			const infoFileLoc = generateFileLocation(file, '/songInfo/');
-
-			fetch(infoFileLoc)
-				.then(resp => {
-					const respClone = resp.clone();
-
-					resp.json().then(data => {
-						if (data.success) {
-							cache.put(infoFileLoc, respClone)
-								.then(() => {
-									songInfoFetched()
-									resolve();
-								})
-								.catch(reject);
-						}
-					}).catch(reject);
-				})
-				.catch(reject);
-		}));
-
-		await Promise.all(promiseArr);
+		await (() => {
+			return new Promise(resolve => {
+				navigator.serviceWorker.addEventListener('message', function handler({ data }) {
+					if (data && 'type' in data && data.type === "bgfetch") {
+						navigator.serviceWorker.removeEventListener('message', handler);
+						resolve(data.data);
+					}
+				});
+			});
+		})();
 		return file;
 	}
 
-	// Attempt persistent storage
-	return new Promise((resolve, reject) => {
-		if (navigator.storage && navigator.storage.persist)
-			navigator.storage.persist()
-				.then(success => {
-					doDownload().then(resolve).catch(reject);
-				})
-				.catch(reject);
+	const doDownload = async (fileLocation, cache) => {
+		const downloadWithProgress = async (url, progressCb, responseArgs = {}) => {
+			const response = await fetch(url, { credentials: 'include' });
+			const size = parseInt(response.headers.get('Content-Length'), 10);
+			const headers = new Headers(response.headers);
 
-		doDownload().then(resolve).catch(reject);
-	});
+			const body = await response.body;
+			const reader = body.getReader();
+			let downloaded = 0;
+
+			const stream = await new ReadableStream({
+				start(controller) {
+					return pump();
+
+					function pump() {
+						return reader.read().then(({ done, value }) => {
+							if (done) {
+								controller.close();
+								return;
+							}
+
+							downloaded += value.length;
+							controller.enqueue(value);
+
+							progressCb(downloaded / size);
+							return pump();
+						});
+					}
+				}
+			});
+
+
+			if (responseArgs.headers) {
+				Object.keys(responseArgs.headers).forEach(key => {
+					headers.set(key, responseArgs.headers[key]);
+				});
+			}
+
+			responseArgs.headers = headers;
+			return await new Response(stream, responseArgs);
+		}
+		const downloadTags = async () => {
+			const infoFileLoc = generateFileLocation(file, '/songInfo/');
+			const response = await fetch(infoFileLoc, { credentials: 'include' });
+			const responseCopy = response.clone();
+			const data = await response.json();
+
+			if (data.success)
+				await cache.put(infoFileLoc, responseCopy);
+
+			return data.success;
+		}
+		const downloadFile = async () => {
+			await cache.put(
+				fileLocation,
+				await downloadWithProgress(
+					fileLocation,
+					progressUpdateHandler,
+					{
+						status: 200, // Firefox sets this to 206 and then complains
+						statusText: file,
+						headers: {
+							'x-filename': file
+						},
+					}
+				)
+			);
+		}
+
+		await Promise.all([
+			downloadFile(),
+			downloadTags(),
+		]);
+
+		return file;
+	}
+
+	return (async () => {
+		const fileLocation = generateFileLocation(file);
+		const cache = await caches.open(musicCache);
+
+		// const downloadFunc = ('BackgroundFetchManager' in self) ? doDownloadBgFetch : doDownload;
+		const downloadFunc = doDownload; // BackgroundFetch seems to be broken?
+		const resolveHandler = async () => {
+			try {
+				const ref = await navigator.serviceWorker.ready;
+
+				if ('index' in registration) {
+					await ref.index.add({
+						description: 'MusicStream downloaded song',
+						category: 'audio',
+						launchUrl: '/',
+						title: file,
+						url: '/',
+						id: file,
+						icons: [{
+							src: '/image/' + file,
+							type: 'image/png',
+						}],
+					});
+				}
+			} catch (err) { }
+		}
+
+
+		if (await cache.match(fileLocation)) {
+			progressUpdateHandler({ progress: 1 });
+			return file;
+		}
+
+		try {
+			// Attempt persistent storage
+			if (navigator.storage && navigator.storage.persist)
+				await navigator.storage.persist();
+		} catch (err) { }
+
+		await resolveHandler(await downloadFunc(fileLocation, cache));
+		return file;
+	})();
 }
 const getDownloaded = async () => {
 	const cache = await caches.open(musicCache);
-	const keys = (await cache.keys());
-	const mapFunc = val => {
-		// val.headers.get('x-filename'); Doesn't work for some reason
-		return decodeURIComponent(new URL(val.url).pathname.replace(/^\/\w+\//, ''));
-	};
+	const keys = await cache.keys();
+	const getFilename = async req => {
+		const resp = await cache.match(req);
 
-	return {
-		songs: keys.filter(val => {
-			return val.url.includes('/song/');
-		}).map(mapFunc),
+		if (resp.headers.has('x-filename'))
+			return resp.headers.get('x-filename');
+		else
+			return decodeURIComponent(new URL(req.url).pathname.replace(/^\/\w+\//, ''));
+	}
 
-		playlists: keys.filter(val => {
-			return val.url.includes('/playlist/');
-		}).map(mapFunc)
-	};
+	const returnObj = { playlists: [], songs: [] };
+	await Promise.all(keys.map(async key => {
+		if (key.url.includes('/song/')) {
+			const fileName = await getFilename(key);
+			returnObj.songs.push(fileName);
+			return fileName;
+		} else if (key.url.includes('/playlist/')) {
+			const fileName = await getFilename(key);
+			returnObj.playlists.push(fileName);
+			return fileName;
+		}
+	}));
+	return returnObj;
 
-	/* const reg = await navigator.serviceWorker.ready;
+	// This gets active fetches...
+	const reg = await navigator.serviceWorker.ready;
 	const ids = await reg.backgroundFetch.getIds();
 
-	return ids.filter(id => id.startsWith('song-')); */
+	return {
+		songs: ids.filter(id => id.startsWith('song-')),
+		playlists: []
+	}
 }
 const savePlaylist = async (name, songs) => {
 	const cache = await caches.open(musicCache);
@@ -151,7 +221,7 @@ const savePlaylist = async (name, songs) => {
 	return await cache.put('/playlist/' + name, new Response(JSON.stringify({
 		success: true,
 		songs
-	}), { headers: { 'Content-Type': 'application/json' } }));
+	}), { headers: { 'Content-Type': 'application/json', 'x-filename': name } }));
 }
 const clearCache = () => {
 	return caches.delete(musicCache);

@@ -199,7 +199,7 @@
 							let songTag = '';
 							const innerDiv = document.createElement('div');
 
-							if (object in tags.tags)
+							if (tags.tags && object in tags.tags)
 								songTag = tags.tags[object];
 
 							if (object == 'comment') {
