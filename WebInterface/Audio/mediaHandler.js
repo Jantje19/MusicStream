@@ -12,12 +12,12 @@ function enqueue(...vals) {
 	if (document.getElementById('shuffle').getAttribute('activated') == 'true')
 		vals.shuffle();
 
-	vals.forEach((object, key) => {
+	vals.forEach((object) => {
 		queue[queue.length] = object;
 	});
 
 	updateInterface();
-	updateCookies();
+	updateQueueStore();
 }
 
 function end() {
@@ -89,7 +89,7 @@ function deleteQueue() {
 	queueIndex = 0;
 	queue.length = 0;
 
-	deleteCookie();
+	removeQueueStore();
 	updateInterface();
 }
 
@@ -277,9 +277,10 @@ function escapeString(string) {
 		return '';
 }
 
-function updateCookies() {
-	document.cookie = `queue=${encodeURIComponent(queue.map(val => { return escape(val) }).join(','))}; SameSite=Strict`;
-	document.cookie = `queueIndex=${queueIndex}; SameSite=Strict`;
+function updateQueueStore() {
+	// Only save first 50
+	localforage.setItem('queue', JSON.stringify(queue.slice(0, 50))).catch(console.error);
+	localforage.setItem('queueIndex', queueIndex).catch(console.error);
 }
 
 
@@ -338,7 +339,7 @@ function mediaSession() {
 				dataDiv.appendChild(tagsBtn);
 				dataDiv.appendChild(document.createElement('hr'));
 
-				tagsBtn.addEventListener('click', () => window.location = '/editTags.html#' + queue[queueIndex]);
+				tagsBtn.addEventListener('click', () => window.open('/editTags.html#' + encodeURIComponent(queue[queueIndex])));
 				lyricsBtn.addEventListener('click', () => displayLyrics(json.artist, json.title));
 
 				['Title', 'Artist', 'Album', 'Year'].forEach(val => {
@@ -422,21 +423,15 @@ function mediaSession() {
 	}
 }
 
-function deleteCookie() {
-	decodeURIComponent(document.cookie).split(";").forEach((object, key) => {
-		const eqPos = object.indexOf("=");
-		const name = eqPos > -1 ? object.substr(0, eqPos) : object;
-
-		document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT";
-	});
+function removeQueueStore() {
+	localforage.removeItem('queueIndex').catch(console.error);
+	localforage.removeItem('queue').catch(console.error);
 }
 
 function updateQueueIndex(num) {
 	queueIndex = num;
-	updateCookies();
+	updateQueueStore();
 }
-
-
 
 function addVideoToQueue(name) {
 	if (name)

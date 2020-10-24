@@ -354,7 +354,7 @@ function reloadSongslist(selectElem, playlistsElem) {
 
 function updateSongInterface(json, songsElem, playlistsElem) {
 	if (json.songs.length > 0) {
-		checkCookies(json.songs);
+		checkQueueStore(json.songs);
 		document.getElementById('songCount').innerText = "Amount: " + json.songs.length;
 		songsElem.innerHTML = '';
 
@@ -413,6 +413,8 @@ function contextMenuClick(elem, func) {
 	if (elem.parentElement.id === 'songContextMenu') {
 		if (func === 'playNext')
 			songClick({ ctrlKey: true, target: { innerText } });
+		else if (func === 'editTags')
+			window.location = '/editTags.html#' + encodeURIComponent(innerText)
 		else if (func === 'removeDownload')
 			window.sw.funcs
 				.removeDownload(innerText)
@@ -849,8 +851,7 @@ function getCookieAttributes() {
 	return outp;
 }
 
-// Location queue-cookie
-function checkCookies(songsArr) {
+function checkQueueStore(songsArr) {
 	function getLocationAttributes() {
 		const json = {};
 
@@ -862,21 +863,22 @@ function checkCookies(songsArr) {
 		return json;
 	}
 
-	function getCookies() {
-		const cookieAtts = getCookieAttributes();
+	async function getQueueStore() {
+		const [storedQueueIndex, queue] = await Promise.all([
+			localforage.getItem('queueIndex'),
+			localforage.getItem('queue')
+		]);
 
-		if (cookieAtts) {
-			if ('queue' in cookieAtts) {
-				cookieAtts['queue'].split(',').forEach(object => {
-					object = decodeURIComponent(object);
-
-					if (songsArr.includes(object))
-						enqueue(object);
+		if (storedQueueIndex !== null && queue !== null) {
+			try {
+				queueIndex = parseInt(storedQueueIndex, 10);
+				JSON.parse(queue).forEach((item) => {
+					if (songsArr.includes(item))
+						enqueue(item);
 				});
+			} catch (err) {
+				console.error(err);
 			}
-
-			if ('queueIndex' in cookieAtts)
-				queueIndex = Number(cookieAtts.queueIndex);
 		}
 	}
 
@@ -902,7 +904,7 @@ function checkCookies(songsArr) {
 		}
 	}
 
-	getCookies();
+	getQueueStore().catch(console.error);
 }
 
 audio.onended = end;
