@@ -25,32 +25,6 @@ module.exports = {
 			});
 		});
 
-		// HTTPS Support
-		let httpsServer;
-		const httpsSupport = utils.httpsArgs();
-
-		if (httpsSupport) {
-			const privateKey = fs.readFileSync(httpsSupport.key);
-			const certificate = fs.readFileSync(httpsSupport.cert);
-			const credentials = { key: privateKey, cert: certificate };
-
-			if ('HSTS' in httpsSupport) {
-				const hstsValue = httpsSupport.HSTS;
-				if (hstsValue !== false) {
-					const maxAge = ((typeof (hstsValue) === typeof (true)) ? 31536000 : hstsValue);
-					const headerValue = `max-age=${maxAge}; includeSubDomains; preload`;
-
-					app.use((request, response, next) => {
-						response.setHeader('Strict-Transport-Security', ((typeof (hstsValue) === typeof ('')) ? hstsValue : headerValue));
-						next();
-					});
-				}
-			}
-
-			httpsServer = https.createServer(credentials, app);
-		}
-		//
-
 		const port = settings.port.val || 8000;
 		const ips = utils.getLocalIP(os);
 
@@ -290,13 +264,11 @@ module.exports = {
 				response.send('500: Server error');
 		});
 
-		const listenerObject = httpsServer || app;
-
-		listenerObject.listen(port, err => {
+		app.listen(port, err => {
 			if (err)
 				throw err;
 			else {
-				ips.forEach((object, key) => {
+				ips.forEach((object) => {
 					utils.colorLog(`${utils.logDate()} Server is running on: [[fgGreen, ${object}:${port}]]`, 'reset');
 				});
 			}

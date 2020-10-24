@@ -513,77 +513,6 @@ const utils = {
 		});
 
 		return ips;
-	},
-
-	/*
-	*	Responsible for checking if https arguments are present
-	*/
-	httpsArgs: () => {
-		for (let i = 0; i < process.argv.length; i++) {
-			const object = process.argv[i];
-
-			if (object.indexOf('--https=') > -1) {
-				const index = object.trim().match(/(--https=)\{(.+)\}/);
-
-				if (index) {
-					if (index[2]) {
-						if (index[2].length > 0) {
-							utils.safeJSONParse(`{${index[2]}}`).then(JSONData => {
-								if (!('key' in JSONData && 'cert' in JSONData))
-									console.wrn('Found https argument, but the given JSON value doesn\'t contain one or both of the required arguments (key, cert). Starting with default settings...');
-								else {
-									if (!(fs.existsSync(JSONData.key) && fs.existsSync(JSONData.cert)))
-										console.wrn('Found https argument, but the given cert or key path(s) don\'t exist. Starting with default settings...');
-									else {
-										utils.colorLog('Found https argument. Starting server in https mode!', 'bgGreen');
-										return JSONData;
-									}
-								}
-							}).catch(() => {
-								console.wrn('Found https argument, but couln\'t parse the given JSON value. Starting with default settings...');
-							});
-						}
-					}
-				} else console.wrn('Found https argument, but couln\'t parse the given value. Starting with default settings...');
-
-				return;
-			} else if (object.indexOf('--https-config=') > -1) {
-				const index = object.trim().match(/(--https-config=)(.+)/);
-
-				if (index) {
-					if (index[2]) {
-						if (index[2].length > 0) {
-							try {
-								if (!fs.existsSync(index[2]))
-									console.wrn('Found https argument, but couln\'t parse the given JSON value. Starting with default settings...');
-								else {
-									utils.safeJSONParse(fs.readFileSync(index[2], 'utf-8')).then(JSONData => {
-										if (!('key' in JSONData && 'cert' in JSONData))
-											console.wrn('Found https argument, but the given JSON value doesn\'t contain one or both of the required arguments (key, cert). Starting with default settings...');
-										else {
-											if (!(fs.existsSync(JSONData.key) && fs.existsSync(JSONData.cert)))
-												console.wrn('Found https argument, but the given cert or key path(s) don\'t exist. Starting with default settings...');
-											else {
-												utils.colorLog('Found https argument. Starting server in https mode!', 'bgGreen');
-												return JSONData;
-											}
-										}
-									}).catch(() => {
-										console.wrn('Found https argument, but the specified file doesn\'t exist. Starting with default settings...');
-									});
-								}
-							} catch (err) {
-								console.wrn('Found https argument, but couln\'t parse the given file. Starting with default settings...');
-							}
-						}
-					}
-				} else console.wrn('Found https argument, but couln\'t parse the given value. Starting with default settings...');
-
-				return;
-			}
-		}
-
-		return;
 	}
 }
 
@@ -677,7 +606,7 @@ if (process.argv.includes('-h') || process.argv.includes('--help') || process.ar
 		}
 
 		function replaceInM3UFiles() {
-			function handleFile(object, ) {
+			function handleFile(object,) {
 				return new Promise((resolve, reject) => {
 					fs.readFile(object.fullPath, 'utf-8', (err, data) => {
 						if (err)
