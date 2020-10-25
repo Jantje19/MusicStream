@@ -1,7 +1,6 @@
 module.exports = {
 	start: function (dirname, fileHandler, fs, os, settings, utils, querystring, id3, ytdl, version, https, URLModule, ffmpeg, path, serverPlugins, hijackRequestPlugins) {
 		const MobileDetect = require('mobile-detect');
-		const compression = require('compression');
 		const express = require('express');
 		const app = express();
 
@@ -27,8 +26,6 @@ module.exports = {
 
 		const port = settings.port.val || 8000;
 		const ips = utils.getLocalIP(os);
-
-		app.use(compression());
 
 		app.get('*favicon.ico*', (_, response) => {
 			utils.sendFile(fs, dirname + 'Assets/Icons/favicon.ico', response);
