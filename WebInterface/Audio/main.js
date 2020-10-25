@@ -260,13 +260,14 @@ function getTmpSavedQueue(type, autoHandleResponse) {
 }
 
 function sharePlaylist() {
-	const url = `${window.location.origin}?queue=${queue.join(',')}`;
+	const url = `${window.location.origin}?queue=${queue.map(encodeURIComponent).join(',')}`;
 	const desktopShare = skipClipboardAPI => {
 		skipClipboardAPI = (skipClipboardAPI == true) ? true : false;
 
 		if (navigator.clipboard && !skipClipboardAPI) {
 			navigator.clipboard.writeText(url).then(() => {
 				console.log('Text copied to clipboard');
+				toastHelper('Copied link to clipboard');
 			}).catch(err => {
 				console.error('Could not copy text: ', err);
 				desktopShare(true);
@@ -288,7 +289,7 @@ function sharePlaylist() {
 			inpElem.select();
 
 			if (document.execCommand('Copy'))
-				alert('Successfully copied URL to clipboard');
+				toastHelper('Successfully copied URL to clipboard');
 			else
 				alert(inpElem.value)
 
