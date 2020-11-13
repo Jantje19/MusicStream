@@ -693,10 +693,10 @@ function load([swFuncs]) {
 		if (document.getElementById('showData').className.indexOf('active') > -1)
 			popUp.style.transform = 'translateY(-170px)';
 
-		if (popUp.style.display == 'block')
+		if (popUp.style.display == 'flex')
 			popUp.style.display = 'none';
 		else
-			popUp.style.display = 'block';
+			popUp.style.display = 'flex';
 	}, { passive: true });
 
 	document.getElementById('muteBtn').addEventListener('click', evt => {

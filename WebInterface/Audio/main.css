@@ -401,27 +401,20 @@ main #controls #mainControls div#left {
 }
 
 main #controls #mainControls div#left #volumePopUp {
-	left: 120px;
-	width: 20px;
-	bottom: 50px;
+	left: 60px;
+	width: 150px;
+	height: 20px;
+	bottom: 55px;
 	padding: 20px;
-	height: 150px;
 	z-index: 1000;
 	display: none;
 	position: fixed;
+	align-items: center;
+	padding-right: 30px;
 	border-radius: 50px;
+	justify-content: center;
 	background-color: white;
 	box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
-}
-
-main #controls #mainControls div#left #volumePopUp>button {
-	left: 20%;
-	bottom: 5px;
-	position: absolute;
-}
-
-main #controls #mainControls div#left #volumeSlider {
-	transform: rotate(-90deg) translate(-30%, -260%);
 }
 
 main #controls #mainControls div#right {
