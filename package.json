@@ -5,8 +5,7 @@
 	"main": "index.js",
 	"scripts": {
 		"debug": "nodemon main.js",
-		"start": "node index.js",
-		"update": "node update.js"
+		"start": "node index.js"
 	},
 	"keywords": [
 		"music",
@@ -23,7 +22,6 @@
 		"express": "^4.17.1",
 		"fluent-ffmpeg": "^2.1.2",
 		"mobile-detect": "^1.4.4",
-		"musicstream-installer": "^0.3.5",
 		"node-id3": "^0.1.19",
 		"ytdl-core": "^3.3.0"
 	},
