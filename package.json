@@ -19,7 +19,7 @@
 	"author": "Jantje19",
 	"license": "GPL-3.0",
 	"dependencies": {
-		"express": "^4.17.1",
+		"express": "^4.18.2",
 		"fluent-ffmpeg": "^2.1.2",
 		"mobile-detect": "^1.4.4",
 		"node-id3": "^0.1.19",
